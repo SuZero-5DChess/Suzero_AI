@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlphaZero 训练曲线</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117; color: #c9d1d9; padding: 20px;
+}
+h1 { font-size: 22px; margin-bottom: 20px; color: #f0f6fc; }
+.controls {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;
+}
+.controls label { font-size: 13px; color: #8b949e; }
+.controls input[type="text"] {
+    background: #161b22; border: 1px solid #30363d; color: #c9d1d9;
+    padding: 6px 10px; border-radius: 6px; font-size: 13px; width: 320px;
+    font-family: 'Consolas', monospace;
+}
+.controls button {
+    background: #238636; color: #fff; border: none; padding: 6px 16px;
+    border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+.controls button:hover { background: #2ea043; }
+.controls button.danger {
+    background: #da3633; color: #fff;
+}
+.controls button.danger:hover { background: #f85149; }
+.controls .status { font-size: 12px; color: #8b949e; }
+.controls .status .live { color: #3fb950; font-weight: bold; }
+.controls .timestamp { font-size: 11px; color: #484f58; margin-left: 8px; }
+.chart-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+}
+.chart-box {
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px;
+    position: relative;
+}
+.chart-box h2 { font-size: 14px; color: #f0f6fc; margin-bottom: 8px; }
+.chart-box canvas { width: 100%; height: 260px; display: block; }
+.full-width { grid-column: 1 / -1; }
+
+/* Stat bar */
+.stat-bar {
+    display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px;
+    padding: 12px 16px; background: #161b22; border: 1px solid #30363d;
+    border-radius: 8px;
+}
+.stat-item {
+    display: flex; flex-direction: column; align-items: center;
+}
+.stat-item .stat-value {
+    font-size: 20px; font-weight: bold; color: #f0f6fc;
+}
+.stat-item .stat-label {
+    font-size: 11px; color: #8b949e; margin-top: 2px;
+}
+.stat-item .stat-value.green { color: #3fb950; }
+.stat-item .stat-value.red { color: #f85149; }
+.stat-item .stat-value.orange { color: #d29922; }
+.stat-item .stat-value.blue { color: #58a6ff; }
+
+@media (max-width: 800px) {
+    .chart-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<h1>📊 AlphaZero 训练曲线</h1>
+
+<div class="controls">
+    <label>日志路径：</label>
+    <input type="text" id="logPath" value="alphazero/logs/very_small/training_log.jsonl">
+    <button onclick="manualRefresh()">加载</button>
+    <button id="autoToggle" class="danger" onclick="toggleAutoRefresh()">停止实时</button>
+    <span class="status" id="status">就绪</span>
+    <span class="timestamp" id="timestamp"></span>
+</div>
+
+<div class="stat-bar" id="statBar">
+    <div class="stat-item">
+        <span class="stat-value" id="statIteration">0</span>
+        <span class="stat-label">迭代次数</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value blue" id="statGames">0</span>
+        <span class="stat-label">总对局数</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value" id="statSamples">0</span>
+        <span class="stat-label">总样本数</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value green" id="statWhiteWins">0</span>
+        <span class="stat-label">白胜</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value red" id="statBlackWins">0</span>
+        <span class="stat-label">黑胜</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-value orange" id="statDraws">0</span>
+        <span class="stat-label">和棋</span>
+    </div>
+</div>
+
+<div class="chart-grid">
+    <div class="chart-box">
+        <h2>Total Loss</h2>
+        <canvas id="chartTotal"></canvas>
+    </div>
+    <div class="chart-box">
+        <h2>Value Loss</h2>
+        <canvas id="chartValue"></canvas>
+    </div>
+    <div class="chart-box">
+        <h2>Policy Loss</h2>
+        <canvas id="chartPolicy"></canvas>
+    </div>
+    <div class="chart-box">
+        <h2>终局类型分布</h2>
+        <canvas id="chartPie"></canvas>
+    </div>
+    <div class="chart-box full-width">
+        <h2>游戏统计</h2>
+        <canvas id="chartStats"></canvas>
+    </div>
+</div>
+
+<script>
+// =========================================================================
+// State
+// =========================================================================
+let charts = {};
+let allEntries = [];          // all entries with loss (for loss charts)
+let allGameEntries = [];      // all entries with game data (for stats chart)
+let lastIteration = 0;        // last iteration we've seen
+let autoRefreshId = null;
+let autoRefreshOn = true;
+
+// Terminal reason colors (GitHub-dark theme)
+const TERM_COLORS = {
+    'capture_king':     '#f85149',
+    'material':         '#d29922',
+    'checkmate':        '#58a6ff',
+    'stalemate':        '#3fb950',
+    'no_legal_action':  '#bc8cff',
+    'max_game_length':  '#f0883e',
+    'aborted':          '#8b949e',
+};
+
+const TERM_LABELS = {
+    'capture_king':     '吃王',
+    'material':         '材料分',
+    'checkmate':        '将杀',
+    'stalemate':        '逼和',
+    'no_legal_action':  '无合法动作',
+    'max_game_length':  '回合上限',
+    'aborted':          '异常终止',
+};
+
+// =========================================================================
+// Helpers
+// =========================================================================
+function getDefaultLogPath() {
+    return document.getElementById('logPath').value;
+}
+
+function updateTimestamp() {
+    const now = new Date();
+    document.getElementById('timestamp').textContent =
+        '最后更新: ' + now.toLocaleTimeString('zh-CN');
+}
+
+// =========================================================================
+// Chart creators
+// =========================================================================
+function makeLossChart(id, label, color, data) {
+    const ctx = document.getElementById(id).getContext('2d');
+    if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+
+    const labels = data.map((_, i) => `${i + 1}`);
+    const minY = data.length > 0 ? Math.min(...data) * 0.95 : 0;
+    const maxY = data.length > 0 ? Math.max(...data) * 1.05 : 1;
+
+    charts[id] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label,
+                data: data,
+                borderColor: color,
+                backgroundColor: color + '33',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: color,
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Iteration', color: '#8b949e' },
+                    grid: { color: '#21262d' },
+                    ticks: { color: '#8b949e', maxTicksLimit: 20 }
+                },
+                y: {
+                    title: { display: true, text: label, color: '#8b949e' },
+                    grid: { color: '#21262d' },
+                    ticks: { color: '#8b949e' },
+                    min: minY,
+                    max: maxY,
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: items => `Iteration ${items[0].label}`,
+                        label: item => `${label}: ${item.parsed.y.toFixed(4)}`
+                    }
+                }
+            }
+        }
+    });
+}
+
+function makeStatsChart(gameData) {
+    const ctx = document.getElementById('chartStats').getContext('2d');
+    if (charts['chartStats']) { charts['chartStats'].destroy(); delete charts['chartStats']; }
+
+    const labels = gameData.map((_, i) => `${i + 1}`);
+
+    charts['chartStats'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Time (s)',
+                    data: gameData.map(d => d.iter_time),
+                    backgroundColor: '#d2992266',
+                    borderColor: '#d29922',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                },
+            ]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Iteration', color: '#8b949e' },
+                    grid: { color: '#21262d' },
+                    ticks: { color: '#8b949e' }
+                },
+                y: {
+                    type: 'linear',
+                    position: 'left',
+                    title: { display: true, text: 'Seconds', color: '#8b949e' },
+                    grid: { color: '#21262d' },
+                    ticks: { color: '#8b949e' },
+                    beginAtZero: true,
+                },
+            },
+            plugins: {
+                legend: {
+                    labels: { color: '#c9d1d9' }
+                }
+            }
+        }
+    });
+}
+
+function makePieChart(terminalReasons) {
+    const ctx = document.getElementById('chartPie').getContext('2d');
+    if (charts['chartPie']) { charts['chartPie'].destroy(); delete charts['chartPie']; }
+
+    // Aggregate terminal reasons across all iterations
+    const aggregated = {};
+    let total = 0;
+    for (const entry of terminalReasons) {
+        if (!entry.terminal_reasons) continue;
+        for (const [reason, count] of Object.entries(entry.terminal_reasons)) {
+            aggregated[reason] = (aggregated[reason] || 0) + count;
+            total += count;
+        }
+    }
+
+    const reasons = Object.keys(aggregated).sort();
+    if (reasons.length === 0) {
+        // No data: show placeholder
+        charts['chartPie'] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['暂无数据'],
+                datasets: [{
+                    data: [1],
+                    backgroundColor: '#21262d',
+                    borderColor: '#30363d',
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    legend: { labels: { color: '#8b949e' } }
+                }
+            }
+        });
+        return;
+    }
+
+    const labels = reasons.map(r => `${TERM_LABELS[r] || r} (${aggregated[r]})`);
+    const data = reasons.map(r => aggregated[r]);
+    const colors = reasons.map(r => TERM_COLORS[r] || '#8b949e');
+
+    charts['chartPie'] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data,
+                backgroundColor: colors.map(c => c + 'CC'),
+                borderColor: colors,
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#c9d1d9',
+                        font: { size: 12 },
+                        padding: 12,
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: item => {
+                            const val = item.parsed;
+                            const pct = total > 0 ? (val / total * 100).toFixed(1) : '0.0';
+                            return `${item.label}: ${val} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// =========================================================================
+// Update stat bar
+// =========================================================================
+function updateStatBar(entries) {
+    if (entries.length === 0) return;
+
+    const last = entries[entries.length - 1];
+    document.getElementById('statIteration').textContent = last.iteration || 0;
+    document.getElementById('statGames').textContent = last.total_games || 0;
+    document.getElementById('statSamples').textContent = last.total_samples || 0;
+
+    // Aggregate outcomes from the latest entry with outcome data
+    let whiteWins = 0, blackWins = 0, draws = 0;
+    for (const entry of entries) {
+        if (entry.outcomes) {
+            whiteWins = entry.outcomes.white_wins || 0;
+            blackWins = entry.outcomes.black_wins || 0;
+            draws = entry.outcomes.draws || 0;
+        }
+    }
+    // Also try to compute from the latest entry's outcomes
+    if (last.outcomes) {
+        whiteWins = last.outcomes.white_wins || 0;
+        blackWins = last.outcomes.black_wins || 0;
+        draws = last.outcomes.draws || 0;
+    }
+    document.getElementById('statWhiteWins').textContent = whiteWins;
+    document.getElementById('statBlackWins').textContent = blackWins;
+    document.getElementById('statDraws').textContent = draws;
+}
+
+// =========================================================================
+// Main data loading
+// =========================================================================
+async function fetchNewData() {
+    const path = getDefaultLogPath();
+    const status = document.getElementById('status');
+    status.textContent = '加载中...';
+
+    try {
+        const url = `/api/training/tail?path=${encodeURIComponent(path)}&after=${lastIteration}`;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        if (!data.entries || data.entries.length === 0) {
+            status.innerHTML = '⏳ 等待新数据...';
+            if (allEntries.length === 0) {
+                status.textContent = '💤 等待训练开始...';
+            }
+            updateTimestamp();
+            return;
+        }
+
+        const newEntries = data.entries;
+        lastIteration = data.current_iteration || 0;
+
+        // Update stat bar
+        updateStatBar(newEntries);
+
+        // Separate entries with loss vs without
+        const newWithLoss = newEntries.filter(e => e.total_loss !== undefined);
+        const newGameEntries = newEntries.filter(e => e.total_games !== undefined);
+
+        allEntries.push(...newWithLoss);
+        allGameEntries.push(...newEntries);
+
+        // Rebuild charts
+        if (allEntries.length > 0) {
+            const totalLoss = allEntries.map(e => e.total_loss);
+            const valueLoss = allEntries.map(e => e.value_loss);
+            const policyLoss = allEntries.map(e => e.policy_loss);
+
+            makeLossChart('chartTotal', 'Total Loss', '#f85149', totalLoss);
+            makeLossChart('chartValue', 'Value Loss', '#d29922', valueLoss);
+            makeLossChart('chartPolicy', 'Policy Loss', '#58a6ff', policyLoss);
+            makeStatsChart(allGameEntries);
+        }
+
+        // Pie chart from ALL entries (aggregate terminal reasons)
+        makePieChart(allGameEntries);
+
+        const totalLines = allEntries.length;
+        const totalEntries = allGameEntries.length;
+        status.innerHTML = `✅ <span class="live">${totalLines}</span> 条训练记录 (共 ${totalEntries} 条日志)`;
+        updateTimestamp();
+
+    } catch (e) {
+        status.textContent = `❌ 加载失败: ${e.message}`;
+        // Don't update timestamp on error
+    }
+}
+
+async function loadData() {
+    // Reset state
+    lastIteration = 0;
+    allEntries = [];
+    allGameEntries = [];
+    await fetchNewData();
+}
+
+// =========================================================================
+// Auto-refresh toggle
+// =========================================================================
+function toggleAutoRefresh() {
+    const btn = document.getElementById('autoToggle');
+    if (autoRefreshOn) {
+        if (autoRefreshId) {
+            clearInterval(autoRefreshId);
+            autoRefreshId = null;
+        }
+        autoRefreshOn = false;
+        btn.textContent = '开启实时';
+        btn.className = '';
+        document.getElementById('status').textContent = '⏸️ 已暂停';
+    } else {
+        autoRefreshOn = true;
+        btn.textContent = '停止实时';
+        btn.className = 'danger';
+        document.getElementById('status').textContent = '🔄 恢复实时...';
+        fetchNewData();
+        startAutoRefresh();
+    }
+}
+
+function startAutoRefresh() {
+    if (autoRefreshId) clearInterval(autoRefreshId);
+    autoRefreshId = setInterval(fetchNewData, 5000);
+}
+
+function manualRefresh() {
+    if (autoRefreshId) {
+        clearInterval(autoRefreshId);
+        autoRefreshId = null;
+    }
+    loadData().then(() => {
+        if (autoRefreshOn) {
+            startAutoRefresh();
+        }
+    });
+}
+
+// =========================================================================
+// Init
+// =========================================================================
+window.addEventListener('DOMContentLoaded', () => {
+    loadData().then(() => {
+        if (autoRefreshOn) {
+            startAutoRefresh();
+        }
+    });
+});
+</script>
+</body>
+</html>

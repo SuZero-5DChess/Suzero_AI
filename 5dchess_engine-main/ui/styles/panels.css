@@ -1,0 +1,504 @@
+
+
+/* ================= HUD Wrapper ================= */
+.hud-wrapper {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    z-index: 100;
+}
+
+/* ================= HUD ================= */
+.hud {
+    position: relative;
+    width: 440px;
+    max-width: calc(100vw - 200px - 18px - 18px - 20px); /* screen width - control panel width - control panel right margin - hud left margin - minimum gap */
+    min-width: 150px;
+    background: rgba(255,255,255,0.88);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.hud.collapsed { height: 65px; }
+.hud.expanded  { height: 230px; }
+
+/* ================= Header ================= */
+.hud-header {
+    height: 56px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.hud-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+/* ================= Glowing Light ================= */
+.hud-light {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff2b2b;
+    box-shadow:
+        0 0 6px rgba(255,0,0,0.8),
+        0 0 14px rgba(255,0,0,0.6);
+    transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+#light{
+    position: absolute;
+    right: 16px;
+    cursor: pointer;
+}
+
+.hud-light.off {
+    opacity: 0.25;
+    box-shadow: none;
+}
+
+.hud-light.blink {
+    animation: blink 0.7s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background: #ff2b2b;
+        opacity: 1;
+        box-shadow:
+            0 0 10px rgba(255,0,0,0.9),
+            0 0 20px rgba(255,0,0,0.7);
+    }
+    50% {
+        background: #ff4510;
+        opacity: 0.6;
+        box-shadow:
+            0 0 4px rgba(255,31,0,0.5),
+            0 0 8px rgba(255,63,16,0.3);
+    }
+}
+
+/* ================= Content ================= */
+.hud-content {
+    position: relative;
+    padding: 12px 14px 34px;
+    height: calc(100% - 56px);
+    box-sizing: border-box;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.hud.collapsed .hud-content {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+}
+
+.hud.expanded .hud-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hud-text {
+    height: 100%;
+    padding-bottom: 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.45;
+    outline: none;
+    cursor: text;
+}
+
+.hud-comment-actions {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.hud-comment-actions.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hud-comment-btn {
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    min-width: 130px;
+}
+
+.hud-comment-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e8e8e8, #dcdcdc);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+#hudUpdateComment {
+    width: max-content;
+    max-width: 190px;
+}
+
+@media (max-width: 600px) {
+    #hudUpdateComment {
+        width: max-content;
+    }
+}
+
+#hudUpdateComment.delete {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border-color: #ef9a9a;
+    color: #c62828;
+}
+
+#hudUpdateComment.delete:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ffcdd2, #ef9a9a);
+    box-shadow: 0 2px 6px rgba(198, 40, 40, 0.2);
+}
+
+.hud-comment-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.hud-comment-btn.secondary {
+    background: linear-gradient(135deg, #ffffff, #f3f3f3);
+    color: #555;
+}
+
+/* Scrollbar */
+.hud-text::-webkit-scrollbar {
+    width: 6px;
+}
+.hud-text::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 4px;
+}
+.hud-text::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ================= Toggle ================= */
+.hud-toggle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.85) 70%,
+        rgba(255,255,255,1) 100%
+    );
+
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    z-index: 2;
+}
+
+.hud-toggle svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.hud-toggle:hover {
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0) 0%,
+        rgba(245,245,245,0.9) 70%,
+        #f0f0f0 100%
+    );
+}
+
+/* ================= Control Panel ================= */
+.control-panel {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    width: 200px;
+    background: rgba(255,255,255,0.88);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    overflow: hidden;
+    transition: height 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ================= Remote Control ================= */
+.remote-control {
+    padding: 14px;
+    display: flex;
+    justify-content: center;
+}
+
+.remote-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(3, 50px);
+    gap: 4px;
+}
+
+.remote-btn {
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.remote-btn.active:hover {
+    background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.remote-btn.active:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.remote-btn.pressed {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.remote-btn.ok.pressed {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.remote-btn.up { grid-column: 2; grid-row: 1; }
+.remote-btn.left { grid-column: 1; grid-row: 2; }
+.remote-btn.ok { grid-column: 2; grid-row: 2; background: linear-gradient(135deg, #4CAF50, #45a049); color: white; border-color: #45a049; }
+.remote-btn.right { grid-column: 3; grid-row: 2; }
+.remote-btn.down { grid-column: 2; grid-row: 3; }
+
+.remote-btn.ok.active:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+.remote-btn.inactive{
+    opacity: 50%;
+}
+
+/* ================= Select Box ================= */
+.select-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 28px;
+}
+
+.control-panel.collapsed .select-container {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.control-panel.expanded .select-container {
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+.select-container::-webkit-scrollbar {
+    width: 6px;
+}
+.select-container::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 4px;
+}
+.select-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.select-option {
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    word-wrap: break-word;
+    line-height: 1.4;
+    transition: background 0.15s;
+}
+
+.select-option:hover {
+    background: #f8f8f8;
+}
+
+.select-option.selected {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.hint-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1976d2;
+    background: #f0f7ff;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+}
+
+.hint-btn:hover {
+    background: #e3f2fd;
+}
+
+.selected-display {
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word;
+    line-height: 1.4;
+    min-height: 40px;
+    box-sizing: border-box;
+}
+
+.control-panel.expanded .selected-display {
+    display: none;
+}
+
+/* ================= Panel Toggle ================= */
+.panel-toggle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.85) 70%,
+        rgba(255,255,255,1) 100%
+    );
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    z-index: 2;
+}
+
+.panel-toggle svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.panel-toggle:hover {
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0) 0%,
+        rgba(245,245,245,0.9) 70%,
+        #f0f0f0 100%
+    );
+}
+
+/* ================= Buttons Panel ================= */
+.buttons-panel {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.88);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    padding: 8px;
+    display: flex;
+    gap: 0;
+}
+
+.btn-icon {
+    width: 42px;
+    height: 42px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+    padding: 9px;
+    border-radius: 6px;
+}
+
+.btn-icon svg {
+    width: 100%;
+    height: 100%;
+    color: #555;
+    transition: color 0.15s ease;
+}
+
+.btn-icon:hover {
+    background: rgba(0,0,0,0.06);
+}
+
+.btn-icon:hover svg {
+    color: #333;
+}
+
+.btn-icon:active {
+    background: rgba(0,0,0,0.1);
+}
+
+.btn-icon.active {
+    background: rgba(25, 118, 210, 0.12);
+}
+
+.btn-icon.active svg {
+    color: #1976d2;
+}

@@ -1,0 +1,6 @@
+[Event "MCTS Turn Zero"]
+[Board "Standard - Turn Zero"]
+[Mode "5D"]
+[Result "*"]
+
+(0T1)h2h4Q S (0T1)b8a6Q S (0T2)h4h5Q S (0T2)a6b8Q S (0T3)b1c3Q S (0T3)a7a6Q S (0T4)a2a3Q S (0T4)a6a5Q S (0T5)f2f3Q S (0T5)f7f5Q S (0T6)g1h3Q S (0T6)a8a6Q S (0T7)d2d4Q S (0T7)a5a4Q S (0T8)h3f2Q S (0T8)g8(0T7)g6Q S (0T9)b2b4Q (-1T8)e1(0T8)f2Q S (1T8)g8h6Q (0T9)e8(1T8)f7Q (-1T8)g6(1T8)h6Q S (0T10)e2e4Q

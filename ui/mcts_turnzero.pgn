@@ -1,0 +1,14 @@
+[Event "MCTS Turn Zero"]
+[Board "Standard - Turn Zero"]
+[Mode "5D"]
+[r*nbqk*bnr*/p*p*p*p*p*p*p*p*/8/8/8/8/P*P*P*P*P*P*P*P*/R*NBQK*BNR*:0:0:b]
+[r*nbqk*bnr*/p*p*p*p*p*p*p*p*/8/8/8/8/P*P*P*P*P*P*P*P*/R*NBQK*BNR*:0:1:w]
+
+
+1. (0T1)d2d3 / (0T1)d7d6 
+2. (0T2)Bc1d2 / (0T2)e7e6 
+3. (0T3)a2a3 / (0T3)Nb8>>(0T2)b6 
+4. (-1T3)Bd2a5 (0T4)a3a4 / (0T4)Bf8e7 (-1T3)e7>>(0T3)e7 
+5. (-2T4)c2c3 (-1T4)Ng1>>(-1T3)g3 / (1T3)d6d5 (-2T4)f7f6 
+6. (1T4)Ng1h3 (-2T5)Ng1>>(-2T4)g3 / (2T4)f7f5 (1T4)e7e6 (-1T4)a7a6 (-2T5)Ke8>>(-2T4)d7 
+7. (0T5)Bd2g5 (1T5)d3d4 (2T5)d3d4 (-2T6)Bd2>>(-2T5)c2 (-1T5)Nb1>>(-2T5)b3 (-3T5)Nb1>>(-1T5)c1 

@@ -1,0 +1,6 @@
+[Event "MCTS Test"]
+[Board "Very Small - Open"]
+[Mode "5D"]
+[Result "*"]
+
+(0T1)d1c3Q S (0T1)b4c3Q S (0T2)b1b4Q S (0T2)c3a1Q

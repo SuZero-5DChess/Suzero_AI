@@ -1,0 +1,225 @@
+name: Build Wheels and WebAssembly
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+# Add permissions for GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }} with ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # -----------------------
+          # Linux / GCC 13
+          # -----------------------
+          - os: ubuntu-22.04
+            compiler: gcc
+            cc: gcc-13
+            cxx: g++-13
+
+          # -----------------------
+          # macOS / Apple Clang
+          # -----------------------
+          - os: macos-15
+            compiler: apple-clang
+            cc: clang
+            cxx: clang++
+
+          # -----------------------
+          # Windows / MSVC
+          # -----------------------
+          - os: windows-2022
+            compiler: msvc
+            msvc_toolset: 14.40
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      # -----------------------
+      # Install compilers
+      # -----------------------
+
+      - name: Setup GCC 13 (Linux)
+        if: matrix.compiler == 'gcc'
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.cc }}
+          cmake: true
+
+      - name: Setup MSVC (Windows)
+        if: matrix.compiler == 'msvc'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: ${{ matrix.msvc_toolset }}
+
+      # Xcode 16.4's libc++ lacks std::jthread and std::stop_token.
+      - name: Select Xcode 26 (macOS)
+        if: matrix.compiler == 'apple-clang'
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_26.0.app/Contents/Developer
+          xcodebuild -version
+
+      # -----------------------
+      # Configure
+      # -----------------------
+
+      - name: Configure CMake
+        shell: bash
+        run: |
+          if [ "${{ matrix.compiler }}" != "msvc" ]; then
+            export CC=$(which ${{ matrix.cc }})
+            export CXX=$(which ${{ matrix.cxx }})
+          fi
+
+          cmake -B build -S . -DPYMODULE=on -DCMAKE_BUILD_TYPE=Release
+
+      # -----------------------
+      # Build
+      # -----------------------
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      # -----------------------
+      # Collect artifacts
+      # -----------------------
+
+      - name: Find engine artifact
+        id: findfile
+        shell: bash
+        run: |
+          FILE=$(find build -type f \( -name "engine*.so" -o -name "engine*.pyd" \) | head -n 1)
+
+          if [ -z "$FILE" ]; then
+            echo "❌ No engine artifact found"
+            exit 1
+          fi
+
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-${{ matrix.os }}-${{ matrix.compiler }}
+          path: ${{ steps.findfile.outputs.file }}
+
+  # -----------------------
+  # Build WASM
+  # -----------------------
+
+  build-wasm:
+    name: Build WebAssembly module
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+          actions-cache-folder: '.emsdk-cache'
+
+      - name: Configure CMake with Emscripten
+        run: |
+          emcmake cmake . \
+            -DEMMODULE=on \
+            -DTEST=off \
+            -DPYMODULE=off \
+            -DCMAKE_BUILD_TYPE=Release \
+            -B build-wasm
+
+      - name: Build WASM module
+        run: cmake --build build-wasm
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "build-wasm/ui" ]; then
+            echo "❌ build-wasm/ui directory not found"
+            exit 1
+          fi
+          if [ ! -f "build-wasm/ui/wasm/engine.js" ]; then
+            echo "❌ engine.js not found"
+            exit 1
+          fi
+          if [ ! -f "build-wasm/ui/wasm/engine.wasm" ]; then
+            echo "❌ engine.wasm not found"
+            exit 1
+          fi
+          echo "✅ Build artifacts verified"
+
+      - name: Create ui.zip
+        run: |
+          cd build-wasm
+          zip -r ../ui.zip ui/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-wasm
+          path: ui.zip
+
+      # Upload ui folder for GitHub Pages
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'build-wasm/ui'
+
+  # -----------------------
+  # Release job
+  # -----------------------
+
+  release:
+    name: Upload wheels to release
+    needs: [build, build-wasm]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            **/engine*.so
+            **/engine*.pyd
+            **/ui*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # -----------------------
+  # Deploy to GitHub Pages
+  # -----------------------
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: [build-wasm]
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
