@@ -1,0 +1,179 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 SuZero-02 contributors
+//
+// Minimal games used only by the unit tests. They are *not* engine
+// integrations and are not part of the library target.
+
+#pragma once
+
+#include <memory>
+#include <utility>
+
+#include "suzero/mcts/evaluator.h"
+#include "suzero/mcts/game_state.h"
+
+namespace suzero::mcts::test {
+
+/// Alternating game: move a token by 1 or 2; land exactly on 5 to win.
+class SubtractionGame final : public IGameState {
+ public:
+  static constexpr int kTarget = 5;
+  static constexpr int kActionCount = 2;
+
+  explicit SubtractionGame(int position = 0, PlayerId player = 0)
+      : position_(position), player_(player) {}
+
+  std::unique_ptr<IGameState> clone() const override {
+    return std::make_unique<SubtractionGame>(*this);
+  }
+
+  int actionCount() const override { return kActionCount; }
+
+  bool isLegal(ActionId action) const override {
+    if (isTerminal() || action < 0 || action >= kActionCount) {
+      return false;
+    }
+    return position_ + (action + 1) <= kTarget;
+  }
+
+  void applyAction(ActionId action) override {
+    position_ += action + 1;
+    player_ = 1 - player_;
+  }
+
+  PlayerId currentPlayer() const override { return player_; }
+  bool isTerminal() const override { return position_ == kTarget; }
+
+  /// The side to move after the winning move has, by definition, lost.
+  double terminalUtility() const override { return -1.0; }
+
+  int position() const { return position_; }
+
+ private:
+  int position_;
+  PlayerId player_;
+};
+
+/// Every action ends the game. Only action 2 wins for the mover.
+class OneMoveWinGame final : public IGameState {
+ public:
+  static constexpr int kActionCount = 3;
+
+  explicit OneMoveWinGame(bool done = false, PlayerId player = 0,
+                          PlayerId winner = 0)
+      : done_(done), player_(player), winner_(winner) {}
+
+  std::unique_ptr<IGameState> clone() const override {
+    return std::make_unique<OneMoveWinGame>(*this);
+  }
+
+  int actionCount() const override { return kActionCount; }
+
+  bool isLegal(ActionId action) const override {
+    return !done_ && action >= 0 && action < kActionCount;
+  }
+
+  void applyAction(ActionId action) override {
+    winner_ = (action == 2) ? player_ : (1 - player_);
+    done_ = true;
+    player_ = 1 - player_;
+  }
+
+  PlayerId currentPlayer() const override { return player_; }
+  bool isTerminal() const override { return done_; }
+
+  double terminalUtility() const override {
+    return winner_ == player_ ? 1.0 : -1.0;
+  }
+
+ private:
+  bool done_;
+  PlayerId player_;
+  PlayerId winner_;
+};
+
+/// Non-alternating game: the same player makes both moves. The unique winning
+/// line is first action 0, then action 1. This exercises the rule that values
+/// are negated only when the player to move actually changes.
+class SamePlayerGame final : public IGameState {
+ public:
+  static constexpr int kActionCount = 2;
+
+  explicit SamePlayerGame(int step = 0, ActionId first = 0, bool done = false,
+                          bool won = false)
+      : step_(step), first_(first), done_(done), won_(won) {}
+
+  std::unique_ptr<IGameState> clone() const override {
+    return std::make_unique<SamePlayerGame>(*this);
+  }
+
+  int actionCount() const override { return kActionCount; }
+
+  bool isLegal(ActionId action) const override {
+    return !done_ && action >= 0 && action < kActionCount;
+  }
+
+  void applyAction(ActionId action) override {
+    if (step_ == 0) {
+      first_ = action;
+      step_ = 1;
+    } else {
+      won_ = (first_ == 0 && action == 1);
+      done_ = true;
+    }
+  }
+
+  PlayerId currentPlayer() const override { return 0; }
+  bool isTerminal() const override { return done_; }
+  double terminalUtility() const override { return won_ ? 1.0 : -1.0; }
+
+ private:
+  int step_;
+  ActionId first_;
+  bool done_;
+  bool won_;
+};
+
+/// Uniform policy over legal actions, neutral value.
+class UniformEvaluator final : public IEvaluator {
+ public:
+  Evaluation evaluate(const IGameState& state) override {
+    Evaluation evaluation;
+    evaluation.policy.assign(state.actionCount(), -1.0f);
+    for (int action = 0; action < state.actionCount(); ++action) {
+      if (state.isLegal(static_cast<ActionId>(action))) {
+        evaluation.policy[static_cast<std::size_t>(action)] = 1.0f;
+      }
+    }
+    evaluation.utility = 0.0;
+    return evaluation;
+  }
+};
+
+/// Uniform value, deliberately skewed prior for OneMoveWinGame.
+class SkewedWinEvaluator final : public IEvaluator {
+ public:
+  Evaluation evaluate(const IGameState& state) override {
+    Evaluation evaluation;
+    evaluation.policy.assign(state.actionCount(), -1.0f);
+    (void)state;
+    const float priors[] = {0.6f, 0.25f, 0.15f};
+    for (int action = 0; action < state.actionCount(); ++action) {
+      evaluation.policy[static_cast<std::size_t>(action)] = priors[action];
+    }
+    evaluation.utility = 0.0;
+    return evaluation;
+  }
+};
+
+/// Returns a policy of the wrong length; used to test validation.
+class BrokenEvaluator final : public IEvaluator {
+ public:
+  Evaluation evaluate(const IGameState& state) override {
+    Evaluation evaluation;
+    evaluation.policy.assign(state.actionCount() + 1, 1.0f);
+    return evaluation;
+  }
+};
+
+}  // namespace suzero::mcts::test
