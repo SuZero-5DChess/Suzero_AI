@@ -10,6 +10,9 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "suzero/mcts/evaluator.h"
@@ -80,13 +83,18 @@ struct SearchResult {
   std::vector<double> denseVisitDistribution(int actionCount) const;
 };
 
-/// Game-agnostic PUCT search, following KataGo's search semantics.
+/// Game-agnostic PUCT graph search, following KataGo's search semantics.
 ///
-/// This implementation is single-threaded. It keeps the algorithmic core of
-/// KataGo's MCTS (PUCT with child weight, FPU, virtual-loss-free tree playouts,
-/// weighted value aggregation, root Dirichlet noise, temperature sampling) but
-/// deliberately omits graph search, evaluation caching, multithreading, Go's
-/// score utilities, and symmetry/pass handling. See docs/katago-mapping.md.
+/// This implementation is single-threaded and performs graph search
+/// (transposition-aware) rather than pure tree search: states with the same
+/// IGameState::stateKey() share one node, edges reference their child instead
+/// of owning it, and the root is deliberately kept out of the node table so it
+/// can never be reached through a cycle. It keeps the algorithmic core of
+/// KataGo's search (PUCT with child weight, FPU, virtual-loss-free playouts,
+/// edge-visit catch-up, weighted value aggregation, root Dirichlet noise,
+/// temperature sampling) but deliberately omits evaluation caching,
+/// multithreading, Go's score utilities, and symmetry/pass handling.
+/// See docs/katago-mapping.md.
 ///
 /// All methods are single-threaded and must not be called concurrently on the
 /// same instance.
@@ -122,16 +130,25 @@ class PuctSearch {
 
   /// Reuses the subtree of `action` as the new root, if that action has an
   /// expanded child. The root game state is advanced accordingly.
+  /// The subtree is copied and the node table is rebuilt (single-threaded
+  /// equivalent of KataGo's copy-and-sweep), so every SearchNode pointer
+  /// obtained before this call is invalidated.
   /// Returns false (and changes nothing) otherwise.
   bool advanceRoot(ActionId action);
 
-  /// Replaces the root state and clears the tree.
+  /// Replaces the root state and clears the graph.
   void resetRoot(std::shared_ptr<IGameState> rootState);
 
   const IGameState& rootState() const { return *root_state_; }
   const SearchNode& rootNode() const { return *root_; }
   const SearchParams& params() const { return params_; }
   int actionCount() const { return action_count_; }
+
+  /// Number of live nodes, including the root. Transpositions reduce this
+  /// below what a pure tree would contain.
+  std::int64_t nodeCount() const {
+    return static_cast<std::int64_t>(node_table_.size()) + 1;
+  }
 
   /// RNG used by noise and temperature sampling. Exposed for reproducibility
   /// and tests.
@@ -144,12 +161,21 @@ class PuctSearch {
     std::int64_t visits = 0;
   };
 
+  struct NodeLookupResult {
+    SearchNode* node = nullptr;
+    bool inserted = false;
+  };
+
+  using PathSet = std::unordered_set<const SearchNode*>;
+
   void validateParams() const;
   void ensureRootPrepared();
   void expandNode(SearchNode& node, const IGameState& state);
   void buildPriors(SearchNode& node, const IGameState& state,
                    const std::vector<float>& policy);
-  void playout(SearchNode& node, IGameState& state, int depth);
+  NodeLookupResult allocateOrFindNode(const StateKey& key, PlayerId player);
+  void playout(SearchNode& node, IGameState& state, int depth, PathSet& path);
+  bool maybeCatchUpEdgeVisits(SearchNode& node, int edge_index, bool is_root);
   int selectPrior(SearchNode& node, bool is_root);
   double computeFpuValue(const SearchNode& node, bool is_root,
                          double policy_mass_visited,
@@ -171,15 +197,24 @@ class PuctSearch {
   SearchResult runImpl(IStopCriterion* criterion,
                        const std::function<bool(const SearchProgress&)>*
                            callback);
+  void clearGraph();
+  std::unique_ptr<SearchNode> copySubtree(
+      const SearchNode& subtree_root,
+      std::unordered_map<StateKey, std::unique_ptr<SearchNode>>& table) const;
 
   std::shared_ptr<IGameState> root_state_;
   std::shared_ptr<IEvaluator> evaluator_;
   SearchParams params_;
   int action_count_ = 0;
 
+  // The root is owned directly and is deliberately not in node_table_, so no
+  // transposition can ever point back to it and create a cycle through it.
   std::unique_ptr<SearchNode> root_;
   std::vector<Prior> root_priors_;
   bool root_prepared_ = false;
+
+  // Owns every non-root node. Edges only hold raw pointers.
+  std::unordered_map<StateKey, std::unique_ptr<SearchNode>> node_table_;
 
   Rng rng_;
 };

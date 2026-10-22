@@ -7,7 +7,6 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
 #include <vector>
 
 #include "suzero/mcts/types.h"
@@ -57,20 +56,23 @@ class NodeStats {
   double utility_sq_sum_ = 0.0;
 };
 
-/// One search-tree node.
+/// One node of the search graph.
 ///
 /// A node stores its prior list once (at expansion), its statistics, and the
 /// edges that have been expanded so far. It does not store a game state; the
-/// search reconstructs state by applying actions while descending.
+/// search reconstructs state by applying actions while descending. Nodes are
+/// owned by PuctSearch's node table; edges merely reference them, so several
+/// parents may point at the same node.
 class SearchNode {
  public:
-  explicit SearchNode(PlayerId player);
+  SearchNode(StateKey stateKey, PlayerId player);
 
   SearchNode(const SearchNode&) = delete;
   SearchNode& operator=(const SearchNode&) = delete;
   SearchNode(SearchNode&&) = delete;
   SearchNode& operator=(SearchNode&&) = delete;
 
+  const StateKey& stateKey() const { return state_key_; }
   PlayerId player() const { return player_; }
   bool isExpanded() const { return expanded_; }
   bool isTerminal() const { return terminal_; }
@@ -100,10 +102,11 @@ class SearchNode {
 
   struct Edge {
     Prior prior;
-    std::unique_ptr<SearchNode> child;
+    SearchNode* child = nullptr;  // Non-owning; owned by the node table.
     std::int64_t visits = 0;
   };
 
+  StateKey state_key_;
   PlayerId player_;
   bool expanded_ = false;
   bool terminal_ = false;

@@ -7,6 +7,7 @@
 #include "suzero/mcts/search_node.h"
 
 #include <algorithm>
+#include <utility>
 
 namespace suzero::mcts {
 
@@ -16,7 +17,8 @@ double NodeStats::childWeight(std::int64_t edgeVisits) const {
          static_cast<double>(child_visits);
 }
 
-SearchNode::SearchNode(PlayerId player) : player_(player) {}
+SearchNode::SearchNode(StateKey stateKey, PlayerId player)
+    : state_key_(std::move(stateKey)), player_(player) {}
 
 std::int64_t SearchNode::edgeVisits(int priorIndex) const {
   if (priorIndex < 0 ||
@@ -39,7 +41,7 @@ const SearchNode* SearchNode::childAt(int priorIndex) const {
   if (edge_index < 0) {
     return nullptr;
   }
-  return edges_[edge_index].child.get();
+  return edges_[edge_index].child;
 }
 
 const SearchNode* SearchNode::childForAction(ActionId action) const {

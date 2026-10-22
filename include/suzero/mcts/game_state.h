@@ -31,6 +31,15 @@ namespace suzero::mcts {
 ///  * Values need not be in [-1, 1], but all utilities returned by the
 ///    evaluator and by terminal states should use the same scale. The search
 ///    parameters (`utilityRadius`, FPU reductions) are expressed on that scale.
+///  * `stateKey()` identifies a state for transposition merging. Equal keys
+///    mean the two states are indistinguishable to the search: same player to
+///    move, same legal actions, same evaluator output, same terminal status and
+///    the same terminal utility. The key must therefore include every part of
+///    the state that affects those things. If the game has repetition rules
+///    (superko, draw by repetition, move counters), the history context that
+///    those rules depend on must be folded into the key; otherwise the search
+///    may merge positions that are not actually interchangeable. This is the
+///    abstract counterpart of KataGo's GraphHash plus graphSearchRepBound.
 ///
 /// Non-alternating games (for example games where one side makes several
 /// consecutive sub-moves) are supported: the engine flips the value sign only
@@ -60,12 +69,12 @@ class IGameState {
   /// Utility for `currentPlayer()` at a terminal state.
   virtual double terminalUtility() const = 0;
 
-  /// Optional identity used by future graph-search extensions.
+  /// Identity of the position for graph search.
   ///
-  /// The current tree-search implementation does not merge transpositions and
-  /// never calls this. It is part of the interface so that a graph-search
-  /// backend can be added without changing game implementations.
-  virtual std::uint64_t stateKey() const { return 0; }
+  /// Called once for the root and once for every edge that is expanded. The
+  /// search keeps at most one node per key and reuses it when the same state is
+  /// reached through different move orders. See the contract above.
+  virtual StateKey stateKey() const = 0;
 };
 
 }  // namespace suzero::mcts

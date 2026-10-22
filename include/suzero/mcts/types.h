@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace suzero::mcts {
 
@@ -22,6 +23,13 @@ using ActionId = std::int32_t;
 /// players alternate: the perspective of a child value is decided by comparing
 /// the child's player with the parent's player.
 using PlayerId = std::int32_t;
+
+/// Identity of a game state for transposition detection.
+///
+/// The search stores one node per key, so two states with equal keys are
+/// treated as completely interchangeable. The game owns the representation;
+/// any byte string works. See IGameState::stateKey() for the exact contract.
+using StateKey = std::string;
 
 inline constexpr ActionId kInvalidAction = -1;
 

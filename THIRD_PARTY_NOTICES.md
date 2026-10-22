@@ -1,8 +1,8 @@
 # 第三方开源声明 / Third-Party Notices
 
-本项目是一个**重新实现的、与游戏无关的 PUCT/MCTS 核心**。其算法、参数语义和统计量设计
-源自 KataGo 的搜索模块。本项目不包含 KataGo 源码树中的任何第三方依赖（CUDA、OpenCL、
-cutlass、nlohmann_json 等均未复制）。
+本项目是一个**重新实现的、与游戏无关的 PUCT 图搜索核心**。其算法、参数语义和统计量
+设计源自 KataGo 的搜索模块。本项目不包含 KataGo 源码树中的任何第三方依赖（CUDA、
+OpenCL、cutlass、nlohmann_json 等均未复制）。
 
 ---
 
@@ -18,9 +18,14 @@ cutlass、nlohmann_json 等均未复制）。
   - `cpp/search/searchexplorehelpers.cpp`
   - `cpp/search/searchupdatehelpers.cpp`
   - `cpp/search/searchresults.cpp`
+  - `cpp/search/searchnodetable.h`
+  - `cpp/search/searchnodetable.cpp`
+  - `cpp/game/graphhash.h`
+  - `cpp/game/graphhash.cpp`
 - 派生方式：将 Go 专用类型（`Board`、`BoardHistory`、`Loc`、`NNOutput`、玩家颜色、
   贴目、领地等）替换为抽象接口，重新组织为与游戏无关的 C++17 代码。PUCT 公式、
-  FPU、根节点 Dirichlet 噪声、访问权重聚合、温度采样等算法语义保持与上游一致。
+  FPU、根节点 Dirichlet 噪声、访问权重聚合、温度采样、图搜索的节点表/边访问
+  追赶/成环与换根处理等算法语义保持与上游一致。
 - 许可证：MIT
 
 ### KataGo MIT License（原文）

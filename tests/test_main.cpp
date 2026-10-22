@@ -259,6 +259,60 @@ void testEvaluatorValidation() {
   CHECK(threw);
 }
 
+void testTranspositionMerging() {
+  // Playing 0 then 1 and 1 then 0 reaches the same state. Graph search must
+  // allocate a single node for it instead of one per path.
+  auto state = std::make_shared<CommutingGame>();
+  auto evaluator = std::make_shared<UniformEvaluator>();
+  PuctSearch search(state, evaluator, paramsWithPlayouts(800));
+  const SearchResult result = runSearch(search);
+
+  // root + two depth-1 states + one shared depth-2 terminal state.
+  CHECK(search.nodeCount() == 4);
+  CHECK(result.completed);
+
+  const suzero::mcts::SearchNode* first = search.rootNode().childForAction(0);
+  const suzero::mcts::SearchNode* second = search.rootNode().childForAction(1);
+  CHECK(first != nullptr);
+  CHECK(second != nullptr);
+  if (first != nullptr && second != nullptr) {
+    CHECK(first != second);
+    CHECK(first->childForAction(1) != nullptr);
+    CHECK(first->childForAction(1) == second->childForAction(0));
+    CHECK(first->childForAction(1)->isTerminal());
+  }
+}
+
+void testCycleTerminates() {
+  // Action 0 loops between two positions. The graph keeps the cycle-closing
+  // edge, so termination relies on the per-playout path check.
+  auto state = std::make_shared<CycleGame>();
+  auto evaluator = std::make_shared<UniformEvaluator>();
+  PuctSearch search(state, evaluator, paramsWithPlayouts(300));
+  const SearchResult result = runSearch(search);
+
+  CHECK(result.completed);
+  CHECK(result.playouts == 300);
+  CHECK(result.rootVisits == result.playouts + 1);
+  // root + two phase nodes + one duplicate of the root phase + two terminals
+  CHECK(search.nodeCount() <= 5);
+
+  // Promote across a cycle edge: the copied subtree keeps the cycle, and the
+  // new root must remain unreachable from it.
+  const suzero::mcts::SearchNode* promoted =
+      search.rootNode().childForAction(0);
+  CHECK(promoted != nullptr);
+  if (promoted != nullptr) {
+    const std::int64_t child_visits = promoted->stats().visits();
+    CHECK(search.advanceRoot(0));
+    CHECK(search.rootNode().stats().visits() == child_visits);
+    const SearchResult reused = runSearch(search);
+    CHECK(reused.completed);
+    CHECK(reused.playouts == 300);
+    CHECK(reused.rootVisits == child_visits + reused.playouts);
+  }
+}
+
 void testAdvanceRootInvalid() {
   auto state = std::make_shared<SubtractionGame>(0, 0);
   auto evaluator = std::make_shared<UniformEvaluator>();
@@ -297,6 +351,8 @@ int main() {
   testDirectPolicyFallback();
   testTemperatureSamplingIsLegal();
   testEvaluatorValidation();
+  testTranspositionMerging();
+  testCycleTerminates();
   testAdvanceRootInvalid();
   testResetRoot();
 

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(suzero_mcts
-  VERSION 0.1.0
-  DESCRIPTION "Game-agnostic PUCT/MCTS core derived from KataGo"
+  VERSION 0.2.0
+  DESCRIPTION "Game-agnostic PUCT graph search core derived from KataGo"
   LANGUAGES CXX
 )
 

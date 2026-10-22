@@ -32,8 +32,16 @@ struct SearchParams {
   double maxTimeSeconds = 0.0;
 
   /// Maximum number of edges traversed in one playout. <= 0 means unlimited.
-  /// Useful for games with cycles.
+  /// Graph search already stops repeated nodes on a path, but this remains a
+  /// hard safety bound.
   int maxDepth = 0;
+
+  // ------------------------------------------------------------ graph search --
+
+  /// Probability of skipping an edge-visit catch-up and descending into an
+  /// already heavily visited transposition anyway. 0 always catches up, which
+  /// is KataGo's default. See docs/katago-mapping.md.
+  double graphSearchCatchUpLeakProb = 0.0;
 
   // ------------------------------------------------------------ exploration --
 

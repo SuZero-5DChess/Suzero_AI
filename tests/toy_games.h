@@ -7,6 +7,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "suzero/mcts/evaluator.h"
@@ -47,6 +48,11 @@ class SubtractionGame final : public IGameState {
   /// The side to move after the winning move has, by definition, lost.
   double terminalUtility() const override { return -1.0; }
 
+  StateKey stateKey() const override {
+    return "sub:" + std::to_string(position_) + ":" +
+           std::to_string(player_);
+  }
+
   int position() const { return position_; }
 
  private:
@@ -84,6 +90,13 @@ class OneMoveWinGame final : public IGameState {
 
   double terminalUtility() const override {
     return winner_ == player_ ? 1.0 : -1.0;
+  }
+
+  StateKey stateKey() const override {
+    // winner_ is only meaningful once the game is over.
+    return "omw:" + std::to_string(done_ ? 1 : 0) + ":" +
+           std::to_string(player_) + ":" +
+           std::to_string(done_ ? winner_ : -1);
   }
 
  private:
@@ -127,11 +140,105 @@ class SamePlayerGame final : public IGameState {
   bool isTerminal() const override { return done_; }
   double terminalUtility() const override { return won_ ? 1.0 : -1.0; }
 
+  StateKey stateKey() const override {
+    return "same:" + std::to_string(step_) + ":" +
+           std::to_string(first_) + ":" + std::to_string(done_ ? 1 : 0) +
+           ":" + std::to_string(done_ && won_ ? 1 : 0);
+  }
+
  private:
   int step_;
   ActionId first_;
   bool done_;
   bool won_;
+};
+
+/// Two moves that commute: playing action 0 then 1 reaches exactly the same
+/// state as playing 1 then 0. Used to verify that graph search merges the
+/// transposition into a single node.
+class CommutingGame final : public IGameState {
+ public:
+  static constexpr int kActionCount = 2;
+  static constexpr int kDoneMask = 3;
+
+  explicit CommutingGame(int mask = 0, PlayerId player = 0)
+      : mask_(mask), player_(player) {}
+
+  std::unique_ptr<IGameState> clone() const override {
+    return std::make_unique<CommutingGame>(*this);
+  }
+
+  int actionCount() const override { return kActionCount; }
+
+  bool isLegal(ActionId action) const override {
+    if (isTerminal() || action < 0 || action >= kActionCount) {
+      return false;
+    }
+    return (mask_ & (1 << action)) == 0;
+  }
+
+  void applyAction(ActionId action) override {
+    mask_ |= 1 << action;
+    player_ = 1 - player_;
+  }
+
+  PlayerId currentPlayer() const override { return player_; }
+  bool isTerminal() const override { return mask_ == kDoneMask; }
+  double terminalUtility() const override { return 1.0; }
+
+  StateKey stateKey() const override {
+    return "commute:" + std::to_string(mask_) + ":" +
+           std::to_string(player_);
+  }
+
+ private:
+  int mask_;
+  PlayerId player_;
+};
+
+/// Action 0 cycles between two non-terminal positions, action 1 ends the
+/// game. With graph search this creates a cycle-closing edge that the playout
+/// path check must stop.
+class CycleGame final : public IGameState {
+ public:
+  static constexpr int kActionCount = 2;
+
+  explicit CycleGame(int phase = 0, bool done = false, PlayerId player = 0)
+      : phase_(phase), done_(done), player_(player) {}
+
+  std::unique_ptr<IGameState> clone() const override {
+    return std::make_unique<CycleGame>(*this);
+  }
+
+  int actionCount() const override { return kActionCount; }
+
+  bool isLegal(ActionId action) const override {
+    return !done_ && action >= 0 && action < kActionCount;
+  }
+
+  void applyAction(ActionId action) override {
+    if (action == 0) {
+      phase_ = 1 - phase_;
+      player_ = 1 - player_;
+    } else {
+      done_ = true;
+      player_ = 1 - player_;
+    }
+  }
+
+  PlayerId currentPlayer() const override { return player_; }
+  bool isTerminal() const override { return done_; }
+  double terminalUtility() const override { return 1.0; }
+
+  StateKey stateKey() const override {
+    return "cycle:" + std::to_string(phase_) + ":" +
+           std::to_string(done_ ? 1 : 0) + ":" + std::to_string(player_);
+  }
+
+ private:
+  int phase_;
+  bool done_;
+  PlayerId player_;
 };
 
 /// Uniform policy over legal actions, neutral value.

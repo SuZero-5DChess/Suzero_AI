@@ -1,8 +1,8 @@
-# SuZero-02 · 游戏无关 PUCT/MCTS 核心
+# SuZero-02 · 游戏无关 PUCT 图搜索核心
 
-从 **KataGo** 的搜索模块中提取、重写出的游戏无关 MCTS 库。当前阶段只提供
-**抽象接口 + 与游戏无关的搜索算法**，**没有接入任何棋类引擎**，也不包含任何棋规、
-神经网络推理后端或训练代码。
+从 **KataGo** 的搜索模块中提取、重写出的游戏无关 PUCT **图搜索**（graph search，
+即带置换合并的 DAG 搜索）库。当前阶段只提供 **抽象接口 + 与游戏无关的搜索算法**，
+**没有接入任何棋类引擎**，也不包含任何棋规、神经网络推理后端或训练代码。
 
 - 语言：C++17
 - 依赖：仅标准库
@@ -17,26 +17,27 @@
 ### 已实现
 
 - KataGo 风格的 PUCT 选择（含 child weight / edge visits 语义）
-- First Play Urgency（FPU）：`fpuReductionMax`、`rootFpuReductionMax`、
-  `fpuLossProp`、基于已访问策略质量的父值混合
+- First Play Urgency（FPU）：`fpuReductionMax` 等参数、基于已访问策略质量的父值混合
 - Utility 标准差对探索系数的缩放（`cpuctUtilityStdev*`）
 - 根节点策略温度与 KataGo 式策略形状 Dirichlet 噪声
 - 带权值聚合的备份，包括 KataGo 的 `valueWeightExponent` 坏子节点降权
 - 终局价值、非交替行棋（同一方连续行动）的价值视角处理
+- **图搜索**：按 `IGameState::stateKey()` 合并置换节点，边只引用子节点
+- 根节点不入节点表，保证换根后不会出现经过根的环
+- 边访问追赶（`graphSearchCatchUpLeakProb`）与路径成环检测
 - 访问数 / playout 数 / 时间 / 深度限制，以及外部停止条件接口
-- 根节点子树复用（`advanceRoot`）
+- 根节点子树复用（`advanceRoot`，复制子图并重建节点表）
 - 最终着法采样：温度、subtract/prune（`chosenMove*`）
 
 ### 明确未实现
 
 - 多线程、原子统计、virtual loss
-- Graph search / 置换表 / 评估缓存
+- 评估缓存（KataGo 的 eval cache）
 - Go 专用逻辑：目数效用、领地、ownership、贴目、劫、对称性、停一手
 - 人类 SL 模型、mirror 对抗、visit cap、时间控制策略
 - 批量神经网络推理
 
-这些是后续可独立扩展的方向，接口中已保留必要位置（例如
-`IGameState::stateKey()` 预留给将来的图搜索）。详见
+这些是后续可独立扩展的方向。详见
 [docs/katago-mapping.md](docs/katago-mapping.md)。
 
 ---
@@ -45,8 +46,9 @@
 
 ```
                  ┌──────────────────────────┐
-                 │      PuctSearch          │  纯算法，不含棋规
+                 │      PuctSearch          │  图搜索，不含棋规
                  │  (single-threaded)       │
+                 │  StateKey -> SearchNode  │
                  └───────┬──────────┬───────┘
                          │          │
              ┌───────────▼──┐   ┌───▼────────────┐
@@ -63,14 +65,19 @@
 
 1. **动作空间**：`IGameState::actionCount()` 对同一游戏恒定；动作 id 为
    `[0, actionCount())` 的稠密整数。
-2. **价值视角**：`Evaluation::utility` 与 `terminalUtility()` 都是
+2. **状态身份**：`IGameState::stateKey()` 相等 <=> 两个状态对搜索完全等价：
+   同一行棋方、相同合法动作、相同评估结果、相同终局状态与终局效用。游戏若有
+   重复/循环规则（超级劫、循环判和、步数计数等），必须把规则所依赖的历史上下文
+   并入键。键的具体表示由游戏决定，任意字节串均可。这是 KataGo `GraphHash` +
+   `graphSearchRepBound` 的抽象对应物。
+3. **价值视角**：`Evaluation::utility` 与 `terminalUtility()` 都是
    **当前行棋方**（`currentPlayer()`）的效用。搜索在备份时只在
    **行棋方真正改变**时取负，因此支持同一方连续行动的游戏。
-3. **策略**：`Evaluation::policy` 长度必须等于 `actionCount()`；不可用动作填
+4. **策略**：`Evaluation::policy` 长度必须等于 `actionCount()`；不可用动作填
    负值或 `0`，引擎还会再用 `isLegal()` 过滤。正值会被重新归一化。
-4. **状态克隆**：每次 playout 从根状态 `clone()` 一次，沿路径原地
+5. **状态克隆**：每次 playout 从根状态 `clone()` 一次，沿路径原地
    `applyAction()`。因此 `applyAction()` 只在合法动作上调用。
-5. **效用尺度**：整棵树使用统一尺度。若效用落在 `[-1, 1]`，一般将
+6. **效用尺度**：整张图使用统一尺度。若效用落在 `[-1, 1]`，一般将
    `utilityRadius` 设为 `1`。
 
 ### 为什么不把“抽象类”做成空接口？
@@ -100,6 +107,9 @@ class MyState final : public IGameState {
   PlayerId currentPlayer() const override;
   bool isTerminal() const override;
   double terminalUtility() const override;  // 当前行棋方视角
+
+  // 图搜索的身份键：必须包含行棋方、以及影响合法性/终局的全部历史上下文。
+  StateKey stateKey() const override;
 };
 
 class MyEvaluator final : public IEvaluator {
@@ -134,8 +144,9 @@ if (!search->advanceRoot(move)) {
 }
 ```
 
-如果游戏包含循环，请设置 `params.maxDepth`，否则单次 playout 可能沿环
-无限下降。
+图搜索按 `stateKey()` 合并不同落子顺序到达的同一状态；同一 playout 的路径上
+再次遇到已访问节点时只计入边访问并停止继续下探，因此带环游戏不会无限递归。
+`params.maxDepth` 仍可作为额外的硬上限。
 
 ---
 

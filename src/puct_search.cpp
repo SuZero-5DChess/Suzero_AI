@@ -50,7 +50,8 @@ PuctSearch::PuctSearch(std::shared_ptr<IGameState> rootState,
         "PuctSearch: IGameState::actionCount() must be positive");
   }
   validateParams();
-  root_ = std::make_unique<SearchNode>(root_state_->currentPlayer());
+  root_ = std::make_unique<SearchNode>(root_state_->stateKey(),
+                                       root_state_->currentPlayer());
 }
 
 PuctSearch::~PuctSearch() = default;
@@ -113,6 +114,9 @@ void PuctSearch::validateParams() const {
   require(params_.chosenMovePrune >= 0.0, "chosenMovePrune must be >= 0");
   require(params_.valueWeightExponent >= 0.0,
           "valueWeightExponent must be >= 0");
+  require(params_.graphSearchCatchUpLeakProb >= 0.0 &&
+              params_.graphSearchCatchUpLeakProb <= 1.0,
+          "graphSearchCatchUpLeakProb must be in [0, 1]");
 }
 
 void PuctSearch::resetRoot(std::shared_ptr<IGameState> rootState) {
@@ -123,11 +127,15 @@ void PuctSearch::resetRoot(std::shared_ptr<IGameState> rootState) {
     throw std::invalid_argument(
         "PuctSearch::resetRoot: actionCount changed between states");
   }
+  clearGraph();
   root_state_ = std::move(rootState);
-  root_ = std::make_unique<SearchNode>(root_state_->currentPlayer());
+  root_ = std::make_unique<SearchNode>(root_state_->stateKey(),
+                                       root_state_->currentPlayer());
   root_priors_.clear();
   root_prepared_ = false;
 }
+
+void PuctSearch::clearGraph() { node_table_.clear(); }
 
 void PuctSearch::ensureRootPrepared() {
   if (!root_->isExpanded()) {
@@ -449,7 +457,49 @@ int PuctSearch::selectPrior(SearchNode& node, bool is_root) {
   return best_prior_index;
 }
 
-void PuctSearch::playout(SearchNode& node, IGameState& state, int depth) {
+PuctSearch::NodeLookupResult PuctSearch::allocateOrFindNode(
+    const StateKey& key, PlayerId player) {
+  auto found = node_table_.find(key);
+  if (found != node_table_.end()) {
+    if (found->second->player() != player) {
+      throw std::runtime_error(
+          "PuctSearch: equal stateKey() with different players; the game key "
+          "must include the player to move");
+    }
+    return NodeLookupResult{found->second.get(), false};
+  }
+
+  auto node = std::make_unique<SearchNode>(key, player);
+  SearchNode* raw = node.get();
+  node_table_.emplace(key, std::move(node));
+  return NodeLookupResult{raw, true};
+}
+
+bool PuctSearch::maybeCatchUpEdgeVisits(SearchNode& node, int edge_index,
+                                        bool is_root) {
+  SearchNode::Edge& edge = node.edges_[edge_index];
+  const std::int64_t child_visits = edge.child->stats().visits();
+
+  // A transposed child may already have visits from other parents while this
+  // edge is still at zero. Never let an edge lag its child: add edge visits
+  // without descending. KataGo allows a probabilistic "leak" that descends
+  // anyway, which keeps some search pressure on heavily transposed branches.
+  if (edge.visits >= child_visits) {
+    return false;
+  }
+  if (params_.graphSearchCatchUpLeakProb > 0.0 &&
+      rng_.nextDouble() < params_.graphSearchCatchUpLeakProb) {
+    return false;
+  }
+
+  edge.visits += 1;
+  node.stats_.visits_ += 1;
+  recomputeNodeStats(node, is_root);
+  return true;
+}
+
+void PuctSearch::playout(SearchNode& node, IGameState& state, int depth,
+                         PathSet& path) {
   if (!node.expanded_) {
     expandNode(node, state);
     return;
@@ -474,29 +524,52 @@ void PuctSearch::playout(SearchNode& node, IGameState& state, int depth) {
     return;
   }
 
-  const std::vector<Prior>& priors = activePriors(node);
-  const ActionId action = priors[prior_index].action;
+  const Prior prior = activePriors(node)[prior_index];
   int edge_index = node.edge_index_by_prior_[prior_index];
+  SearchNode* child = nullptr;
+  const bool new_edge = edge_index < 0;
 
-  if (edge_index < 0) {
-    state.applyAction(action);
-    auto child = std::make_unique<SearchNode>(state.currentPlayer());
-    node.edges_.push_back(
-        SearchNode::Edge{priors[prior_index], std::move(child), 0});
-    node.edge_index_by_prior_[prior_index] =
-        static_cast<int>(node.edges_.size()) - 1;
+  if (new_edge) {
+    state.applyAction(prior.action);
+    const StateKey key = state.stateKey();
+    const NodeLookupResult lookup =
+        allocateOrFindNode(key, state.currentPlayer());
+    child = lookup.node;
+
+    node.edges_.push_back(SearchNode::Edge{prior, child, 0});
     edge_index = static_cast<int>(node.edges_.size()) - 1;
-
-    SearchNode& child_node = *node.edges_[edge_index].child;
-    playout(child_node, state, depth + 1);
-    node.edges_[edge_index].visits += 1;
+    node.edge_index_by_prior_[prior_index] = edge_index;
   } else {
-    SearchNode::Edge& edge = node.edges_[edge_index];
-    state.applyAction(action);
-    playout(*edge.child, state, depth + 1);
-    edge.visits += 1;
+    child = node.edges_[edge_index].child;
+
+    // Catch-up must be checked before descending, since a heavily transposed
+    // child is reached from this edge without doing any new work.
+    if (maybeCatchUpEdgeVisits(node, edge_index, is_root)) {
+      return;
+    }
+
+    state.applyAction(prior.action);
   }
 
+  // A newly created edge can point at an existing transposed node whose visits
+  // predate this edge, so it checks catch-up once as well.
+  if (new_edge && maybeCatchUpEdgeVisits(node, edge_index, is_root)) {
+    return;
+  }
+
+  // KataGo's cycle rule: if the child is already on this playout's path, do
+  // not descend. Count the edge visit and the parent visit so the playout
+  // still makes progress and the limits are eventually reached.
+  if (!path.insert(child).second) {
+    node.edges_[edge_index].visits += 1;
+    node.stats_.visits_ += 1;
+    recomputeNodeStats(node, is_root);
+    return;
+  }
+
+  playout(*child, state, depth + 1, path);
+
+  node.edges_[edge_index].visits += 1;
   node.stats_.visits_ += 1;
   recomputeNodeStats(node, is_root);
 }
@@ -624,6 +697,75 @@ void PuctSearch::recomputeNodeStats(SearchNode& node, bool is_root) {
   node.stats_.utility_sq_sum_ = utility_sq_sum;
 }
 
+std::unique_ptr<SearchNode> PuctSearch::copySubtree(
+    const SearchNode& subtree_root,
+    std::unordered_map<StateKey, std::unique_ptr<SearchNode>>& table) const {
+  // The graph may contain cycles (a cycle-closing edge is kept; the playout
+  // path check merely stops search from traversing it again), so the copy has
+  // to register a node before recursing into its children.
+  std::unordered_map<const SearchNode*, std::unique_ptr<SearchNode>> owned;
+  std::function<SearchNode*(const SearchNode&)> copy_node =
+      [&](const SearchNode& original) -> SearchNode* {
+    auto found = owned.find(&original);
+    if (found != owned.end()) {
+      return found->second.get();
+    }
+
+    auto node = std::make_unique<SearchNode>(original.state_key_,
+                                            original.player_);
+    SearchNode* raw = node.get();
+    owned.emplace(&original, std::move(node));
+
+    raw->expanded_ = original.expanded_;
+    raw->terminal_ = original.terminal_;
+    raw->evaluator_utility_ = original.evaluator_utility_;
+    raw->stats_ = original.stats_;
+    raw->priors_ = original.priors_;
+    raw->edge_index_by_prior_ = original.edge_index_by_prior_;
+    raw->edges_.resize(original.edges_.size());
+    for (std::size_t i = 0; i < original.edges_.size(); ++i) {
+      const SearchNode::Edge& edge = original.edges_[i];
+      raw->edges_[i] =
+          SearchNode::Edge{edge.prior, copy_node(*edge.child), edge.visits};
+    }
+    return raw;
+  };
+
+  copy_node(subtree_root);
+
+  // The promoted node stays in the table under its own key, exactly as in
+  // KataGo, where the old child remains a table node after being promoted.
+  // This matters for cycles: a descendant's back-edge resolves to this table
+  // copy, never to the new root.
+  table.reserve(owned.size());
+  for (auto& entry : owned) {
+    StateKey key = entry.second->state_key_;
+    table.emplace(std::move(key), std::move(entry.second));
+  }
+
+  // The new root is a separate copy whose edges only target table nodes. It is
+  // therefore unreachable from the graph and can never be part of a cycle.
+  auto new_root = std::make_unique<SearchNode>(subtree_root.state_key_,
+                                              subtree_root.player_);
+  new_root->expanded_ = subtree_root.expanded_;
+  new_root->terminal_ = subtree_root.terminal_;
+  new_root->evaluator_utility_ = subtree_root.evaluator_utility_;
+  new_root->stats_ = subtree_root.stats_;
+  new_root->priors_ = subtree_root.priors_;
+  new_root->edge_index_by_prior_ = subtree_root.edge_index_by_prior_;
+  new_root->edges_.reserve(subtree_root.edges_.size());
+  for (const SearchNode::Edge& edge : subtree_root.edges_) {
+    auto found = table.find(edge.child->state_key_);
+    if (found == table.end()) {
+      throw std::logic_error(
+          "PuctSearch::advanceRoot: copied subtree lost a child node");
+    }
+    new_root->edges_.push_back(
+        SearchNode::Edge{edge.prior, found->second.get(), edge.visits});
+  }
+  return new_root;
+}
+
 bool PuctSearch::advanceRoot(ActionId action) {
   for (std::size_t i = 0; i < root_->priors_.size(); ++i) {
     if (root_->priors_[i].action != action) {
@@ -634,17 +776,23 @@ bool PuctSearch::advanceRoot(ActionId action) {
       return false;
     }
 
-    std::unique_ptr<IGameState> new_state = root_state_->clone();
-    new_state->applyAction(action);
-
-    std::unique_ptr<SearchNode> new_root =
-        std::move(root_->edges_[edge_index].child);
-    if (!new_root) {
+    SearchNode* child = root_->edges_[edge_index].child;
+    if (child == nullptr) {
       return false;
     }
 
+    std::unique_ptr<IGameState> new_state = root_state_->clone();
+    new_state->applyAction(action);
+
+    // KataGo copies the promoted subtree so that the new root never lives in
+    // the node table, then discards every node that is not reachable from it.
+    // Copying also gives us a fresh, cycle-safe ownership structure.
+    std::unordered_map<StateKey, std::unique_ptr<SearchNode>> new_table;
+    std::unique_ptr<SearchNode> new_root = copySubtree(*child, new_table);
+
     root_state_ = std::move(new_state);
     root_ = std::move(new_root);
+    node_table_ = std::move(new_table);
     root_priors_.clear();
     root_prepared_ = false;
     return true;
@@ -681,6 +829,8 @@ SearchResult PuctSearch::runImpl(
   const auto start = std::chrono::steady_clock::now();
   std::int64_t playouts = 0;
   bool completed = true;
+  PathSet path;
+  path.reserve(256);
 
   for (;;) {
     if (limitsReached(playouts, start)) {
@@ -696,7 +846,8 @@ SearchResult PuctSearch::runImpl(
     }
 
     std::unique_ptr<IGameState> state = root_state_->clone();
-    playout(*root_, *state, 0);
+    path.clear();
+    playout(*root_, *state, 0, path);
     ++playouts;
   }
 
