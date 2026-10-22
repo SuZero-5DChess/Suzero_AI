@@ -313,6 +313,49 @@ void testCycleTerminates() {
   }
 }
 
+void testCycleCheckToggleOnAcyclicGame() {
+  // On a DAG the path set only costs time, so both settings must agree.
+  auto make_params = [](bool enabled) {
+    SearchParams params = paramsWithPlayouts(500);
+    params.graphSearchCycleCheckEnabled = enabled;
+    return params;
+  };
+
+  PuctSearch with_check(std::make_shared<CommutingGame>(),
+                        std::make_shared<UniformEvaluator>(),
+                        make_params(true), 4242);
+  PuctSearch without_check(std::make_shared<CommutingGame>(),
+                           std::make_shared<UniformEvaluator>(),
+                           make_params(false), 4242);
+
+  const SearchResult a = runSearch(with_check);
+  const SearchResult b = runSearch(without_check);
+
+  CHECK(a.bestAction == b.bestAction);
+  CHECK(a.actions.size() == b.actions.size());
+  for (std::size_t i = 0; i < a.actions.size() && i < b.actions.size(); ++i) {
+    CHECK(a.actions[i].action == b.actions[i].action);
+    CHECK(a.actions[i].visits == b.actions[i].visits);
+    CHECK_NEAR(a.actions[i].prior, b.actions[i].prior, 0.0);
+  }
+  CHECK_NEAR(a.rootUtility, b.rootUtility, 0.0);
+  CHECK(with_check.nodeCount() == without_check.nodeCount());
+}
+
+void testCycleCheckDisabledWithDepthLimit() {
+  // Without the path check a cyclic game relies on maxDepth to terminate.
+  SearchParams params = paramsWithPlayouts(50);
+  params.graphSearchCycleCheckEnabled = false;
+  params.maxDepth = 8;
+
+  PuctSearch search(std::make_shared<CycleGame>(),
+                    std::make_shared<UniformEvaluator>(), params);
+  const SearchResult result = runSearch(search);
+
+  CHECK(result.completed);
+  CHECK(result.playouts == 50);
+}
+
 void testAdvanceRootInvalid() {
   auto state = std::make_shared<SubtractionGame>(0, 0);
   auto evaluator = std::make_shared<UniformEvaluator>();
@@ -353,6 +396,8 @@ int main() {
   testEvaluatorValidation();
   testTranspositionMerging();
   testCycleTerminates();
+  testCycleCheckToggleOnAcyclicGame();
+  testCycleCheckDisabledWithDepthLimit();
   testAdvanceRootInvalid();
   testResetRoot();
 

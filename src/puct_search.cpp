@@ -499,7 +499,7 @@ bool PuctSearch::maybeCatchUpEdgeVisits(SearchNode& node, int edge_index,
 }
 
 void PuctSearch::playout(SearchNode& node, IGameState& state, int depth,
-                         PathSet& path) {
+                         PathSet* path) {
   if (!node.expanded_) {
     expandNode(node, state);
     return;
@@ -559,8 +559,9 @@ void PuctSearch::playout(SearchNode& node, IGameState& state, int depth,
 
   // KataGo's cycle rule: if the child is already on this playout's path, do
   // not descend. Count the edge visit and the parent visit so the playout
-  // still makes progress and the limits are eventually reached.
-  if (!path.insert(child).second) {
+  // still makes progress and the limits are eventually reached. Games that
+  // cannot cycle can turn this off to skip the path-set hash and lookup.
+  if (path != nullptr && !path->insert(child).second) {
     node.edges_[edge_index].visits += 1;
     node.stats_.visits_ += 1;
     recomputeNodeStats(node, is_root);
@@ -830,7 +831,11 @@ SearchResult PuctSearch::runImpl(
   std::int64_t playouts = 0;
   bool completed = true;
   PathSet path;
-  path.reserve(256);
+  PathSet* path_ptr = nullptr;
+  if (params_.graphSearchCycleCheckEnabled) {
+    path.reserve(256);
+    path_ptr = &path;
+  }
 
   for (;;) {
     if (limitsReached(playouts, start)) {
@@ -846,8 +851,10 @@ SearchResult PuctSearch::runImpl(
     }
 
     std::unique_ptr<IGameState> state = root_state_->clone();
-    path.clear();
-    playout(*root_, *state, 0, path);
+    if (path_ptr != nullptr) {
+      path_ptr->clear();
+    }
+    playout(*root_, *state, 0, path_ptr);
     ++playouts;
   }
 

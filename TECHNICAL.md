@@ -11,7 +11,7 @@
 - 接入状态：**未接入任何游戏引擎**
 - 抽象接口：`IGameState`、`IEvaluator`、`IStopCriterion`
 - 构建：CMake + Visual Studio 2022 通过（MSVC 19.44，Release 与 Debug）
-- 测试：`suzero_mcts_tests`，176 项检查全部通过
+- 测试：`suzero_mcts_tests`，188 项检查全部通过
 
 ## 不可破坏的不变量
 
@@ -28,6 +28,8 @@
 9. 先验列表只包含合法且策略值大于 0 的动作，按动作 id 升序，保证确定性。
 10. 根节点噪声与策略温度只作用于 `root_priors_`，不修改图中节点的原始先验。
 11. 同一个 `PuctSearch` 实例不支持并发调用。
+12. 关闭 `graphSearchCycleCheckEnabled` 后不再维护 playout 路径集合；这只对严格
+    无环的图安全，有环时只能依赖 `maxDepth` 或调用栈上限终止。
 
 ## 实现要点
 
@@ -37,6 +39,8 @@
 - `maybeCatchUpEdgeVisits`：`edgeVisits < childVisits` 时只补边访问而不下探；
   `graphSearchCatchUpLeakProb` 控制偶尔仍然下探。
 - `PathSet`：每次 playout 的节点集合；再次遇到即判定成环，只计边访问。
+  `graphSearchCycleCheckEnabled = false` 时不创建、不清空该集合，playout 中也
+  不做插入/查找。
 - `selectPrior`：PUCT + FPU + utility stdev 缩放；平局保留较前先验。
 - `recomputeNodeStats`：child weight 聚合、根节点 subtract/prune、
   `valueWeightExponent` 坏子降权、加入自身评估权重 1。
@@ -56,6 +60,11 @@
 6. 更紧凑的状态键（当前为 `std::string`，键构造成本由游戏承担）。
 
 ## 变更记录
+
+### 2026-10-22 · 成环检查可关闭
+
+- 新增 `graphSearchCycleCheckEnabled`；关闭时不维护 playout 路径集合。
+- 新增无环图开关等价性、有环图加 `maxDepth` 的终止测试；测试增至 188 项检查。
 
 ### 2026-10-22 · 改为纯图搜索
 

@@ -24,7 +24,8 @@
 - 终局价值、非交替行棋（同一方连续行动）的价值视角处理
 - **图搜索**：按 `IGameState::stateKey()` 合并置换节点，边只引用子节点
 - 根节点不入节点表，保证换根后不会出现经过根的环
-- 边访问追赶（`graphSearchCatchUpLeakProb`）与路径成环检测
+- 边访问追赶（`graphSearchCatchUpLeakProb`）与路径成环检测；
+  无环游戏可用 `graphSearchCycleCheckEnabled = false` 省去路径集合的哈希与查找
 - 访问数 / playout 数 / 时间 / 深度限制，以及外部停止条件接口
 - 根节点子树复用（`advanceRoot`，复制子图并重建节点表）
 - 最终着法采样：温度、subtract/prune（`chosenMove*`）

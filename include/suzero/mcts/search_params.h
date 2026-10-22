@@ -43,6 +43,14 @@ struct SearchParams {
   /// is KataGo's default. See docs/katago-mapping.md.
   double graphSearchCatchUpLeakProb = 0.0;
 
+  /// Whether each playout tracks the nodes on its path to stop cycles.
+  ///
+  /// Set to false only for games where a playout can never return to a state
+  /// it already visited (strictly progressing games). This removes the per-edge
+  /// path-set hash/lookup. On a cyclic game it can recurse until `maxDepth` or
+  /// the call stack is exhausted, so keep `maxDepth` set if there is any doubt.
+  bool graphSearchCycleCheckEnabled = true;
+
   // ------------------------------------------------------------ exploration --
 
   /// Constant part of the PUCT exploration coefficient.

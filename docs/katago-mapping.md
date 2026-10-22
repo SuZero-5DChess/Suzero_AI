@@ -70,7 +70,9 @@ childWeight(child) = weightSum(child) * edgeVisits / max(childVisits, 1)
   插入集合；若已在集合中，说明本 playout 成环，只给该边 +1、父节点 +1，然后
   返回，不再递归。环边会保留在图中，因此
   `edgeVisits >= childVisits` **不是**不变量（KataGo 在环处理处也明确说明），
-  child weight 公式仍然成立。
+  child weight 公式仍然成立。若 `graphSearchCycleCheckEnabled = false`，则完全
+  跳过路径集合的插入与查找（适用于严格无环游戏）；此时有环图只能依靠
+  `maxDepth` 或调用栈上限终止。
 - **换根**：`advanceRoot` 复制以目标子节点为根的整个可达子图（包括可能存在的
   环边），被提升的节点在表内保留一份副本，**新根另建一份独立副本**且只指向表内
   节点，因此新根永远不会成为任何边的目标，也就不可能位于环上。旧表整体丢弃。
@@ -211,6 +213,8 @@ P'_i = (1 - weight) * P_i + weight * noise_i / sum(noise)
 11. **成环时 `edgeVisits` 可能大于 `childVisits`**：与上游一致，child weight
     公式仍按两者比值计算。
 12. **`nodeCount()`** 返回根节点加节点表大小；根始终计入，但不占用表项。
+13. **`graphSearchCycleCheckEnabled` 是新增参数**：上游总是检查路径成环；这里
+    允许无环游戏显式关掉该检查以省去每步的集合操作。关闭后正确性由游戏保证。
 
 ---
 

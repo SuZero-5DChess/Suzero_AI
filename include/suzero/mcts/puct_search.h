@@ -174,7 +174,8 @@ class PuctSearch {
   void buildPriors(SearchNode& node, const IGameState& state,
                    const std::vector<float>& policy);
   NodeLookupResult allocateOrFindNode(const StateKey& key, PlayerId player);
-  void playout(SearchNode& node, IGameState& state, int depth, PathSet& path);
+  void playout(SearchNode& node, IGameState& state, int depth,
+               PathSet* path);
   bool maybeCatchUpEdgeVisits(SearchNode& node, int edge_index, bool is_root);
   int selectPrior(SearchNode& node, bool is_root);
   double computeFpuValue(const SearchNode& node, bool is_root,
