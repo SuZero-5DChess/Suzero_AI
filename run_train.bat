@@ -1,5 +1,5 @@
 @echo off
-REM SuZero-02 5D chess AlphaZero training launcher.
+REM SuZero AI 5D chess AlphaZero training launcher.
 REM
 REM Requires the pybind11 extension:
 REM   python\suzero_5dchess\_5dchess*.pyd

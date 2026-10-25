@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
 // IEvaluator implementation backed by the 5dc_ml smallstep_movekey_v1 ONNX
 // model. The ONNX Runtime C++ API is hidden behind a pimpl so the public header

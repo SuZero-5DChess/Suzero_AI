@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
-// Unit tests for the game-agnostic PUCT search. Toy games only; no engine is
+// Unit tests for the PUCT search core. Toy games only; no engine is
 // linked or modified.
 
 #include <atomic>

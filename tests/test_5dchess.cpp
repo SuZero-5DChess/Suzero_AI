@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
 // Acceptance tests for the 5D chess integration:
 //   Chess5DGameState (IGameState) + OnnxEvaluator (IEvaluator) + PuctSearch.

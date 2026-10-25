@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
-// This file is part of a game-agnostic PUCT/MCTS library derived from KataGo
-// (https://github.com/lightvector/KataGo). See THIRD_PARTY_NOTICES.md.
+// This file is part of SuZero AI, a 5D chess AlphaZero project. The search
+// core is derived from KataGo (https://github.com/lightvector/KataGo).
+// See THIRD_PARTY_NOTICES.md.
 
 #pragma once
 

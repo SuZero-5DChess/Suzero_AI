@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
 // Minimal games used only by the unit tests. They are *not* engine
 // integrations and are not part of the library target.

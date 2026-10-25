@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(suzero_mcts
   VERSION 0.5.0
-  DESCRIPTION "Game-agnostic PUCT graph search core derived from KataGo"
+  DESCRIPTION "SuZero AI 5D chess AlphaZero; search core derived from KataGo"
   LANGUAGES CXX
 )
 

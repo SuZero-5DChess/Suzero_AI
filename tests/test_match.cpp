@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
 // Standalone tests for heterogeneous matches. These use two deliberately
 // different toy adapters and do not depend on any external game engine.

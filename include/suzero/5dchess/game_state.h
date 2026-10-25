@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
-// 5D chess ("Very Small - Open") integration for the game-agnostic PUCT core.
+// 5D chess ("Very Small - Open") integration for the SuZero AI PUCT core.
 //
 // This header deliberately hides the upstream engine types behind a pimpl so
 // that consumers only need C++17 and this include directory. The implementation

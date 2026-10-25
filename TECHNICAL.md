@@ -1,9 +1,9 @@
-# TECHNICAL — SuZero-02 PUCT 图搜索核心
+# TECHNICAL — SuZero AI 5D 国际象棋 AlphaZero
 
 本文件记录当前实现状态、关键不变量与变更历史。算法与上游对应关系详见
 [docs/katago-mapping.md](docs/katago-mapping.md)。
 
-## 当前状态（2026-10-23）
+## 当前状态（2026-10-25）
 
 - 版本：0.6.0
 - 语言/标准：核心 C++17，仅标准库；5D 适配层 C++23（上游引擎要求）
@@ -11,16 +11,17 @@
 - 自对弈：**进程内多对局线程 + 共享批量推理**（对齐 KataGo
   `numGameThreads` / `NNEvaluator` 模型）：`BatchedEvaluator`（通用请求队列 +
   server 线程 + `IBatchBackend`）与 `SelfPlayRunner`（对局线程池）
-- 接入状态：核心保持游戏无关；可选构建 **5D 象棋（Very Small - Open）**
-  适配层（`suzero_5dchess`），连接 5dchess_engine、ONNX 网络与 PUCT
+- 接入状态：项目主线为 **5D 国际象棋**；C++ 核心保持游戏无关的接口设计，
+  5D 适配层（`suzero_5dchess`）连接 5dchess_engine、ONNX 网络与 PUCT
 - 抽象接口：`IGameState`、`IEvaluator`、`IBatchBackend`、`IStopCriterion`
-- 训练（可选，Python）：游戏无关抽象层 `Trainer` / `TrainingDataSource` /
+- 训练（Python）：游戏无关抽象层 `Trainer` / `TrainingDataSource` /
   `TrainingLoop` / `MetricsSink`，以及 PyTorch 后端 `TorchTrainer` /
   `InMemoryDataSource` / `IterableDataSource`；与 C++ 目标完全解耦
 - 5D 训练：`suzero_5dchess` 在通用训练核心之上实现自对弈 AlphaZero
   （pybind11 绑定 + PyTorch 网络 + PUCT + 回放 + ONNX 导出 + 评估）；
-  `d_model=128` 时参数 192,058，默认变体 `very_small`；新增 8×8 变体
-  `standard_turn_zero`（270,202 参数，训练 CLI 默认预算 300,000）
+  `d_model=128` 时参数 192,058，CLI 默认变体 `very_small`；8×8 变体
+  `standard_turn_zero` / `standard`（270,202 参数，Turn Zero 训练预算 300,000）；
+  `run_train.bat` 默认变体为 `standard_turn_zero`
 - 异构模型对战使用独立的棋盘上限 `model_match_max_boards`，默认 `25`；达到上限立即按物质分结束。
 - 构建：CMake + Visual Studio 2022 通过（MSVC 19.44，Release）
 - 测试：`suzero_mcts_tests` 1213 项 + `suzero_5dchess_tests` 664 项，
@@ -372,10 +373,24 @@
 
 ## 变更记录
 
+### 2026-10-25 · 文档重新定位为 5D 国际象棋 AI
+
+- README 从“游戏无关 PUCT 图搜索核心”改为 5D 国际象棋 AlphaZero 项目说明：
+  规则变体与模型规模前置，训练/对战/棋谱/回放按使用流程重组，并同步
+  `run_train.bat` 当前默认值（`standard_turn_zero`、100 workers、4 进程、
+  1000 局、棋盘上限 55–90、连续训练开启）。
+- 在 README 与 LICENSE 开头明确标注搜索核心大量借鉴并派生自 KataGo（MIT），
+  训练调度重新实现其 `python/train.py` 方法；LICENSE 增补第三方组件清单。
+- 同步更新 `THIRD_PARTY_NOTICES.md`、`docs/katago-mapping.md` 与
+  `run_train.bat` 中过时的旧项目名和不一致的定位表述。
+- 全仓 42 个 C++ 源文件的 SPDX 版权行统一为 `SuZero-5DChess contributors`，
+  文件头统一描述 SuZero AI 5D 国际象棋项目并保留 KataGo 派生声明；
+  CMake 与 Python 包描述同步。
+
 ### 2026-10-25 · 构建目录可重定位，配置入口脚本化
 
 - 问题：`build/` 内的 `CMakeCache.txt`、`.vcxproj`、`.tlog` 等生成物嵌入了
-  绝对源码路径（迁移前为 `C:/UserData/Project/Suzero_02`），全树共 483 个
+  绝对源码路径（迁移前的旧目录），全树共 483 个
   生成文件含旧路径。目录改名后 CMake 会因 `CMAKE_HOME_DIRECTORY` 不一致
   拒绝复用缓存，MSBuild 的 `OutDir` 与包含目录也全部失效。
 - 源码本身没有绝对路径：`CMakeLists.txt` 使用 `CMAKE_CURRENT_SOURCE_DIR`，

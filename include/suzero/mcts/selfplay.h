@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
-// This file is part of a game-agnostic PUCT/MCTS library derived from KataGo
-// (https://github.com/lightvector/KataGo). See THIRD_PARTY_NOTICES.md.
+// This file is part of SuZero AI, a 5D chess AlphaZero project. The search
+// core is derived from KataGo (https://github.com/lightvector/KataGo).
+// See THIRD_PARTY_NOTICES.md.
 //
-// Game-agnostic self-play driver: several game threads each own one search
+// Self-play driver: several game threads each own one search
 // tree and one game, and share a single (normally batching) evaluator. This is
 // the C++ counterpart of KataGo's `selfplay` game-loop threads.
 

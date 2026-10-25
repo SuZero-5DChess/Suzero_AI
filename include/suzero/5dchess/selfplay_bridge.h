@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
 // Self-play driver used by the Python trainer's `cpp_onnx` backend.
 //
@@ -11,7 +11,7 @@
 //
 // The loop mirrors python/suzero_5dchess/self_play.py (forced SUBMIT, playout
 // cap randomization, temperature schedule, samples only on full-search moves)
-// but uses the game-agnostic PuctSearch with subtree reuse.
+// but uses the SuZero AI PuctSearch core with subtree reuse.
 
 #pragma once
 

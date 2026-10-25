@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "suzero-train"
 version = "0.1.0"
-description = "Game-agnostic training loop, PyTorch trainer and 5D chess AlphaZero"
+description = "5D chess AlphaZero training, self-play and PyTorch training core"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [

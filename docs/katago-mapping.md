@@ -1,4 +1,4 @@
-# KataGo 搜索模块 → SuZero-02 映射
+# KataGo 搜索模块 → SuZero AI 映射
 
 本文记录提取范围、公式对应关系、刻意省略的部分，以及重写时容易出错的语义。
 所有上游路径均相对 KataGo 仓库 `cpp/search/`。
@@ -9,7 +9,7 @@
 
 ## 1. 类型映射
 
-| KataGo | SuZero-02 | 说明 |
+| KataGo | SuZero AI | 说明 |
 |---|---|---|
 | `Search` | `PuctSearch` | 去掉了 Go 专用状态、线程池、评估缓存 |
 | `SearchParams` | `SearchParams` | 仅保留游戏无关子集 |
@@ -338,7 +338,7 @@ KataGo 的棋盘动作空间固定为 `NNPos` 的稠密大小；本库允许
 `cpp/command/selfplay.cpp`、`cpp/program/selfplaymanager.cpp`，以及
 `cpp/configs/training/selfplay*.cfg`。
 
-| KataGo | SuZero-02 | 说明 |
+| KataGo | SuZero AI | 说明 |
 |---|---|---|
 | `NNEvaluator::evaluate` 入队 + 条件变量等待 | `BatchedEvaluator::evaluate` | 每个请求一个 `Request`，阻塞到被服务 |
 | `m_numNNServerThreadsPerModel` | `BatchEvaluatorConfig::numServerThreads` | 每线程一个 backend（一份模型） |

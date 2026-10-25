@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SuZero-02 contributors
+// Copyright (c) 2026 SuZero-5DChess contributors
 //
 // Private implementation unit shared by OnnxEvaluator (one position per call)
 // and OnnxBatchBackend (many positions per device call). Keeping the protocol,

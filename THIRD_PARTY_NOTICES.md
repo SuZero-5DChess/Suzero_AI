@@ -1,9 +1,10 @@
 # 第三方开源声明 / Third-Party Notices
 
-本项目是一个**重新实现的、与游戏无关的 PUCT 图搜索核心**。其算法、参数语义和统计量
-设计源自 KataGo 的搜索模块；可选的 Python 训练器也重新实现了 KataGo 的训练调度与
-裁剪方法。本项目不包含 KataGo 源码树中的任何文件，也不包含其第三方依赖
-（CUDA、OpenCL、cutlass、nlohmann_json 等均未复制）。
+本项目是一个面向 **5D 国际象棋**的 AlphaZero 项目。其搜索核心是从 KataGo 搜索模块
+提取、移植并重写出的 PUCT 图搜索实现，算法、参数语义和统计量设计**大量源自
+KataGo**；Python 训练器也重新实现了 KataGo 的训练调度与裁剪方法。本项目不包含
+KataGo 源码树中的文件，也不包含其第三方依赖（CUDA、OpenCL、cutlass、
+nlohmann_json 等均未复制）。
 
 ---
 
@@ -29,7 +30,7 @@
   追赶/成环与换根处理等算法语义保持与上游一致。
 - 许可证：MIT
 
-### KataGo 训练方法（可选 Python 训练器）
+### KataGo 训练方法（Python 训练器）
 
 参考的上游路径：`python/train.py`（及其调用的训练辅助逻辑）。
 
@@ -76,7 +77,7 @@ KataGo 仓库根目录的 `LICENSE` 还说明：其随附的若干第三方库/�
 
 ---
 
-## 5dchess_engine（可选 5D 适配层）
+## 5dchess_engine（5D 规则与 UI）
 
 - 项目主页：<https://github.com/ftxi/5dchess_engine>
 - 用途：`src/5dchess/game_state.cpp` 通过公开 API 使用该引擎的棋规与
@@ -89,7 +90,7 @@ KataGo 仓库根目录的 `LICENSE` 还说明：其随附的若干第三方库/�
 - 引擎许可证见 `5dchess_engine-main/LICENSE`。SVG 棋子、图标及字体的独立许可证
   和归属声明保留在 `ui/assets/`、`ui/icons/` 和 `ui/fonts/` 中，分发时一并保留。
 
-## ONNX Runtime（可选 5D 适配层）
+## ONNX Runtime（5D 网络推理）
 
 - 项目主页：<https://github.com/microsoft/onnxruntime>
 - 用途：`src/5dchess/onnx_evaluator.cpp` 使用其 C++ API 做同步推理。
@@ -121,8 +122,7 @@ KataGo 仓库根目录的 `LICENSE` 还说明：其随附的若干第三方库/�
 ## 本项目
 
 - 新增代码：MIT，见 [LICENSE](LICENSE)。
-- 搜索核心**不依赖**任何游戏引擎或神经网络；`tests/` 下的玩具游戏仅用于
-  验证抽象接口和搜索算法。5D 适配层是可选的独立目标，不改变核心的
-  游戏无关性。
+- 项目主线是 5D 国际象棋；内部搜索核心**不依赖**任何游戏引擎或神经网络，
+  `tests/` 下的玩具游戏仅用于验证抽象接口和搜索算法，5D 适配层是独立构建目标。
 - Python 训练子系统与 C++ 目标完全解耦；`python/suzero_train/` 的代码
   均为新实现，未复制 KataGo 的上游文件。

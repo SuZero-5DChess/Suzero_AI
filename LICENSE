@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 SuZero-02 contributors
+Copyright (c) 2026 SuZero-5DChess contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,26 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-This repository contains code derived from KataGo, which is licensed under the
-MIT License by its authors. See THIRD_PARTY_NOTICES.md for the full text of the
-KataGo license and for a list of the derived components.
+SuZero AI is a 5D chess AlphaZero project. Substantial portions of its search
+core are derived from KataGo (https://github.com/lightvector/KataGo),
+Copyright (c) 2025 David J Wu ("lightvector") and/or other authors of that
+repository, which is distributed under the MIT License. The Python trainer
+reimplements training-schedule methods from KataGo's python/train.py. KataGo's
+upstream copyright notice and license text are reproduced in
+THIRD_PARTY_NOTICES.md and must be retained in redistributions.
+
+Third-party components used by this repository. Each component remains under
+its own license; the list below is a summary, and THIRD_PARTY_NOTICES.md
+contains the full upstream notices:
+
+- KataGo (MIT) - search core and training methods.
+  https://github.com/lightvector/KataGo
+- 5dchess_engine (BSD 2-Clause, Copyright (c) 2024-2026, ftxi) - rules engine
+  and native replay UI, vendored under 5dchess_engine-main/.
+  https://github.com/ftxi/5dchess_engine
+- ONNX Runtime (MIT, Copyright (c) Microsoft Corporation) - linked at build
+  time from a user-provided SDK; not vendored in this repository.
+  https://github.com/microsoft/onnxruntime
+- very_small ONNX model and legacy LSTM checkpoint compatibility (BSD
+  2-Clause, Copyright (c) 2024-2026, ftxi) - derived from 5dc_ml.
+  https://github.com/ftxi/5dc_ml
