@@ -1,0 +1,30 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.07"]
+[Round "8"]
+[White "Sapphia"]
+[Black "Tones"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1. Nf3 / Nf6
+2. Na3 / d5
+3. c4 / c6
+4. Qb3 / Qb6
+5. Qxb6 / axb6
+6. b3 / Rxa3
+7. Bxa3 / c5
+8. g3 / Bg4
+9. Bg2 / Ne4
+10. O-O / Bxf3
+11. Bxf3 / Nxd2
+12. Bxd5 / Nc6
+13. Bb2 / e6
+14. Bxc6 / bxc6
+15. Be5 / (0T15)Nd2>>x(0T13)e2~ (>L-1)
+16. (-1T14)Kh1 / (-1T14)Nd8
+17. (-1T15)Bf6 / (-1T15)Nxg3
+18. (-1T16)Kg2 (0T16)Kg2 / (-1T16)Ne2 (0T16)Bd6
+19. (0T17)Be5>>(0T15)g5~ (>L1) / (1T15)f6
+20. (1T16)Bxd2 / (1T16)Bd6
+21. (1T17)Bd2>>(1T16)d3~ (>L2) / (2T16)Nf3

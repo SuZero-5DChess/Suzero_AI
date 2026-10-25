@@ -1,0 +1,22 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.10"]
+[Round "164"]
+[White "Tones"]
+[Black "cirtus"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{9:31}(0T1)e2e4 / {7:54}(0T1)Ng8f6 
+2.{9:31}(0T2)d2d4 / {7:54}(0T2)c7c5 
+3.{9:31}(0T3)b2b4 / {7:54}(0T3)Qd8b6 
+4.{9:31}(0T4)c2c3 / {7:54}(0T4)c5b4 
+5.{9:31}(0T5)Bc1g5 / {7:54}(0T5)b4c3 
+6.{9:31}(0T6)Bg5f6 / {7:54}(0T6)c3c2 
+7.{9:31}(0T7)Nb1c3 / {7:54}(0T7)c2d1 
+8.{9:31}(0T8)Ra1d1 / {7:54}(0T8)Qb6f6 
+9.{9:31}(0T9)Bf1c4 / {7:54}(0T9)Nb8c6 
+10.{9:31}(0T10)Nc3d5 / {7:54}(0T10)Qf6d6 
+11.{9:31}(0T11)Bc4>>(0T7)c8 / {7:54}(1T7)Qb6b4 
+12.{9:31}(1T8)Nb1d2 / {7:54}(1T8)Qb4>>(0T7)c3 
+13.{9:31}(1T9)Nd2>>(0T7)d2 / {7:54}(2T7)c2d1

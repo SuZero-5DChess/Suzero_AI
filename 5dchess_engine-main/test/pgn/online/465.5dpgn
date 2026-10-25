@@ -1,0 +1,29 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.09"]
+[Round "420"]
+[White "cirtus"]
+[Black "RyanFourPM"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Ng1f3 / {20:05}(0T2)d7d5 
+3.{20:05}(0T3)c2c4 / {20:05}(0T3)c7c6 
+4.{20:05}(0T4)c4d5 / {20:05}(0T4)Bc8d7 
+5.{19:48}(0T5)d5c6 / {20:05}(0T5)Nb8c6 
+6.{19:47}(0T6)Qd1b3 / {19:45}(0T6)e7e6 
+7.{19:02}(0T7)Bf1b5 / {14:07}(0T7)Bf8d6 
+8.{14:43}(0T8)Nb1a3 / {12:58}(0T8)Nc6a5 
+9.{14:21}(0T9)Qb3d3 / {10:29}(0T9)Qd8b6 
+10.{12:02}(0T10)b2b4 / {3:58}(0T10)Na5c6 
+11.{11:33}(0T11)Qd3d6 / {3:35}(0T11)Ra8d8 
+12.{10:04}(0T12)Bc1b2 / {3:07}(0T12)Nf6e4 
+13.{9:25}(0T13)Bb2g7 / {3:02}(0T13)Rh8g8 
+14.{4:13}(0T14)Qd6d3 / {2:01}(0T14)Nc6b4 
+15.{2:17}(0T15)Qd3e4 / {2:01}(0T15)Bd7b5 
+16.{2:03}(0T16)Na3b5 / {1:43}(0T16)Nb4d3 
+17.{1:24}(0T17)Ke1f1 / {1:12}(0T17)Rg8g7 
+18.{0:45}(0T18)Nb5c7 / {1:11}(0T18)Qb6c7 
+19.{0:43}(0T19)Qe4a4
+{original data: black wins; verification: white wins}

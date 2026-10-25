@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.25"]
+[Round "449"]
+[White "RyanFourPM"]
+[Black "Gjorbajarb"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)e7e6 
+2.{20:05}(0T2)d2d4 / {20:05}(0T2)Qd8f6 
+3.{19:56}(0T3)c2c3 / {20:05}(0T3)h7h6 
+4.{19:47}(0T4)Nb1d2 / {20:05}(0T4)Ng8e7 
+5.{19:41}(0T5)Qd1c2 / {19:55}(0T5)Ne7f5 
+6.{19:31}(0T6)Nd2e4 / {19:52}(0T6)Qf6g6 
+7.{18:14}(0T7)Rh1g1 / {19:35}(0T7)h6h5 
+8.{17:17}(0T8)Bc1f4 / {18:51}(0T8)c7c6 
+9.{16:56}(0T9)Nf3e5 / {18:49}(0T9)Qg6h7 
+10.{16:56}(0T10)Ne4g5 / {18:48}(0T10)Qh7h6 
+11.{16:44}(0T11)Ne5f7 / {18:13}(0T11)Qh6f6 
+12.{16:31}(0T12)Nf7h8 / {18:09}(0T12)g7g6 
+13.{15:38}(0T13)Ng5f7 / {18:09}(0T13)Bf8g7 
+14.{14:55}(0T14)Bf4g5 / {17:04}(0T14)Qf6g5 
+15.{14:31}(0T15)Nh8>>(0T13)g8
+{recorded:white wins}

@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2023.01.20"]
+[Round "717"]
+[White "Nehemiagurl"]
+[Black "Los Bro SPQR"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "5D Chess World Championship 2022"]
+
+1.{14:54}(0T1)Ng1f3 / {17:46}(0T1)Ng8f6
+2.{14:54}(0T2)e2e3 / {17:46}(0T2)c7c6
+3.{14:54}(0T3)c2c3 / {17:46}(0T3)Qd8b6
+4.{14:54}(0T4)Qd1b3 / {17:46}(0T4)Qb6b3
+5.{14:54}(0T5)a2b3 / {17:46}(0T5)d7d5
+6.{14:54}(0T6)c3c4 / {17:46}(0T6)Bc8f5
+7.{14:54}(0T7)c4d5 / {17:46}(0T7)Nf6d5
+8.{14:54}(0T8)Bf1c4 / {17:46}(0T8)e7e6
+9.{14:54}(0T9)Bc4d5 / {17:46}(0T9)c6d5
+10.{14:54}(0T10)Ra1a4 / {17:46}(0T10)Bf8c5
+11.{14:54}(0T11)Ra4f4 / {17:46}(0T11)Bf5b1
+12.{14:54}(0T12)Ke1g1 / {17:46}(0T12)Bb1g6
+13.{14:54}(0T13)Nf3e5 / {17:46}(0T13)Nb8c6
+14.{14:54}(0T14)Ne5g6 / {17:46}(0T14)h7g6
+15.{14:54}(0T15)Bc1>>(0T11)c5 / {17:46}(1T11)Nb8c6
+16.{14:54}(1T12)b3b4 / {17:46}(1T12)Bf5g4
+17.{14:54}(1T13)b4b5 / {17:46}(1T13)Bg4>>(1T11)g2

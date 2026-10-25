@@ -1,0 +1,35 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.15"]
+[Round "222"]
+[White "tesseract"]
+[Black "Los Bro SPQR"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)e7e6 
+2.(0T2)Qd1h5 / (0T2)Qd8f6 
+3.(0T3)Qh5f3 / (0T3)Qf6f3 
+4.(0T4)g2f3 / (0T4)f7f5 
+5.(0T5)Bf1c4 / (0T5)Ng8f6 
+6.(0T6)Bc4e6 / (0T6)d7e6 
+7.(0T7)Nb1c3 / (0T7)Nb8c6 
+8.(0T8)b2b3 / (0T8)a7a6 
+9.(0T9)Bc1b2 / (0T9)Nc6b4 
+10.(0T10)Ra1c1 / (0T10)Bf8e7 
+11.(0T11)a2a3 / (0T11)Nb4c6 
+12.(0T12)Nc3e2 / (0T12)Rh8g8 
+13.(0T13)Ng1h3 / (0T13)g7g5 
+14.(0T14)Rh1g1 / (0T14)h7h6 
+15.(0T15)d2d4 / (0T15)b7b6 
+16.(0T16)d4d5 / (0T16)Nf6d5 
+17.(0T17)Nh3f4 / (0T17)Nd5f6 
+18.(0T18)Nf4d3 / (0T18)Bc8b7 
+19.(0T19)f3f4 / (0T19)Ke8c8 
+20.(0T20)Nd3e5 / (0T20)Nc6e5 
+21.(0T21)f4e5 / (0T21)Nf6e4 
+22.(0T22)Ne2g3 / (0T22)Ne4g3 
+23.(0T23)h2g3 / (0T23)Kc8b8 
+24.(0T24)b3b4 / (0T24)b6b5 
+25.(0T25)Bb2d4 / (0T25)Rd8d4 
+26.(0T26)e3d4 / (0T26)Bb7e4

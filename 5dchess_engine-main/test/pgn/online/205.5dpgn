@@ -1,0 +1,32 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.11.02"]
+[Round "149"]
+[White "Tones"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Custom"]
+[Timeline "Odd"]
+[rusyksdr/rnbcqbnr/wwwwwwww/pppppppp/PPPPPPPP/WWWWWWWW/RNBCQBNR/RUSYKSDR:0:1:w]
+
+{Initial position: Excessive - Two Regents, by sanoy1997.}
+
+1.{17:56}(0T1)e4f5 / {13:50}(0T1)b5c4 
+2.{17:56}(0T2)Wb3c4 / {13:50}(0T2)Wg6f5 
+3.{17:56}(0T3)g4f5 / {13:50}(0T3)We6f5 
+4.{17:56}(0T4)We3e4 / {13:50}(0T4)Bf7e6 
+5.{17:56}(0T5)d4e5 / {13:50}(0T5)Wb6b5 
+6.{17:56}(0T6)e5d6 / {13:50}(0T6)Nb7d6 
+7.{17:56}(0T7)Wd3d4 / {13:50}(0T7)a5b4 
+8.{17:56}(0T8)We4f5 / {13:50}(0T8)Nd6f5 
+9.{17:56}(0T9)Bc2f5 / {13:48}(0T9)Ng7f5 
+10.{17:49}(0T10)Wg3g4 / {13:12}(0T10)Nf5g7 
+11.{17:21}(0T11)Bf2e3 / {12:15}(0T11)Wa6a5 
+12.{17:08}(0T12)Sc1c2 / {10:35}(0T12)Wf6f5 
+13.{16:55}(0T13)Sc2f5 / {9:30}(0T13)Ng7f5 
+14.{16:45}(0T14)Wg4f5 / {9:13}(0T14)Be6f5 
+15.{15:17}(0T15)Sf1f2 / {8:57}(0T15)Sf8f7 
+16.{15:12}(0T16)Ub1>>(0T11)g6 / {8:17}(1T11)Cd7d6 
+17.{14:47}(1T12)Qe2e6 / {7:30}(1T12)Sc8e6 
+18.{14:43}(1T13)Bf2e3
+{recorded:white wins}

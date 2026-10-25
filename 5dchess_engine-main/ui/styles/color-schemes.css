@@ -1,0 +1,243 @@
+/* Color schemes and variables for canvas drawing and UI
+   Provide variables for easy theming (e.g., dark mode overrides)
+*/
+
+/* Shared UI palette and canvas colors. Theme classes override the palette;
+   interaction colors and translucent desktop surfaces follow automatically. */
+:root {
+    color-scheme: light;
+    --md-sys-color-error: #ba1a1a;
+    --ui-error: var(--md-sys-color-error);
+    --ui-illegal: #883b3b;
+    --ui-primary: #555555;
+    --ui-on-primary: #ffffff;
+    --ui-panel: #fafafa;
+    --ui-text: #303030;
+    --ui-muted: #666666;
+    --ui-border: #dddddd;
+    --ui-outline: var(--ui-border);
+    --ui-soft: #eeeeee;
+    --ui-close-background: #dedede;
+    --ui-close-border: #aaaaaa;
+    --ui-primary-hover: color-mix(in srgb, var(--ui-primary) 90%, var(--ui-text));
+    --ui-primary-pressed: color-mix(in srgb, var(--ui-primary) 80%, var(--ui-text));
+    --ui-on-primary-soft: var(--ui-primary);
+    --ui-primary-soft: color-mix(in srgb, var(--ui-primary) 12%, var(--ui-panel));
+    --ui-panel-editing: color-mix(in srgb, var(--ui-primary) 10%, var(--ui-panel));
+    --ui-panel-floating: color-mix(in srgb, var(--ui-panel) 88%, transparent);
+    --ui-panel-dialog: color-mix(in srgb, var(--ui-panel) 95%, transparent);
+    --ui-hover: color-mix(in srgb, var(--ui-text) 6%, transparent);
+    --ui-pressed: color-mix(in srgb, var(--ui-text) 10%, transparent);
+    --ui-scrollbar: color-mix(in srgb, var(--ui-text) 25%, transparent);
+
+    --sp-grid-white: #ffffff;
+    --sp-grid-black: #f5f5f5;
+    --present: rgba(219,172,52,0.4);
+
+    --board-margin-black: #555555;
+    --board-margin-white: #dfdfdf;
+    --phantom-board-opacity: 0.5;
+
+    --square-black: #7f7f7f;
+    --square-white: #cccccc;
+    --square-fuzzy: #a6a6a6;
+
+    --highlight-check: #ff1111;
+    --highlight-white-move: rgba(255, 255, 128, 0.8);
+    --highlight-white-move-arrow: #ffff80;
+    --highlight-black-move: rgba(128, 128, 255, 0.8);
+    --highlight-black-move-arrow: #8080ff;
+    --highlight-generated-move: rgba(128, 204, 63, 0.8);
+    --highlight-movable-piece: rgba(143, 10, 255, 0.4);
+    --highlight-phantom-board: rgba(128, 0, 0, 0.2);
+
+    --arrow-white-top: rgba(255,255,255,0.8);
+
+    --debug-red: red;
+}
+
+/* Paper and graphite: neutral Material 3 controls with a quieter multiverse.
+   Both gray board frames contrast with both background cells. */
+:root.plain {
+    --md-sys-color-primary: #000000;
+    --md-sys-color-on-primary: #e2e2e2;
+    --md-sys-color-primary-container: #3b3b3b;
+    --md-sys-color-on-primary-container: #ffffff;
+    --md-sys-color-surface: #f9f9f9;
+    --md-sys-color-on-surface: #1b1b1b;
+    --md-sys-color-on-surface-variant: #474747;
+    --md-sys-color-surface-container-high: #e8e8e8;
+    --md-sys-color-surface-container-highest: #e2e2e2;
+    --md-sys-color-outline: #777777;
+    --md-sys-color-outline-variant: #c6c6c6;
+    --md-sys-color-error: #ba1a1a;
+
+    --ui-primary: var(--md-sys-color-primary);
+    --ui-on-primary: var(--md-sys-color-on-primary);
+    --ui-primary-soft: var(--md-sys-color-primary-container);
+    --ui-on-primary-soft: var(--md-sys-color-on-primary-container);
+    --ui-panel: var(--md-sys-color-surface);
+    --ui-text: var(--md-sys-color-on-surface);
+    --ui-muted: var(--md-sys-color-on-surface-variant);
+    --ui-border: var(--md-sys-color-outline-variant);
+    --ui-outline: var(--md-sys-color-outline);
+    --ui-soft: var(--md-sys-color-surface-container-high);
+    --ui-close-background: var(--md-sys-color-surface-container-highest);
+    --ui-close-border: var(--md-sys-color-outline);
+
+    --sp-grid-white: #dddddd;
+    --sp-grid-black: #aaaaaa;
+    --present: #e6d4a3;
+    --board-margin-black: #222222;
+    --board-margin-white: #585858;
+    --phantom-board-opacity: .4;
+    --square-black: #696969;
+    --square-white: #ededed;
+    --square-fuzzy: color-mix(in srgb, var(--square-black), var(--square-white));
+    --highlight-check: var(--md-sys-color-error);
+    --highlight-white-move: rgba(166, 104, 0, 0.6);
+    --highlight-white-move-arrow: #a66800;
+    --highlight-black-move: rgba(49, 94, 155, 0.6);
+    --highlight-black-move-arrow: #315e9b;
+    --highlight-generated-move: rgba(0, 113, 89, 0.6);
+    --highlight-movable-piece: rgba(120, 68, 155, 0.4);
+    --highlight-phantom-board: color-mix(in srgb, var(--md-sys-color-error) 20%, transparent);
+    --arrow-white-top: rgba(255,255,255,0.8);
+    --debug-red: var(--md-sys-color-error);
+}
+
+:root.theme1 {
+    --ui-primary: #416b59;
+    --ui-on-primary: #ffffff;
+    --ui-panel: #f3f7f4;
+    --ui-text: #293b32;
+    --ui-muted: #5c7166;
+    --ui-border: #d0ddd5;
+    --ui-soft: #e4eee8;
+    --ui-close-background: #cbded0;
+    --ui-close-border: #92b29f;
+    --sp-grid-white: hsl(157, 16%, 40%);
+    --sp-grid-black: hsl(157, 16%, 21%);
+    --present: hsla(39, 88%, 57%, 0.8);;
+
+    --board-margin-black: #555555;
+    --board-margin-white: #dfdfdf;
+    --phantom-board-opacity: 0.5;
+
+    --square-black: hsl(45, 61%, 51%);
+    --square-white: hsl(45, 61%, 86%);
+    --square-fuzzy: color-mix(in hsl, var(--square-black), var(--square-white));
+
+    --highlight-check: hsl(5, 88%, 57%);
+    --highlight-white-move: hsla(157, 16%, 40%, 0.8);
+    --highlight-white-move-arrow: hsl(157, 16%, 40%);
+    --highlight-black-move: hsla(157, 16%, 21%, 0.8);
+    --highlight-black-move-arrow: hsl(157, 16%, 21%);
+    --highlight-generated-move: rgba(128, 128, 255, 0.8); 
+    --highlight-phantom-board: rgba(128, 0, 0, 0.2);
+
+    --arrow-white-top: rgba(255,255,255,0.8);
+
+    --debug-red: red;
+}
+
+/*
+:colors {
+    --dusty-olive: hsla(69, 12%, 44%, 1);
+    --palm-leaf: hsla(60, 14%, 54%, 1);
+    --khaki-beige: hsla(35, 27%, 63%, 1);
+    --desert-sand: hsla(23, 48%, 72%, 1);
+    --soft-peach: hsla(43, 73%, 80%, 1);
+    --golden-pollen: hsla(39, 100%, 71%, 1);
+    --sunlit-clay: hsla(33, 74%, 65%, 1);
+    --toasted-almond: hsla(24, 54%, 60%, 1);
+    --faded-copper: hsla(24, 36%, 55%, 1);
+    --dusty-taupe: hsla(25, 20%, 50%, 1);
+}
+*/
+:root.vintage {
+    --ui-primary: #4c6546;
+    --ui-on-primary: #ffffff;
+    --ui-panel: #faf8f3;
+    --ui-text: #30372e;
+    --ui-muted: #626b5d;
+    --ui-border: #deded2;
+    --ui-soft: #eeeee5;
+    --ui-close-background: #d4dfcd;
+    --ui-close-border: #a1b596;
+    --sp-grid-white: hsl(60, 14%, 54%);
+    --sp-grid-black: hsl(69, 12%, 44%);
+    --present: hsl(39, 100%, 71%);
+
+    --board-margin-black: hsl(25, 20%, 28%);
+    --board-margin-white: hsl(24, 54%, 48%);
+    --phantom-board-opacity: 0.3;
+
+    --square-white: hsl(43, 73%, 80%);
+    --square-black: hsl(33, 74%, 65%);
+    --square-fuzzy: color-mix(in hsl, var(--square-black), var(--square-white));
+
+    --highlight-check: hsl(5, 92%, 50%);
+    --highlight-white-move: hsla(24, 54%, 48%, 0.8);
+    --highlight-white-move-arrow: hsl(24, 59%, 53%);
+    --highlight-black-move: hsla(25, 20%, 28%, 0.55);
+    --highlight-black-move-arrow: hsl(25, 25%, 33%);
+    --highlight-generated-move: hsla(228, 100%, 75%, 0.55); 
+    --highlight-phantom-board: hsla(0, 100%, 50%, 0.2);
+
+    --arrow-white-top: rgba(255, 255, 255, 0.8);
+
+    --debug-red: red;
+}
+
+/* Midnight: Material 3 Tonal Spot controls from #4f6b91, standard contrast.
+   Ice-blue and violet frames lift both board turns above the ink-blue grid. */
+:root.dark {
+    color-scheme: dark;
+    --ui-illegal: #e5a09a;
+    --md-sys-color-primary: #a4c9fe;
+    --md-sys-color-on-primary: #00315c;
+    --md-sys-color-primary-container: #1f4876;
+    --md-sys-color-on-primary-container: #d3e3ff;
+    --md-sys-color-surface: #111318;
+    --md-sys-color-on-surface: #e1e2e8;
+    --md-sys-color-on-surface-variant: #c3c6cf;
+    --md-sys-color-surface-container-high: #272a2f;
+    --md-sys-color-surface-container-highest: #32353a;
+    --md-sys-color-outline: #8d9199;
+    --md-sys-color-outline-variant: #43474e;
+    --md-sys-color-error: #ffb4ab;
+
+    --ui-primary: var(--md-sys-color-primary);
+    --ui-on-primary: var(--md-sys-color-on-primary);
+    --ui-primary-soft: var(--md-sys-color-primary-container);
+    --ui-on-primary-soft: var(--md-sys-color-on-primary-container);
+    --ui-panel: var(--md-sys-color-surface);
+    --ui-text: var(--md-sys-color-on-surface);
+    --ui-muted: var(--md-sys-color-on-surface-variant);
+    --ui-border: var(--md-sys-color-outline-variant);
+    --ui-outline: var(--md-sys-color-outline);
+    --ui-soft: var(--md-sys-color-surface-container-high);
+    --ui-close-background: var(--md-sys-color-surface-container-highest);
+    --ui-close-border: var(--md-sys-color-outline);
+
+    --sp-grid-white: #141926;
+    --sp-grid-black: #314059;
+    --present: #3e3261;
+    --board-margin-black: #a890bc;
+    --board-margin-white: #94cce3;
+    --phantom-board-opacity: .4;
+    --square-black: #4a5d72;
+    --square-white: #c7d5e2;
+    --square-fuzzy: color-mix(in srgb, var(--square-black), var(--square-white));
+    --highlight-check: var(--md-sys-color-error);
+    --highlight-white-move: rgba(104, 219, 230, 0.6);
+    --highlight-white-move-arrow: #68dbe6;
+    --highlight-black-move: rgba(242, 166, 193, 0.6);
+    --highlight-black-move-arrow: #f2a6c1;
+    --highlight-generated-move: rgba(171, 227, 178, 0.55);
+    --highlight-movable-piece: rgba(197, 178, 255, 0.4);
+    --highlight-phantom-board: color-mix(in srgb, var(--md-sys-color-error) 20%, transparent);
+    --arrow-white-top: rgba(255,255,255,0.9);
+    --debug-red: var(--md-sys-color-error);
+}

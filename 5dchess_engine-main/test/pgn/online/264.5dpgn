@@ -1,0 +1,19 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.04"]
+[Round "211"]
+[White "tesseract"]
+[Black "Los Bro SPQR"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)e7e6 
+2.(0T2)Qd1h5 / (0T2)Qd8f6 
+3.(0T3)Qh5>>(0T1)f7 / (1T1)Ke8f7 
+4.(1T2)Ng1f3 / (1T2)Kf7e8 
+5.(1T3)e2e3 / (1T3)Ng8f6 (0T3)Bf8b4 
+6.(1T4)Qd1>(0T4)e2 / (0T4)Qf6>>(0T0)f2 
+7.(-1T1)Ke1f2 / (-1T1)Ng8h6 
+8.(-1T2)e2e3 / (-1T2)e7e6 
+9.(-1T3)Qd1h5 / (1T4)Qd8>>(-1T2)f6 
+10.(-2T3)Ng1f3

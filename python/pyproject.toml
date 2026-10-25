@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "suzero-train"
+version = "0.1.0"
+description = "Game-agnostic training loop, PyTorch trainer and 5D chess AlphaZero"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "torch>=2.4",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+chess5d = [
+    "numpy>=1.26",
+    "onnx>=1.16",
+    "onnxruntime>=1.18",
+    "tensorboard>=2.15",
+    "tqdm>=4.66",
+]
+
+[project.scripts]
+suzero-5dc = "suzero_5dchess.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["suzero_train*", "suzero_5dchess*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

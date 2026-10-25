@@ -1,0 +1,40 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.05"]
+[Round "403"]
+[White "Andrey"]
+[Black "RyanFourPM"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Blitz and Blunder"]
+[Link "https://youtu.be/1z_dPDo0ezk"]
+
+1.{5:05}(0T1)e2e3 / {5:05}(0T1)Ng8f6 
+2.{5:05}(0T2)Ng1f3 / {5:05}(0T2)d7d5 
+3.{5:05}(0T3)b2b3 / {5:04}(0T3)Bc8g4 
+4.{5:05}(0T4)Bf1e2 / {5:05}(0T4)Bg4f3 
+5.{5:05}(0T5)Be2f3 / {5:05}(0T5)c7c6 
+6.{5:05}(0T6)Bc1b2 / {5:05}(0T6)Nb8d7 
+7.{5:05}(0T7)Qd1e2 / {5:03}(0T7)e7e6 
+8.{5:05}(0T8)Nb1c3 / {5:01}(0T8)Nd7e5 
+9.{4:52}(0T9)Nc3b5 / {4:54}(0T9)Ne5f3 
+10.{4:52}(0T10)g2f3 / {4:52}(0T10)Qd8d7 
+11.{4:52}(0T11)Nb5d4 / {4:50}(0T11)a7a6 
+12.{4:52}(0T12)Rh1g1 / {4:27}(0T12)Qd7d6 
+13.{4:49}(0T13)f3f4 / {4:06}(0T13)Rh8g8 
+14.{4:39}(0T14)Nd4f5 / {4:06}(0T14)Qd6d7 
+15.{4:39}(0T15)Bb2f6 / {3:58}(0T15)g7f6 
+16.{4:35}(0T16)Rg1g8 / {3:58}(0T16)Ke8c8 
+17.{4:01}(0T17)a2a4 / {2:44}(0T17)d5d4 
+18.{3:17}(0T18)Nf5>>(0T16)f6 / {2:43}(1T16)Ke8d8 
+19.{3:17}(1T17)Rg1g8 / {2:10}(1T17)Qd7e7 
+20.{2:57}(1T18)Nf5e7 / {2:07}(1T18)Kd8e7 (0T18)Qd7d5 
+21.{2:29}(0T19)Rg8g1 (1T19)Nf6g4 / {1:55}(0T19)d4d3 (1T19)Ke7d7 
+22.{2:25}(0T20)Qe2g4 (1T20)Ng4e5 / {2:00}(0T20)Qd5>>(0T16)h1 
+23.{2:30}(-1T17)Qe2f1 / {0:50}(-1T17)Qh1f3 
+24.{2:15}(-1T18)Nf5g7 / {0:50}(-1T18)Ke8d8 
+25.{2:15}(-1T19)Rg8f8 / {0:50}(-1T19)Kd8c7 
+26.{2:15}(-1T20)Rf8c8 / {0:50}(-1T20)Kc7c8 (1T20)Kd7c7 
+27.{2:15}(0T21)Qg4>(1T21)h4 (-1T21)Ng7e8
+{unfinished final turn: / {0:00}(-1T21)Qd7e8}
+{recorded:white wins}

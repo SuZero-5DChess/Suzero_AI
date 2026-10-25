@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.04.17"]
+[Round "629"]
+[White "RyanFourPM"]
+[Black "Los Bro SPQR"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Pro league season 4"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)d2d4 / {20:05}(0T2)d7d5 
+3.{20:05}(0T3)c2c3 / {20:05}(0T3)c7c6 
+4.{20:05}(0T4)Bc1f4 / {20:05}(0T4)Bc8g4 
+5.{19:56}(0T5)Nb1d2 / {19:50}(0T5)e7e6 
+6.{19:54}(0T6)Nf3e5 / {19:37}(0T6)Qd8e7 
+7.{19:20}(0T7)Qd1b3 / {18:06}(0T7)Nf6e4 
+8.{17:52}(0T8)Nd2e4 / {17:13}(0T8)Qe7h4 
+9.{14:31}(0T9)Qb3b7 / {16:13}(0T9)Qh4>>(0T7)f2 
+10.{14:29}(-1T8)Ke1f2 / {16:13}(-1T8)Nf6e4 
+11.{14:05}(-1T9)Kf2g1 / {16:18}(-1T9)Qe7h4 
+12.{14:03}(0T10)Qb7>>(0T9)c8 / {16:03}(0T10)Bg4>>(0T8)g2 
+13.{13:49}(0T11)Bf4>>(0T8)f7 / {15:51}(2T8)Qe7f7

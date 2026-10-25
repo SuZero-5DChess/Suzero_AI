@@ -1,0 +1,20 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.18"]
+[Round "33"]
+[White "MaSK78"]
+[Black "5D Voyage"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1g5 / (0T4)Nf6e4 
+5.(0T5)Nb1d2 / (0T5)Ne4g5 
+6.(0T6)Nf3g5 / (0T6)Bc8g4 
+7.(0T7)Ng5f7 / (0T7)e7e6 
+8.(0T8)Nf7d8 / (0T8)Ke8d8 
+9.(0T9)Qd1b3 / (0T9)Bg4e2 
+10.(0T10)Bf1e2 / (0T10)Nb8d7 
+11.(0T11)Qb3b7 / (0T11)Bf8>>(0T5)f2

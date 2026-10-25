@@ -1,0 +1,22 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.10"]
+[Round "322"]
+[White "tesseract"]
+[Black "Mage"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Ng1f3 / {20:05}(0T2)e7e6 
+3.{19:31}(0T3)Nf3g5 / {16:04}(0T3)Nb8c6 
+4.{18:27}(0T4)Qd1f3 / {16:00}(0T4)Nc6e5 
+5.{18:27}(0T5)Qf3f4 / {16:00}(0T5)Bf8d6 
+6.{16:54}(0T6)Qf4a4 / {13:07}(0T6)h7h6 
+7.{15:52}(0T7)Ng5e6 / {13:07}(0T7)f7e6 
+8.{15:29}(0T8)Qa4b3 / {12:18}(0T8)Nf6g4 
+9.{14:21}(0T9)h2h4 / {8:20}(0T9)Qd8f6 
+10.{12:47}(0T10)f2f4 / {7:22}(0T10)Qf6>>(0T6)f2 
+11.{12:17}(-1T7)Ke1f2 / {6:45}(-1T7)Nf6g4 
+12.{11:34}(-1T8)Kf2e2 / {5:33}(-1T8)Qd8g5 
+13.{11:17}(0T11)Qb3>>(0T8)e6

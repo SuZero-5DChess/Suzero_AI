@@ -1,0 +1,57 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.06.15"]
+[Round "215"]
+[White "Los Bro SPQR"]
+[Black "Narik"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1. Nf3 / e6 
+2. c3 / Qf6 
+3. d4 / h6 
+4. Be3 / Ne7 
+5. Nbd2 / Nd5 
+6. Ne4 / Nxe3 
+7. fxe3 / Qg6 
+8. Qd3 / b6 
+9. Ng3 / Bb7 
+10. Qxg6 / fxg6 
+11. e4 / Nc6 
+12. d5 / Na5 
+13. e3 / Bc5 
+14. Be2 / Nc4 
+15. Nf1 / Nxe3 
+16. Nxe3 / Bxe3 
+17. dxe6 / O-O 
+18. Ne5 / Bf2 
+19. Kd1 / Bxe4 
+20. Bd3 / Bxd3 
+21. Nxd3 / dxe6 
+22. Nxf2 / Rxf2 
+23. Rc1 / Rd8 
+24. Ke1 / Rdd2 
+25. g3 / Rfe2 
+26. Kf1 / Rf2 
+27. Ke1 / Rde2 
+28. Kd1 / (0T28)Re2>>(0T27)e2~ (>L-1) 
+29. (-1T28)Ke1>(0T29)e1 / (-1T28)Kh8 
+30. (-1T29)Rcf1 / (-1T29)Rd2>(0T29)d2 
+31. (0T30)Kd1>(-1T30)d1 / (-1T30)Re2>(0T30)e2 
+32. (0T31)Ke1>(-1T31)e1 / (-1T31)Rxf1 (0T31)Rxb2 
+33. (-1T32)Rxf1 (0T32)Rhd1 / (-1T32)Kg8 (0T32)Red2 
+34. (0T33)Rxd2 (-1T33)Rf2 / (0T33)Rfxd2 (-1T33)g5 
+35. (-1T34)Rd2 (0T34)Re1 / (0T34)Rd2>x(-1T34)d2 
+36. (-1T35)Kdxd2 (0T35)Rxe6 / (-1T35)e5 (0T35)Kf7 
+37. (0T36)Re2 (-1T36)Kc1 / (0T36)Rxe2 (-1T36)c5 
+38. (-1T37)Ke1>x(0T37)e2 / (-1T37)Kf7 (0T37)Ke6 
+39. (0T38)Ke3 (-1T38)Kd2 / (-1T38)Ke6 (0T38)g5 
+40. (-1T39)Ke3 (0T39)h3 / (0T39)a5 (-1T39)g4 
+41. (-1T40)Ke4 (0T40)c4 / (-1T40)a5 (0T40)c6 
+42. (0T41)a4 (-1T41)a4 / (-1T41)g5 (0T41)h5 
+43. (-1T42)b3 (0T42)Ke4 / (0T42)g6 (-1T42)h5 
+44. (-1T43)c4 (0T43)g4 / (-1T43)h4 (0T43)c5 
+45. (0T44)Ke4>(-1T44)e3 / (-1T44)h3 (0T44)hxg4 
+46. (0T45)hxg4 (-1T45)K3d3 / (-1T45)Ke6>(0T45)f6 
+47. (-1T46)Kd3>(0T46)e4 / (-1T46)Pe5>(0T46)e5 
+48. (-1T47)Ke4>>x(-1T46)e5~ (>L1)

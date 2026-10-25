@@ -1,0 +1,44 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.03.16"]
+[Round "610"]
+[White "cirtus"]
+[Black "Tones"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League season 4"]
+
+{
+t0database/game 640 records the same game with conflicting information:
+ white: Cirtus
+ black: Public Match
+}
+
+1.{19:12}(0T1)e2e3 / {19:32}(0T1)Ng8f6 
+2.{19:12}(0T2)Ng1f3 / {19:32}(0T2)e7e6 
+3.{19:12}(0T3)c2c3 / {19:32}(0T3)c7c6 
+4.{19:12}(0T4)b2b4 / {19:32}(0T4)a7a5 
+5.{19:12}(0T5)b4a5 / {19:23}(0T5)Ra8a5 
+6.{18:45}(0T6)a2a4 / {18:42}(0T6)b7b5 
+7.{18:32}(0T7)Bc1a3 / {17:40}(0T7)Bf8a3 
+8.{17:39}(0T8)Nb1a3 / {17:35}(0T8)Ra5a4 
+9.{15:58}(0T9)c3c4 / {17:00}(0T9)Ra4a3 
+10.{15:58}(0T10)Ra1a3 / {15:58}(0T10)b5c4 
+11.{15:57}(0T11)Bf1c4 / {14:13}(0T11)Qd8c7 
+12.{13:27}(0T12)g2g3 / {12:47}(0T12)d7d5 
+13.{12:21}(0T13)Bc4d3 / {11:53}(0T13)Nb8d7 
+14.{8:32}(0T14)Ra3c3 / {8:42}(0T14)Ke8g8 
+15.{6:55}(0T15)Nf3g5 / {7:43}(0T15)g7g6 
+16.{3:49}(0T16)Ke1g1 / {6:50}(0T16)Nd7e5 
+17.{3:35}(0T17)Bd3e2 / {6:23}(0T17)c6c5 
+18.{3:31}(0T18)d2d4 / {5:48}(0T18)c5c4 
+19.{2:29}(0T19)d4e5 / {5:46}(0T19)Qc7e5 
+20.{1:37}(0T20)Ng5f3 / {5:42}(0T20)Qe5c3 
+21.{1:10}(0T21)Qd1b1 / {5:04}(0T21)Nf6e4 
+22.{0:37}(0T22)Rf1c1 / {4:09}(0T22)Qc3f6 
+23.{0:28}(0T23)Qb1b4 / {3:26}(0T23)Rf8d8 
+24.{0:13}(0T24)Qb4a3 / {3:07}(0T24)Ne4g5 
+25.{0:07}(0T25)Qa3b2 / {2:44}(0T25)Ng5f3 
+26.{0:06}(0T26)Be2f3 / {2:47}(0T26)Qf6b2 
+27.{0:00}(0T27)Bf3>>(0T24)f6
+{recorded:black wins}

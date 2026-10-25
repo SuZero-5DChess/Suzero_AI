@@ -1,0 +1,32 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.13"]
+[Round "367"]
+[White "cirtus"]
+[Black "Public Match"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1g5 / (0T4)Bc8f5 
+5.(0T5)Qd1b3 / (0T5)Qd8b6 
+6.(0T6)Qb3b6 / (0T6)a7b6 
+7.(0T7)g2g3 / (0T7)Nb8d7 
+8.(0T8)Nb1d2 / (0T8)h7h6 
+9.(0T9)Bg5e3 / (0T9)Nf6g4 
+10.(0T10)Bf1g2 / (0T10)Ng4e3 
+11.(0T11)f2e3 / (0T11)e7e6 
+12.(0T12)Nf3e5 / (0T12)Nd7e5 
+13.(0T13)d4e5 / (0T13)Bf8c5 
+14.(0T14)e3e4 / (0T14)d5e4 
+15.(0T15)Nd2e4 / (0T15)Bf5e4 
+16.(0T16)Bg2e4 / (0T16)Bc5e3 
+17.(0T17)a2a4 / (0T17)Ra8a5 
+18.(0T18)Rh1f1 / (0T18)Ra5a4 
+19.(0T19)Be4>>(0T18)e3 / (1T18)Ra5a4 
+20.(1T19)Ke1g1 / (0T19)Ra4a1 (1T19)Ra4a1 
+21.(0T20)Ke1>>(1T19)f2 (1T20)Be3b6 / (1T20)Ra1f1 (0T20)Ra1f1 
+22.(1T21)Kg1g2 (0T21)h2h3 / (0T21)Rf1e1 (1T21)Rf1e1
+{original data: white wins; verification: black wins}

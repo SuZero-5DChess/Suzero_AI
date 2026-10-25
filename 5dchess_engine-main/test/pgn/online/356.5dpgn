@@ -1,0 +1,26 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.26"]
+[Round "305"]
+[White "Public Match"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{5:05}(0T1)e2e3 / {5:05}(0T1)Ng8f6 
+2.{5:05}(0T2)Ng1f3 / {5:05}(0T2)d7d5 
+3.{5:05}(0T3)c2c4 / {5:05}(0T3)c7c6 
+4.{5:05}(0T4)c4d5 / {5:05}(0T4)Qd8d5 
+5.{5:05}(0T5)Nb1c3 / {5:02}(0T5)Qd5d6 
+6.{5:05}(0T6)Qd1b3 / {4:58}(0T6)Bc8e6 
+7.{5:05}(0T7)Qb3b7 / {3:27}(0T7)Nf6g4 
+8.{3:52}(0T8)Nc3b5 / {1:30}(0T8)Qd6d7 
+9.{2:34}(0T9)Qb7a8 / {1:30}(0T9)Qd7c8 
+10.{2:34}(0T10)Nb5a7 / {1:25}(0T10)Qc8c7 
+11.{2:18}(0T11)Na7c6 / {1:00}(0T11)Be6d5 
+12.{1:59}(0T12)Nc6e7 / {0:59}(0T12)Bf8e7 
+13.{1:59}(0T13)Qa8d5 / {0:31}(0T13)Rh8f8 
+14.{1:58}(0T14)Bf1b5 / {0:15}(0T14)Ke8>>(0T13)f8 
+15.{1:56}(-1T14)Bf1b5 / {0:15}(-1T14)Nb8d7 
+16.{1:56}(-1T15)Bb5d7 (0T15)Bb5e8 / {0:15}(-1T15)Qc7d7 (0T15)Rf8e8 
+17.{1:53}(0T16)Qd5b5 (-1T16)Qd5d7

@@ -1,0 +1,28 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2023.01.08"]
+[Round "716"]
+[White "Sanoy"]
+[Black "Sapphia"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "5D Chess World Championship 2022"]
+
+1.{20:04}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{19:55}(0T2)d2d4 / {20:05}(0T2)c7c5 
+3.{19:54}(0T3)c2c3 / {20:05}(0T3)Qd8b6 
+4.{19:55}(0T4)Qd1b3 / {20:05}(0T4)Qb6b3 
+5.{19:55}(0T5)a2b3 / {20:05}(0T5)b7b6 
+6.{19:55}(0T6)Nb1d2 / {20:05}(0T6)Bc8b7 
+7.{19:43}(0T7)e2e3 / {20:04}(0T7)Bb7f3 
+8.{19:43}(0T8)Nd2f3 / {19:56}(0T8)e7e6 
+9.{19:05}(0T9)h2h3 / {19:56}(0T9)Nb8c6 
+10.{18:58}(0T10)Bf1a6 / {19:48}(0T10)c5d4 
+11.{18:56}(0T11)Ba6b7 / {19:37}(0T11)Ra8d8 
+12.{18:33}(0T12)c3d4 / {19:01}(0T12)Nc6b4 
+13.{18:18}(0T13)Nf3e5 / {18:54}(0T13)Bf8d6 
+14.{16:47}(0T14)Ra1a7 / {18:52}(0T14)Bd6e5 
+15.{16:41}(0T15)Ra7a8 / {18:52}(0T15)Nb4d3 
+16.{16:00}(0T16)Ke1e2 / {15:25}(0T16)Ke8g8 
+17.{15:08}(0T17)Ra8c8 / {15:22}(0T17)Rd8c8 
+18.{14:14}(0T18)Bb7c8 / {15:12}(0T18)Nf6e4

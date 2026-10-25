@@ -1,0 +1,478 @@
+#include <cassert>
+#include <sstream>
+
+#include "finetree.h"
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_node<T>::fine_node(
+    fine_node *parent,
+    state s,
+    T info_value)
+: parent{parent}, pocessed_context{nullptr}, context{nullptr}, n{index_t(-7)}, i{index_t(-7)}, cells{}, next_cell_index{0}, info{std::move(info_value)}
+{
+    ignite_impl(s);
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_node<T>::fine_node(fine_node *parent, index_t n, index_t i, T info_value)
+: parent{parent}, pocessed_context{nullptr}, context{parent->get_context()}, n{n}, i{i}, cells{}, next_cell_index{0}, info{std::move(info_value)} {}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_node<T>::fine_node(fine_node *parent, index_t n, index_t i)
+: parent{parent}, pocessed_context{nullptr}, context{parent->get_context()}, n{n}, i{i}, cells{}, next_cell_index{0}, info{} {}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline std::unique_ptr<fine_node<T>> fine_node<T>::make_root(
+    state s,
+    T info)
+{
+    return std::unique_ptr<fine_node<T>>(
+        new fine_node(nullptr, std::move(s), std::move(info)));
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline std::unique_ptr<fine_node<T>> fine_node<T>::make_temproary(fine_node *parent, index_t n, index_t i, T info)
+{
+    return std::unique_ptr<fine_node<T>>(new fine_node(parent, n, i, std::move(info)));
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_cell<T> *fine_node<T>::add_cell(fine_cell<T> &&cell)
+{
+    auto ctx = get_context();
+    ctx->cell_pool.push_back(std::move(cell));
+    fine_cell<T> *new_cell = &ctx->cell_pool.back();
+    cells.push_back(new_cell);
+    return new_cell;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_cell<T> *fine_node<T>::add_unexplored_cell(fine_cell<T> *parent, HC space)
+{
+    fine_cell<T> cell{
+        .parent = parent,
+        .node = this,
+        .space = space,
+        .subspace = {}
+    };
+    cell.subspace.push_back(std::move(space));
+    return add_cell(std::move(cell));
+}
+
+// TODO: insert elements while keep the increasing order of i
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_node<T> *fine_node<T>::add_child(index_t n, index_t i)
+{
+    assert(!get_child(i) && "fine-tree siblings must have unique coordinates");
+    auto ctx = get_context();
+    ctx->node_pool.emplace_back(this, n, i);
+    fine_node<T> *child = &ctx->node_pool.back();
+    children.push_back(child);
+    return child;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline bool fine_node<T>::is_ceiling() const noexcept
+{
+    if(!context)
+    {
+        // root node
+        return false;
+    }
+    // is_ceiling needs the older context, not the newer one
+    return n + 1 == context->hc_info.dimension();
+}
+
+template <typename T>
+    requires std::default_initializable<T>
+template <HCOrdering Order>
+inline bool fine_node<T>::is_terminal(const Order &order) &
+{
+    if(!is_nodal())
+    {
+        // if the node is not nodal, it is not terminal because every temporary node has a valid branch as witness
+        return false;
+    }
+    else if(pocessed_context->verified_terminal)
+    {
+        // if it is already verified to be terminal, return true
+        return true;
+    }
+    if(!get_children().empty())
+    {
+        // if the node already has children, it is not terminal
+        return false;
+    }
+    if(expand(order))
+    {
+        // if the node has a valid search result, it is not terminal
+        return false;
+    }
+    pocessed_context->verified_terminal = true;
+    return true;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline bool fine_node<T>::is_terminal() &
+{
+    return is_terminal(natural_HC_ordering{});
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_node<T> *fine_node<T>::get_child(index_t i) & noexcept
+{
+    for(fine_node<T> *next_node : children)
+    {
+        if(next_node->i == i)
+        {
+            return next_node;
+        }
+    }
+    return nullptr;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline const fine_node<T> *fine_node<T>::get_child(index_t i) const & noexcept
+{
+    for(const fine_node<T> *next_node : children)
+    {
+        if(next_node->i == i)
+        {
+            return next_node;
+        }
+    }
+    return nullptr;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline typename fine_node<T>::nodal_pocession *fine_node<T>::get_context() & noexcept
+{
+    return pocessed_context ? pocessed_context.get() : context;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline const HC_info &fine_node<T>::get_hc_info() const & noexcept
+{
+    return pocessed_context ? pocessed_context->hc_info : context->hc_info;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline bool fine_node<T>::get_player() const noexcept
+{
+    return get_hc_info().get_state().get_present().c();
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline std::string fine_node<T>::print_semimove() const
+{
+    if(context)
+    {
+        return context->hc_info.get_semimove(n, i).to_string(context->hc_info.get_state());
+    }
+    else
+    {
+        return "root";
+    }
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+template<HCOrdering Order>
+inline generator<index_t> fine_node<T>::search(Order order) &
+{
+    fine_node<T> *next_node = expand(order);
+    while(next_node)
+    {
+        co_yield next_node->i;
+        next_node = expand(order);
+    }
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+template<HCOrdering Order>
+inline fine_node<T> *fine_node<T>::expand(const Order &order)
+{
+    auto ans = explore(order);
+    if(!ans)
+    {
+        return nullptr;
+    }
+    const auto &[pt, cell, hc] = *ans;
+    fine_node<T> *final_node = isolate(pt, cell, hc);
+    fine_node<T> *next_node = normalize(pt, cell, final_node);
+    return next_node;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+template<HCOrdering Order>
+inline std::optional<std::tuple<point, fine_cell<T> *, HC *>> fine_node<T>::explore(const Order &order)
+{
+    HC_info &hc_info = get_context()->hc_info;
+    std::size_t consecutive_empty_cells = 0;
+    while(!cells.empty()
+          && consecutive_empty_cells < cells.size())
+    {
+        if(next_cell_index >= cells.size())
+        {
+            next_cell_index = 0;
+        }
+        fine_cell<T> *cell = cells[next_cell_index];
+        next_cell_index++;
+
+        if(cell->subspace.empty())
+        {
+            consecutive_empty_cells++;
+            continue;
+        }
+        consecutive_empty_cells = 0;
+
+        HC &hc = cell->subspace.back();
+        auto pt_opt = hc_info.take_point(hc, order);
+        if(!pt_opt)
+        {
+            cell->subspace.pop_back();
+            continue;
+        }
+
+        auto problem = hc_info.find_problem(*pt_opt, hc_info.get_universe());
+        if(problem)
+        {
+            remove_problem(*problem);
+            continue;
+        }
+
+        return std::optional<std::tuple<point, fine_cell<T> *, HC *>>{
+            std::in_place, std::move(*pt_opt), cell, &hc};
+    }
+    return std::nullopt;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline void fine_node<T>::remove_from_cell(const slice &s, fine_cell<T> *cell)
+{
+    if(!cell->space.intersects(s)) return;
+    cell->subspace.remove_slice_globally(s);
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline void fine_node<T>::remove_from_node(const slice &s, fine_node<T> *node)
+{
+    for(fine_cell<T> *cell : node->cells) remove_from_cell(s, cell);
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline void fine_node<T>::remove_problem(const slice &s)
+{
+    nodal_pocession *problem_context = get_context();
+    // Propagate the whole conflict through every remaining HC on the current
+    // node/ancestor path. Stay within this position's context; do not visit
+    // descendants or off-path sibling subtrees.
+    for(fine_node<T> *node = this;
+        node && node->get_context() == problem_context;
+        node = node->parent)
+    {
+        remove_from_node(s, node);
+        if(node->is_nodal()) break;
+    }
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_node<T> *fine_node<T>::isolate(const point &p, fine_cell<T> *target_cell, HC *target_hc)
+{
+    assert(target_cell->space.contains(p));
+    assert(target_hc->contains(p));
+    fine_node<T> *current_node = this;
+    fine_cell<T> *current_cell = target_cell;
+    index_t next_n = current_node->is_nodal() ? 0 : current_node->n + 1;
+    HC *current_hc = target_hc;
+    while(next_n < get_context()->hc_info.dimension())
+    {
+        index_t next_i = p[next_n];
+        fine_node<T> *next_node = current_node->add_child(next_n, next_i);
+        auto [with_i, without_i] = current_hc->split(next_n, next_i);
+        fine_cell<T> *next_cell = next_node->add_unexplored_cell(current_cell, std::move(with_i));
+        *current_hc = std::move(without_i);
+        current_cell->subspace.prune_empty(); /* optional */
+        // prepare for next iteration
+        current_node = next_node;
+        current_cell = next_cell;
+        current_hc = &current_cell->subspace.back();
+        next_n++;
+    }
+    return current_node;
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline fine_node<T> *fine_node<T>::normalize(const point &p, fine_cell<T> *target_cell, fine_node<T> *final_node)
+{
+    std::vector<fine_node<T> *> nodes(get_context()->hc_info.dimension()+1, nullptr);
+    fine_node<T> *current_node = final_node;
+    while(current_node != this)
+    {
+        nodes[current_node->n+1] = current_node;
+        current_node = current_node->parent;
+    }
+    index_t next_n = current_node->is_nodal() ? 0 : current_node->n + 1;
+    nodes[next_n] = this;
+    
+    auto try_isolate = [current_node=this, &p, target_cell, &nodes](HC *target_hc)
+    -> void {
+        fine_cell<T> *current_cell = target_cell;
+        HC *current_hc = target_hc;
+        index_t next_n = current_node->is_nodal() ? 0 : current_node->n + 1;
+        auto context = current_node->get_context();
+        while(next_n < context->hc_info.dimension())
+        {
+            index_t next_i = p[next_n];
+            if(!(*current_hc)[next_n].contains(p[next_n]))
+            {
+                // next axis does not contain the coordinate of p: done
+                return;
+            }
+            // nodes[k] is the prefix before choosing axis k. The region
+            // with that coordinate fixed belongs to its child, nodes[k+1].
+            assert(nodes[next_n+1] != nullptr);
+            auto [with_i, without_i] = current_hc->split(next_n, next_i);
+            fine_cell<T> *next_cell = nodes[next_n+1]->add_unexplored_cell(current_cell, std::move(with_i));
+            *current_hc = std::move(without_i);
+            current_cell = next_cell;
+            current_hc = &current_cell->subspace.back();
+            next_n++;
+        }
+    };
+
+    for(HC &hc : target_cell->subspace)
+    {
+        try_isolate(&hc);
+    }
+    index_t n1 = next_n + 1;
+    return nodes[n1];
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline void fine_node<T>::ignite() &
+{
+    state s = context->hc_info.get_state();
+    moveseq mvs = to_action();
+    for(full_move mv : mvs)
+    {
+        [[maybe_unused]] const bool applied = s.apply_move<true>(mv);
+        assert(applied);
+    }
+    s.submit<true>();
+    ignite_impl(s);
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline void fine_node<T>::ignite_impl(const state &s)
+{
+    auto [hc_info, ss] = HC_info::build_HC(s);
+    HC universe = hc_info.get_universe();
+    auto new_context = std::unique_ptr<nodal_pocession>(
+        new nodal_pocession{
+            .hc_info = std::move(hc_info),
+            .node_pool = {},
+            .cell_pool = {},
+            .verified_terminal = false
+        });
+    new_context->cell_pool.push_back(fine_cell<T>{
+        .parent = nullptr,
+        .node = this,
+        .space = std::move(universe),
+        .subspace = std::move(ss)
+    });
+    pocessed_context = std::move(new_context);
+    // clear the old cells which are related to the old context
+    cells.clear();
+    next_cell_index = 0;
+    cells.push_back(&pocessed_context->cell_pool.back());
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline moveseq fine_node<T>::to_action() const
+{
+    assert(is_ceiling());
+    int dim = context->hc_info.dimension();
+    std::vector<index_t> pt(dim);
+    auto current = this;
+    // Walk parent pointers to build the point vector.
+    // Loop while current has a parent (i.e., not the root) so this works
+    // even if the ceiling node has been ignited (is_nodal() == true).
+    for(int j = 0; j < dim; j++)
+    {
+        assert((j==0 || !current->is_nodal()) && "expected more temproary nodes");
+        pt[current->n] = current->i;
+        current = current->parent;
+        assert(current && "expected more nodes before root");
+    }
+    assert(current->is_nodal());
+    return context->hc_info.to_action(pt);
+}
+
+template<typename T>
+    requires std::default_initializable<T>
+inline std::string fine_node<T>::to_string() const
+{
+    std::ostringstream oss;
+
+    const auto dump_node = [&](const fine_node<T> &node, size_t depth, const auto &self) -> void {
+        const std::string indent(depth * 2, ' ');
+
+        oss << indent << "fine_node{";
+        if(node.is_nodal())
+        {
+            oss << "nodal";
+        }
+        else
+        {
+            oss << "temporary n=" << node.n << ", i=" << node.i;
+        }
+        oss << ", cells#=" << node.cells.size() << "}\n";
+
+        for(size_t cell_index = 0; cell_index < node.cells.size(); ++cell_index)
+        {
+            const auto &cell = node.cells[cell_index];
+            oss << indent << "  cell[" << cell_index << "]\n";
+            oss << indent << "    space:\n";
+            oss << cell->space.to_string(false);
+            oss << indent << "    subspace:\n";
+            oss << cell->subspace.to_string();
+        }
+        
+        oss << indent << "  children#=" << node.children.size() << "\n";
+        for(size_t child_index = 0; child_index < node.children.size(); ++child_index)
+        {
+            oss << indent << "    child[" << child_index << "]\n";
+            self(*node.children[child_index], depth + 4, self);
+        }
+    };
+
+    dump_node(*this, 0, dump_node);
+    return oss.str();
+}

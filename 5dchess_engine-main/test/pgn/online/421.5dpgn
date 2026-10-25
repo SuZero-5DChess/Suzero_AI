@@ -1,0 +1,20 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.28"]
+[Round "375"]
+[White "cirtus"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)e7e6 
+3.(0T3)c2c3 / (0T3)c7c5 
+4.(0T4)Qd1b3 / (0T4)Qd8a5 
+5.(0T5)Qb3>>(0T1)f7 / (1T1)Ke8f7 
+6.(1T2)Ng1h3 / (1T2)Ng8f6 
+7.(1T3)Nh3g5 / (1T3)Kf7e8 
+8.(1T4)Ng5>>(1T2)f5 / (1T4)d7d5 
+9.(1T5)Ke1>>(0T5)d1 / (1T5)c7c6 (0T5)Nf6g4 
+10.(0T6)Ke1>>(0T5)d1 (1T6)Qd1e1
+{recorded:white wins}

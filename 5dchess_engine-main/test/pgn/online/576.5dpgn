@@ -1,0 +1,21 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.07.28"]
+[Round "535"]
+[White "cirtus"]
+[Black "Andrey"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)e7e6 
+2.(0T2)Qd1f3 / (0T2)Ng8h6 
+3.(0T3)Bf1c4 / (0T3)Qd8g5 
+4.(0T4)Bc4e6 / (0T4)d7e6 
+5.(0T5)Qf3>>(0T1)f7 / (1T1)Ke8f7 
+6.(1T2)Ng1h3 / (1T2)e7e6 
+7.(1T3)e2e3 / (1T3)Qd8f6 
+8.(1T4)g2g3 / (1T4)Bf8c5 
+9.(1T5)f2f4 / (0T5)Qg5g2 (1T5)Bc5e3 
+10.(1T6)d2e3 (0T6)Nb1c3 / (0T6)Nh6g4 (1T6)Qf6c3 
+11.(1T7)Nb1c3 (0T7)Nc3e4 / (0T7)Qg2>>(0T6)f1 
+12.(0T8)Ng1>>(0T6)g2 / (2T6)Nh6g4

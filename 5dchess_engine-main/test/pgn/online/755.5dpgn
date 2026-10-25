@@ -1,0 +1,26 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2023.01.27"]
+[Round "721"]
+[White "DoctorDoom"]
+[Black "Adib"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "5D Pogchamps Season 2"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)Nf3g5 / (0T2)c7c6 
+3.(0T3)Ng5f7 / (0T3)Qd8b6 
+4.(0T4)Nf7d6 / (0T4)e7d6 
+5.(0T5)e2e3 / (0T5)Bf8e7 
+6.(0T6)Bf1d3 / (0T6)Qb6>>(0T2)f2 
+7.(-1T3)Ke1f2 / (-1T3)Nf6g4 
+8.(-1T4)Kf2g1 / (-1T4)c7c6 
+9.(-1T5)e2e3 / (-1T5)Qd8b6 
+10.(-1T6)Qd1f3 / (-1T6)Ng4e3 
+11.(0T7)Qd1>>(0T3)h5 / (1T3)Nf6h5 
+12.(1T4)e2e3 / (1T4)Nh5f4 
+13.(1T5)Nb1a3 / (1T5)Qd8a5 
+14.(1T6)Ng5>>(1T4)h5 / (2T4)Qd8a5 
+15.(2T5)Nh5g7 / (2T5)Bf8g7 
+16.(2T6)c2c3 / (1T6)Qa5d2 (2T6)Qa5c3

@@ -1,0 +1,34 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.25"]
+[Round "170"]
+[White "Tones"]
+[Black "Macfor"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e4 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)c7c6 
+3.(0T3)b2b4 / (0T3)Qd8b6 
+4.(0T4)c2c3 / (0T4)e7e6 
+5.(0T5)Bc1g5 / (0T5)h7h5 
+6.(0T6)Bg5f6 / (0T6)g7f6 
+7.(0T7)a2a3 / (0T7)a7a5 
+8.(0T8)Qd1f3 / (0T8)Rh8h6 
+9.(0T9)h2h3 / (0T9)a5b4 
+10.(0T10)g2g4 / (0T10)b4c3 
+11.(0T11)Bf1d3 / (0T11)Qb6b2 
+12.(0T12)Ng1e2 / (0T12)Ra8a3 
+13.(0T13)Ra1a3 / (0T13)Bf8a3 
+14.(0T14)Ke1g1 / (0T14)Qb2>>(0T12)d2 
+15.(-1T13)Nb1d2 / (-1T13)Qb2d2 
+16.(0T15)Nb1>>(0T13)b2 / (1T13)c3b2 
+17.(1T14)Ne2>(-1T14)d2 / (1T14)b2a1 (-1T14)c3d2 
+18.(-1T15)Ke1d2 (1T15)Ke1g1 / (1T15)Qa1>>(-1T13)a1 
+19.(-2T14)Nd2b1 / (-2T14)c3c2 
+20.(-2T15)Ke1g1 / (0T15)Ba3b2 (-1T15)Ra8a3 (-2T15)c2b1 
+21.(-1T16)Ra1a3 (-2T16)Rf1b1 (0T16)Rf1b1 (1T16)Qf3d1 / (0T16)Bb2>(1T16)b1 (-2T16)Qb2>(-1T16)b2 
+22.(0T17)Qf3>>(0T14)f6 / (2T14)Qb2c1 
+23.(2T15)Ne2c1 / (2T15)Ba3c1 
+24.(-2T17)Qf3>>(1T14)f6 / (3T14)Rh6f6 
+25.(3T15)Bd3c2 / (3T15)Bf8b4

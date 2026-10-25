@@ -1,0 +1,20 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.12.13"]
+[Round "363"]
+[White "Gjorbajarb"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{19:59}(0T2)Qd1f3 / {19:59}(0T2)d7d5 
+3.{19:59}(0T3)Ng1e2 / {19:05}(0T3)Nf6g4 
+4.{19:54}(0T4)h2h3 / {18:59}(0T4)f7f5 
+5.{18:53}(0T5)h3g4 / {18:59}(0T5)g7g6 
+6.{16:27}(0T6)Qf3f4 / {19:04}(0T6)Bf8>>(0T0)f2 
+7.{16:14}(-1T1)Ke1f2 / {18:27}(-1T1)Ng8h6 
+8.{14:32}(-1T2)Ng1f3 / {18:25}(-1T2)Nh6g4 
+9.{14:28}(-1T3)Kf2e1 / {17:54}(-1T3)c7c6 
+10.{14:06}(0T7)Qf4>>(0T1)f4 / {17:24}(1T1)Ng8f6 
+11.{13:50}(1T2)Qf4>(-1T4)d4 / {17:16}(1T2)Nf6>>(1T1)f4

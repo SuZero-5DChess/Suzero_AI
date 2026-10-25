@@ -1,0 +1,31 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.30"]
+[Round "264"]
+[White "tesseract"]
+[Black "Mage"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1f3 / (0T2)e7e6 
+3.(0T3)c2c3 / (0T3)c7c5 
+4.(0T4)Qd1b3 / (0T4)Qd8a5 
+5.(0T5)Nf3e5 / (0T5)Qa5c7 
+6.(0T6)f2f4 / (0T6)b7b6 
+7.(0T7)g2g3 / (0T7)Bc8b7 
+8.(0T8)Rh1g1 / (0T8)Nb8c6 
+9.(0T9)Bf1g2 / (0T9)Nc6e5 
+10.(0T10)f4e5 / (0T10)Bb7g2 
+11.(0T11)Rg1g2 / (0T11)Qc7c6 
+12.(0T12)Rg2g1 / (0T12)Qc6f3 
+13.(0T13)Qb3c4 / (0T13)Qf3>>(0T12)e2 
+14.(0T14)Qc4>>(0T1)c4 / (1T1)Ng8f6 
+15.(1T2)Ng1f3 / (1T2)e7e6 
+16.(1T3)e2e3 / (1T3)b7b6 
+17.(1T4)Nf3g5 / (1T4)Qd8e7 
+18.(1T5)Qd1f3 / (1T5)Qe7d8 
+19.(1T6)Ng5e6 / (1T6)f7e6 
+20.(1T7)Qc4d5 / (1T7)Bf8d6 
+21.(1T8)Qd5h5 / (1T8)Nf6h5 
+22.(1T9)Qf3h5

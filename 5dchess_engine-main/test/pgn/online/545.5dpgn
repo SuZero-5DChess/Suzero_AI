@@ -1,0 +1,35 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.21"]
+[Round "501"]
+[White "Andrey"]
+[Black "Mage"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Blitz Tournament"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6
+2.(0T2)Ng1f3 / (0T2)e7e6
+3.(0T3)b2b3 / (0T3)b7b6
+4.(0T4)Bc1b2 / (0T4)Bc8b7
+5.(0T5)Nb1c3 / (0T5)Bf8d6
+6.(0T6)Bf1d3 / (0T6)a7a6
+7.(0T7)Qd1e2 / (0T7)Nb8c6
+8.(0T8)Nf3g5 / (0T8)Nc6e5
+9.(0T9)Nc3e4 / (0T9)Nf6e4
+10.(0T10)Ng5e4 / (0T10)Qd8e7
+11.(0T11)Rh1f1 / (0T11)Rh8f8
+12.(0T12)Qe2h5 / (0T12)g7g6
+13.(0T13)Qh5e2 / (0T13)f7f5
+14.(0T14)Ne4d6 / (0T14)c7d6
+15.(0T15)g2g3 / (0T15)Bb7f3
+16.(0T16)Bb2e5 / (0T16)Bf3e2
+17.(0T17)Bd3e2 / (0T17)d6e5
+18.(0T18)f2f4 / (0T18)e5e4
+19.(0T19)a2a4 / (0T19)a6a5
+20.(0T20)Ke1f2 / (0T20)Qe7d6
+21.(0T21)Rf1d1 / (0T21)h7h6
+22.(0T22)d2d3 / (0T22)Qd6>>(0T18)d2
+23.(-1T19)Ke1d2 / (-1T19)Qe7d6
+24.(-1T20)Kd2c3 / (-1T20)a6a5
+25.(-1T21)Kc3c4 / (-1T21)Qd6c5

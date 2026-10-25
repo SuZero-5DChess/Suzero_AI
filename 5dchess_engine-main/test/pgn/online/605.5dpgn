@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.28"]
+[Round "565"]
+[White "Tones"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)b2b4 / {20:05}(0T1)Ng8f6 
+2.{19:26}(0T2)Bc1b2 / {20:01}(0T2)d7d5 
+3.{19:19}(0T3)e2e3 / {18:36}(0T3)Nf6g4 
+4.{18:24}(0T4)c2c4 / {17:29}(0T4)Bc8d7 
+5.{16:58}(0T5)c4d5 / {14:42}(0T5)f7f6 
+6.{15:18}(0T6)Bb2f6 / {13:26}(0T6)g7f6 
+7.{15:23}(0T7)Qd1f3 / {9:57}(0T7)Bf8>>(0T1)f2 
+8.{15:14}(-1T2)Ke1f2 / {9:41}(-1T2)Ng8h6 
+9.{15:14}(-1T3)e2e3 / {9:02}(-1T3)Nh6f5 
+10.{15:14}(-1T4)Qd1h5 / {9:02}(-1T4)Nf5>>(-1T2)f4 
+11.{13:07}(-1T5)Qh5f7 / {8:57}(-1T5)Ke8f7 
+12.{12:22}(-1T6)Bf1c4 / {8:50}(-1T6)e7e6 
+13.{11:48}(-1T7)Bc4e6 / {7:22}(-1T7)d7e6 
+14.{11:31}(0T8)Qf3>(-1T8)f4

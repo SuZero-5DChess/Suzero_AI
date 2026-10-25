@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.13"]
+[Round "368"]
+[White "cirtus"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Defended Pawn"]
+
+1.{3:28}(0T1)c2c3 / {14:36}(0T1)c7c5 
+2.{3:28}(0T2)Ng1f3 / {14:36}(0T2)c5c4 
+3.{3:28}(0T3)Qb1e4 / {14:36}(0T3)b7b5 
+4.{3:28}(0T4)Nf3g5 / {14:36}(0T4)Ng8f6 
+5.{3:28}(0T5)Qe4e3 / {14:36}(0T5)e7e6 
+6.{3:28}(0T6)b2b3 / {14:36}(0T6)Bc8b7 
+7.{3:28}(0T7)b3c4 / {14:36}(0T7)Nf6e4 
+8.{3:28}(0T8)Ng5e4 / {14:36}(0T8)h7h6 
+9.{3:28}(0T9)c4b5 / {14:36}(0T9)Bb7d5 
+10.{3:28}(0T10)a2a4 / {14:36}(0T10)Nd8b7 
+11.{3:28}(0T11)Qe3f3 / {14:36}(0T11)Nb7d6 
+12.{3:28}(0T12)Qf3h5 / {14:36}(0T12)Bd5e4 
+13.{3:28}(0T13)Bc1a3 / {14:36}(0T13)Nd6c4 
+14.{3:28}(0T14)Ba3f8 / {14:36}(0T14)Rh8f8 
+15.{3:28}(0T15)e2e3 / {14:36}(0T15)Qb8f4 
+16.{3:28}(0T16)Qh5>>(0T14)f7 / {14:36}(0T16)Qf4>>(0T9)f4 
+17.{3:28}(-1T10)Qe3d3 / {14:36}(-1T10)Bb7e4
+{recorded:white wins}

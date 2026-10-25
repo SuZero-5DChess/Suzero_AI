@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.22"]
+[Round "519"]
+[White "Mage"]
+[Black "Dreamer"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Nb1a3 / (0T1)Ng8f6
+2.(0T2)Ng1f3 / (0T2)d7d5
+3.(0T3)Na3b5 / (0T3)c7c5
+4.(0T4)c2c3 / (0T4)Nb8c6
+5.(0T5)d2d4 / (0T5)a7a6
+6.(0T6)Nb5a3 / (0T6)Bc8g4
+7.(0T7)Bc1f4 / (0T7)e7e6
+8.(0T8)Qd1b3 / (0T8)Qd8d7
+9.(0T9)Nf3e5 / (0T9)Nc6e5
+10.(0T10)d4e5 / (0T10)g7g5
+11.(0T11)e5f6 / (0T11)g5f4
+12.(0T12)Na3c2 / (0T12)b7b5
+13.(0T13)Nc2a3 / (0T13)Bf8d6
+14.(0T14)f2f3 / (0T14)Bg4f5
+{recorded:black wins}

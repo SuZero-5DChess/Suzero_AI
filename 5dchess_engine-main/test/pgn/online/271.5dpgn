@@ -1,0 +1,31 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.11"]
+[Round "218"]
+[White "tesseract"]
+[Black "Shad Amethyst"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League Season 2"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)c7c5 
+3.(0T3)c2c3 / (0T3)c5c4 
+4.(0T4)Bc1f4 / (0T4)e7e6 
+5.(0T5)e2e3 / (0T5)b7b5 
+6.(0T6)Nf3g5 / (0T6)g7g6 
+7.(0T7)b2b3 / (0T7)b5b4 
+8.(0T8)Bf1c4 / (0T8)b4c3 
+9.(0T9)Nb1c3 / (0T9)Qd8b6 
+10.(0T10)a2a3 / (0T10)Bf8d6 
+11.(0T11)Bf4d6 / (0T11)Qb6d6 
+12.(0T12)Qd1f3 / (0T12)Qd6e7 
+13.(0T13)b3b4 / (0T13)Nb8c6 
+14.(0T14)Ke1g1 / (0T14)Ra8b8 
+15.(0T15)Nc3e4 / (0T15)Nf6e4 
+16.(0T16)Ng5e4 / (0T16)f7f5 
+17.(0T17)Qf3f4 / (0T17)f5e4 
+18.(0T18)Bc4b5 / (0T18)Rb8b5 
+19.(0T19)Qf4>>(0T16)f7 / (1T16)Qe7f7 
+20.(1T17)Qf3f7 / (0T19)Qe7>>(0T16)h4 
+21.(-1T17)Qf3f7

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>5D Chess</title>
+    <link rel="stylesheet" href="styles/color-schemes.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/panels.css">
+    <link rel="stylesheet" href="styles/popup.css">
+    <link rel="stylesheet" href="styles/mobile.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script>
+        window.svg_file_mapping = {
+            'b': 'assets/bishop-black.svg',
+            'B': 'assets/bishop-white.svg',
+            'w': 'assets/brawn-black.svg',
+            'W': 'assets/brawn-white.svg',
+            'c': 'assets/commonking-black.svg',
+            'C': 'assets/commonking-white.svg',
+            'd': 'assets/dragon-black.svg',
+            'D': 'assets/dragon-white.svg',
+            'k': 'assets/king-black.svg',
+            'K': 'assets/king-white.svg',
+            'n': 'assets/knight-black.svg',
+            'N': 'assets/knight-white.svg',
+            'p': 'assets/pawn-black.svg',
+            'P': 'assets/pawn-white.svg',
+            's': 'assets/princess-black.svg',
+            'S': 'assets/princess-white.svg',
+            'q': 'assets/queen-black.svg',
+            'Q': 'assets/queen-white.svg',
+            'r': 'assets/rook-black.svg',
+            'R': 'assets/rook-white.svg',
+            'y': 'assets/royalqueen-black.svg',
+            'Y': 'assets/royalqueen-white.svg',
+            'u': 'assets/unicorn-black.svg',
+            'U': 'assets/unicorn-white.svg'
+        };
+        window.worker_path = 'scripts/worker.js';
+        window.engine_path = 'wasm/engine.js';
+
+        window.themes = [
+            { name: "vintage", option: "Vintage" },
+            { name: "plain", option: "Plain" },
+            { name: "dark", option: "Dark" }
+        ]
+        window.defaultTheme = "vintage";
+    </script>
+    <script type="importmap">
+    {
+        "imports": {
+            "ui": "./scripts/ui.js",
+            "piece": "./scripts/piece.js",
+            "parse": "./scripts/parse.js",
+            "color": "./scripts/color.js",
+            "canvas": "./scripts/canvas.js",
+            "draw": "./scripts/draw.js",
+            "onload": "./scripts/onload.js"
+        }
+    }
+    </script>
+    <script type="module">
+        import { startWorker } from './scripts/startup.js';
+        startWorker();
+        import('./scripts/main.js');
+    </script>
+</head>
+
+<body>
+
+<div id="loadingScreen" aria-labelledby="loadingTitle">
+    <h1 id="loadingTitle">5D Chess Analyzer</h1>
+    <p id="loadingStatus" role="status" aria-live="polite" aria-atomic="true">[1/5] Preparing the analyzer…</p>
+</div>
+
+<div id="mobileLayout" hidden>
+    <header class="mobile-header">
+        <div id="mobileStatus"></div>
+        <button type="button" id="mobileCommentButton" class="mobile-comment-button" data-mobile-panel="comments" aria-expanded="false" aria-controls="mobileSheet" aria-label="Comment (empty)">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-comment-empty"></use></svg>
+        </button>
+        <button type="button" class="mobile-game-button" hidden data-mobile-panel="game" aria-expanded="false" aria-controls="mobileSheet" aria-label="Game details">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-price-tag-3-line"></use></svg>
+        </button>
+        <button type="button" class="mobile-tools-button" data-mobile-panel="tools" aria-expanded="false" aria-controls="mobileSheet" aria-label="Additional actions">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-more-2-fill"></use></svg>
+        </button>
+    </header>
+    <div id="mobileBoard"></div>
+    <section id="mobileSheet" hidden aria-labelledby="mobileSheetTitle">
+        <div class="mobile-sheet-header" id="mobileSheetHeader">
+            <h2 id="mobileSheetTitle" class="mobile-sheet-title"></h2>
+            <div id="mobileContinuationActions" hidden>
+                <button type="button" id="mobileEditContinuations" aria-pressed="false">Edit</button>
+            </div>
+        </div>
+        <button type="button" id="mobileSheetClose" aria-label="Close panel">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-close-line"></use></svg>
+        </button>
+        <div class="mobile-sheet-content">
+            <div data-mobile-pane="variations" hidden></div>
+            <div data-mobile-pane="comments" hidden></div>
+            <div data-mobile-pane="tools" hidden></div>
+            <div data-mobile-pane="game" hidden></div>
+        </div>
+    </section>
+    <footer class="mobile-footer">
+        <button type="button" id="mobileContinuation" data-mobile-panel="variations" aria-expanded="false" aria-controls="mobileSheet" aria-label="Choose continuation"><span class="mobile-choose">Choose ›</span></button>
+        <div id="mobileNavigation"></div>
+    </footer>
+</div>
+<canvas id="canvas" tabindex="0" aria-label="Chess board canvas"></canvas>
+
+<!-- Shared desktop layout; each panel expands independently from the top. -->
+<div class="top-panels">
+<!-- Game metadata: one panel that extends from its top-left corner. -->
+<section id="gameMetadata" class="game-metadata" aria-label="Game information" hidden>
+    <div id="gameMetadataSummary" class="game-metadata-summary">
+        <span data-game-header="white" class="game-metadata-name game-metadata-unknown">Unknown Player</span>
+        <span class="game-metadata-separator" aria-hidden="true">/</span>
+        <span data-game-header="black" class="game-metadata-name game-metadata-unknown">Unknown Player</span>
+        <span data-game-header="result" class="game-metadata-result" hidden></span>
+    </div>
+    <div id="gameMetadataDetails" class="game-metadata-details" hidden>
+        <div data-game-header="event" class="game-metadata-event"></div>
+        <div class="game-metadata-players">
+            <div><div data-game-header="white" class="game-metadata-player game-metadata-unknown">Unknown Player</div><span class="game-metadata-label">White</span></div>
+            <span data-game-header="result" class="game-metadata-result game-metadata-result-empty">/</span>
+            <div><div data-game-header="black" class="game-metadata-player game-metadata-unknown">Unknown Player</div><span class="game-metadata-label">Black</span></div>
+        </div>
+        <dl class="game-metadata-facts">
+            <div class="game-metadata-site"><dt>Site</dt><dd data-game-header="site"></dd></div>
+            <div><dt>Date</dt><dd data-game-header="date"></dd></div>
+            <div><dt>Round</dt><dd data-game-header="round"></dd></div>
+        </dl>
+    </div>
+    <button id="gameMetadataToggle" class="game-metadata-toggle" type="button" aria-expanded="false" aria-controls="gameMetadataDetails" aria-label="Expand game information" title="Expand game information">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path></path></svg>
+    </button>
+</section>
+
+<div class="hud-wrapper" id="hudWrapper">
+    <div class="hud collapsed" id="hud">
+        <div class="hud-header">
+            <div class="hud-title">Loading...</div>
+            <div class="hud-light" id="light"></div>
+        </div>
+
+        <div class="hud-content" id="hudContent">
+            <div class="hud-text" contenteditable="true" spellcheck="false" role="textbox" aria-label="Comment" aria-multiline="true">
+                Loading WebAssembly module. This may take a while.
+            </div>
+        </div>
+
+        <button class="hud-toggle" id="toggle" type="button" aria-label="Expand comment" aria-expanded="false" aria-controls="hudContent"></button>
+    </div>
+
+    <div class="hud-comment-actions" id="hudCommentActions">
+        <button class="hud-comment-btn" id="hudUpdateComment">Update Comment</button>
+        <button class="hud-comment-btn secondary" id="hudDiscardChanges">Discard Changes</button>
+    </div>
+</div>
+
+<div class="navigation-stack">
+<div class="control-panel collapsed" id="controlPanel">
+    <div class="remote-control">
+        <div class="remote-grid">
+            <!-- Tapered 2px crescents extend 5 degrees beyond each diagonal junction. -->
+            <svg class="navigation-arcs" viewBox="0 0 194 170" preserveAspectRatio="none" fill="none" aria-hidden="true" focusable="false">
+                <path class="navigation-arc arc-prev" d="M20.269 30.684 C21.083 29.763 23.447 26.924 25.154 25.154 C26.862 23.384 28.654 21.681 30.513 20.065 C32.372 18.449 34.310 16.907 36.307 15.459 C38.303 14.010 40.373 12.643 42.493 11.375 C44.612 10.107 46.798 8.927 49.025 7.850 C51.251 6.774 53.536 5.791 55.851 4.915 C58.167 4.039 60.533 3.263 62.920 2.596 C65.307 1.929 67.735 1.366 70.174 0.915 C72.612 0.463 75.083 0.119 77.554 -0.113 C80.025 -0.344 81.759 -0.411 85.000 -0.476 C88.241 -0.540 93.000 -0.500 97.000 -0.500 C101.000 -0.500 105.759 -0.540 109.000 -0.476 C112.241 -0.411 113.975 -0.344 116.446 -0.113 C118.917 0.119 121.388 0.463 123.826 0.915 C126.265 1.366 128.693 1.929 131.080 2.596 C133.467 3.263 135.833 4.039 138.149 4.915 C140.464 5.791 142.749 6.774 144.975 7.850 C147.202 8.927 149.388 10.107 151.507 11.375 C153.627 12.643 155.697 14.010 157.693 15.459 C159.690 16.907 161.628 18.449 163.487 20.065 C165.346 21.681 167.138 23.384 168.846 25.154 C170.553 26.924 172.917 29.763 173.731 30.684 C172.885 29.794 170.420 27.046 168.655 25.345 C166.891 23.643 165.046 22.014 163.144 20.474 C161.242 18.934 159.266 17.473 157.241 16.105 C155.216 14.737 153.125 13.453 150.993 12.266 C148.860 11.080 146.670 9.982 144.447 8.984 C142.224 7.985 139.951 7.080 137.653 6.277 C135.355 5.473 133.016 4.767 130.660 4.163 C128.305 3.558 125.916 3.054 123.520 2.653 C121.124 2.251 118.703 1.952 116.283 1.756 C113.863 1.560 112.214 1.519 109.000 1.476 C105.786 1.433 101.000 1.500 97.000 1.500 C93.000 1.500 88.214 1.433 85.000 1.476 C81.786 1.519 80.137 1.560 77.717 1.756 C75.297 1.952 72.876 2.251 70.480 2.653 C68.084 3.054 65.695 3.558 63.340 4.163 C60.984 4.767 58.645 5.473 56.347 6.277 C54.049 7.080 51.776 7.985 49.553 8.984 C47.330 9.982 45.140 11.080 43.007 12.266 C40.875 13.453 38.784 14.737 36.759 16.105 C34.734 17.473 32.758 18.934 30.856 20.474 C28.954 22.014 27.109 23.643 25.345 25.345 C23.580 27.046 21.115 29.794 20.269 30.684 Z"/>
+                <path class="navigation-arc arc-redo" d="M163.316 20.269 C164.240 21.081 167.086 23.436 168.861 25.139 C170.636 26.842 172.346 28.630 173.967 30.486 C175.589 32.341 177.137 34.277 178.590 36.272 C180.044 38.267 181.416 40.337 182.688 42.456 C183.960 44.576 185.145 46.762 186.224 48.990 C187.303 51.218 188.288 53.504 189.164 55.823 C190.041 58.141 190.817 60.509 191.481 62.899 C192.146 65.289 192.706 67.720 193.153 70.162 C193.600 72.603 193.938 75.076 194.162 77.549 C194.387 80.022 194.500 82.516 194.500 85.000 C194.500 87.484 194.387 89.978 194.162 92.451 C193.938 94.924 193.600 97.397 193.153 99.838 C192.706 102.280 192.146 104.711 191.481 107.101 C190.817 109.491 190.041 111.859 189.164 114.177 C188.288 116.496 187.303 118.782 186.224 121.010 C185.145 123.238 183.960 125.424 182.688 127.544 C181.416 129.663 180.044 131.733 178.590 133.728 C177.137 135.723 175.589 137.659 173.967 139.514 C172.346 141.370 170.636 143.158 168.861 144.861 C167.086 146.564 164.240 148.919 163.316 149.731 C164.203 148.882 166.943 146.409 168.640 144.640 C170.336 142.871 171.960 141.022 173.494 139.117 C175.028 137.211 176.484 135.234 177.846 133.207 C179.209 131.180 180.487 129.089 181.670 126.956 C182.853 124.824 183.947 122.634 184.942 120.412 C185.938 118.190 186.841 115.919 187.644 113.624 C188.447 111.329 189.154 108.992 189.760 106.640 C190.366 104.287 190.874 101.902 191.280 99.508 C191.685 97.115 191.991 94.697 192.195 92.279 C192.398 89.861 192.500 87.426 192.500 85.000 C192.500 82.574 192.398 80.139 192.195 77.721 C191.991 75.303 191.685 72.885 191.280 70.492 C190.874 68.098 190.366 65.713 189.760 63.360 C189.154 61.008 188.447 58.671 187.644 56.376 C186.841 54.081 185.938 51.810 184.942 49.588 C183.947 47.366 182.853 45.176 181.670 43.044 C180.487 40.911 179.209 38.820 177.846 36.793 C176.484 34.766 175.028 32.789 173.494 30.883 C171.960 28.978 170.336 27.129 168.640 25.360 C166.943 23.591 164.203 21.118 163.316 20.269 Z"/>
+                <path class="navigation-arc arc-next" d="M173.731 139.316 C172.917 140.237 170.553 143.076 168.846 144.846 C167.138 146.616 165.346 148.319 163.487 149.935 C161.628 151.551 159.690 153.093 157.693 154.541 C155.697 155.990 153.627 157.357 151.507 158.625 C149.388 159.893 147.202 161.073 144.975 162.150 C142.749 163.226 140.464 164.209 138.149 165.085 C135.833 165.961 133.467 166.737 131.080 167.404 C128.693 168.071 126.265 168.634 123.826 169.085 C121.388 169.537 118.917 169.881 116.446 170.113 C113.975 170.344 112.241 170.411 109.000 170.476 C105.759 170.540 101.000 170.500 97.000 170.500 C93.000 170.500 88.241 170.540 85.000 170.476 C81.759 170.411 80.025 170.344 77.554 170.113 C75.083 169.881 72.612 169.537 70.174 169.085 C67.735 168.634 65.307 168.071 62.920 167.404 C60.533 166.737 58.167 165.961 55.851 165.085 C53.536 164.209 51.251 163.226 49.025 162.150 C46.798 161.073 44.612 159.893 42.493 158.625 C40.373 157.357 38.303 155.990 36.307 154.541 C34.310 153.093 32.372 151.551 30.513 149.935 C28.654 148.319 26.862 146.616 25.154 144.846 C23.447 143.076 21.083 140.237 20.269 139.316 C21.115 140.206 23.580 142.954 25.345 144.655 C27.109 146.357 28.954 147.986 30.856 149.526 C32.758 151.066 34.734 152.527 36.759 153.895 C38.784 155.263 40.875 156.547 43.007 157.734 C45.140 158.920 47.330 160.018 49.553 161.016 C51.776 162.015 54.049 162.920 56.347 163.723 C58.645 164.527 60.984 165.233 63.340 165.837 C65.695 166.442 68.084 166.946 70.480 167.347 C72.876 167.749 75.297 168.048 77.717 168.244 C80.137 168.440 81.786 168.481 85.000 168.524 C88.214 168.567 93.000 168.500 97.000 168.500 C101.000 168.500 105.786 168.567 109.000 168.524 C112.214 168.481 113.863 168.440 116.283 168.244 C118.703 168.048 121.124 167.749 123.520 167.347 C125.916 166.946 128.305 166.442 130.660 165.837 C133.016 165.233 135.355 164.527 137.653 163.723 C139.951 162.920 142.224 162.015 144.447 161.016 C146.670 160.018 148.860 158.920 150.993 157.734 C153.125 156.547 155.216 155.263 157.241 153.895 C159.266 152.527 161.242 151.066 163.144 149.526 C165.046 147.986 166.891 146.357 168.655 144.655 C170.420 142.954 172.885 140.206 173.731 139.316 Z"/>
+                <path class="navigation-arc arc-undo" d="M30.684 149.731 C29.760 148.919 26.914 146.564 25.139 144.861 C23.364 143.158 21.654 141.370 20.033 139.514 C18.411 137.659 16.863 135.723 15.410 133.728 C13.956 131.733 12.584 129.663 11.312 127.544 C10.040 125.424 8.855 123.238 7.776 121.010 C6.697 118.782 5.712 116.496 4.836 114.177 C3.959 111.859 3.183 109.491 2.519 107.101 C1.854 104.711 1.294 102.280 0.847 99.838 C0.400 97.397 0.062 94.924 -0.162 92.451 C-0.387 89.978 -0.500 87.484 -0.500 85.000 C-0.500 82.516 -0.387 80.022 -0.162 77.549 C0.062 75.076 0.400 72.603 0.847 70.162 C1.294 67.720 1.854 65.289 2.519 62.899 C3.183 60.509 3.959 58.141 4.836 55.823 C5.712 53.504 6.697 51.218 7.776 48.990 C8.855 46.762 10.040 44.576 11.312 42.456 C12.584 40.337 13.956 38.267 15.410 36.272 C16.863 34.277 18.411 32.341 20.033 30.486 C21.654 28.630 23.364 26.842 25.139 25.139 C26.914 23.436 29.760 21.081 30.684 20.269 C29.797 21.118 27.057 23.591 25.360 25.360 C23.664 27.129 22.040 28.978 20.506 30.883 C18.972 32.789 17.516 34.766 16.154 36.793 C14.791 38.820 13.513 40.911 12.330 43.044 C11.147 45.176 10.053 47.366 9.058 49.588 C8.062 51.810 7.159 54.081 6.356 56.376 C5.553 58.671 4.846 61.008 4.240 63.360 C3.634 65.713 3.126 68.098 2.720 70.492 C2.315 72.885 2.009 75.303 1.805 77.721 C1.602 80.139 1.500 82.574 1.500 85.000 C1.500 87.426 1.602 89.861 1.805 92.279 C2.009 94.697 2.315 97.115 2.720 99.508 C3.126 101.902 3.634 104.287 4.240 106.640 C4.846 108.992 5.553 111.329 6.356 113.624 C7.159 115.919 8.062 118.190 9.058 120.412 C10.053 122.634 11.147 124.824 12.330 126.956 C13.513 129.089 14.791 131.180 16.154 133.207 C17.516 135.234 18.972 137.211 20.506 139.117 C22.040 141.022 23.664 142.871 25.360 144.640 C27.057 146.409 29.797 148.882 30.684 149.731 Z"/>
+                <!-- Full-width joins appear only when both adjacent controls are enabled. -->
+                <path class="navigation-arc navigation-connector connector-prev-undo" d="M.5 85 A84.5 84.5 0 0 1 85 .5"/>
+                <path class="navigation-arc navigation-connector connector-prev-redo" d="M109 .5 A84.5 84.5 0 0 1 193.5 85"/>
+                <path class="navigation-arc navigation-connector connector-next-redo" d="M193.5 85 A84.5 84.5 0 0 1 109 169.5"/>
+                <path class="navigation-arc navigation-connector connector-next-undo" d="M85 169.5 A84.5 84.5 0 0 1 .5 85"/>
+            </svg>
+            <button class="remote-btn up active" aria-label="Previous" title="Previous Action [↑]"><span class="desktop-remote-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><use href="./icons/lucide.svg#chevrons-up"></use></svg></span><span class="mobile-remote-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-previous"></use></svg><span>Previous</span></span></button>
+            <button class="remote-btn left active" aria-label="Undo" title="Undo [←]"><span class="desktop-remote-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><use href="./icons/lucide.svg#undo-2"></use></svg></span><span class="mobile-remote-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-undo"></use></svg><span>Undo</span></span></button>
+            <button class="remote-btn ok inactive" aria-label="Submit" title="Submit [↵]"><span class="desktop-remote-label">Submit</span><span class="mobile-remote-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-submit"></use></svg><span>Submit</span></span></button>
+            <button class="remote-btn right inactive" aria-label="Redo" title="Redo [→]"><span class="desktop-remote-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><use href="./icons/lucide.svg#redo-2"></use></svg></span><span class="mobile-remote-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-redo"></use></svg><span>Redo</span></span></button>
+            <button class="remote-btn down active" aria-label="Next" title="Next Action [↓]"><span class="desktop-remote-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><use href="./icons/lucide.svg#chevrons-down"></use></svg></span><span class="mobile-remote-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-previous"></use></svg><span>Next</span></span></button>
+        </div>
+    </div>
+
+    <div class="selected-display" id="selectedDisplay">No continuations</div>
+
+    <div class="select-container" id="selectContainer">
+        <button type="button" class="hint-btn" id="hintBtn">+ Hint</button>
+    </div>
+
+    <button class="panel-toggle" id="panelToggle" type="button" aria-label="Expand continuations" aria-expanded="false" aria-controls="selectContainer"></button>
+</div>
+
+    <div class="pending-branches" id="pendingBranches" hidden>
+        <div class="pending-branch-actions">
+            <button type="button" class="hud-comment-btn secondary" id="restoreAllBranches">Restore All</button>
+            <button type="button" class="hud-comment-btn delete" id="confirmBranches">Confirm Deletion</button>
+        </div>
+    </div>
+</div><!-- .navigation-stack -->
+</div><!-- .top-panels -->
+
+<dialog id="deletionDialog" class="deletion-dialog" aria-labelledby="deletionTitle" aria-describedby="deletionReason">
+    <h2 id="deletionTitle">Delete pending branches?</h2>
+    <p id="deletionReason"></p>
+    <ul id="deletionActions"></ul>
+    <form method="dialog" class="branch-buttons">
+        <button value="cancel" autofocus>Cancel</button>
+        <button value="confirm">Delete and continue</button>
+    </form>
+</dialog>
+
+<div class="buttons-panel" id="buttonsPanel">
+    <button class="btn-icon" id="btnFocus" title="Focus (F)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-focus"></use></svg>
+    </button>
+    <button class="btn-icon" id="btnFlip" title="Flip">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-flip"></use></svg>
+    </button>
+    <button class="btn-icon" id="btnScreenshot" title="Screenshot">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-screenshot"></use></svg>
+    </button>
+    <button class="btn-icon" id="btnImport" title="Import">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-import"></use></svg>
+    </button>
+    <button class="btn-icon" id="btnExport" title="Export">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-export"></use></svg>
+    </button>
+    <button class="btn-icon" id="btnInfo" title="Information">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-info"></use></svg>
+    </button>
+    <button class="btn-icon" id="btnEdit" title="Edit">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-edit"></use></svg>
+    </button>
+    <button class="btn-icon" id="btnSettings" title="Settings">
+        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-settings"></use></svg>
+    </button>
+</div>
+
+<div class="popup-overlay" id="popupOverlay">
+    <div class="popup-window popup-standard" id="popupImport">
+        <div class="popup-title">Import Data</div>
+        <div class="popup-content popup-content-flex">
+            <div class="pgn-input">
+                <div class="pgn-overlay" id="importHighlight" aria-hidden="true" hidden><div class="pgn-mirror" id="importMirror"></div></div>
+                <textarea class="popup-textarea" id="importTextarea" aria-label="PGN input" aria-describedby="importDiagnostic" spellcheck="false" placeholder="Paste your data here or drag and drop a file..."></textarea>
+            </div>
+            <div class="import-diagnostic" id="importDiagnostic" data-state="empty">
+                <button type="button" class="diagnostic-heading diagnostic-location" id="importDiagnosticLocation" aria-controls="importHighlight" aria-pressed="false" hidden>
+                    <svg class="diagnostic-error-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 5h2v6h-2zm0 8h2v2h-2z"/></svg>
+                    <span id="importDiagnosticHeading" role="status" aria-atomic="true"></span>
+                    <span class="diagnostic-locate-hint">[Click to Locate]:</span>
+                </button>
+                <div id="importDiagnosticMessage"></div>
+            </div>
+            <div class="popup-button-group">
+                <button class="popup-button" id="loadFromFileButton">Open File...</button>
+                <button class="popup-button" id="loadButton">Load</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-window popup-standard" id="popupExport">
+        <div class="popup-title">Export Data</div>
+        <div class="popup-content popup-content-flex">
+            <textarea class="popup-textarea popup-textarea-flex" id="exportTextarea" readonly></textarea>
+            <div class="filename-inputs desktop-export-controls">
+                <div class="input-group" style="width: 60%;">
+                    <input type="text" id="exportFilename" placeholder="filename" aria-label="Filename">
+                </div>
+                <div class="input-group" style="width: 20%;">
+                    <input type="text" id="exportExtension" placeholder=".extension" aria-label="File extension">
+                </div>
+                <button class="popup-button" id="saveButton" type="button"><span class="desktop-export-label">Save as File</span><span class="mobile-export-label">Download</span></button>
+            </div>
+            <div class="popup-button-group desktop-export-controls">
+                <div class="export-options">
+                    <label style="display:flex;align-items:center;gap:6px;">
+                        <input type="checkbox" id="exportMate">
+                        <span>Mate</span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;">
+                        <input type="checkbox" id="exportShortNotation">
+                        <span>Short Notation</span>
+                    </label>
+                    <button class="popup-button export-more-options" id="exportMoreOptionsButton" type="button" aria-haspopup="dialog"><span class="desktop-export-label">More Options</span><span class="mobile-export-label">Options</span></button>
+                </div>
+                <div id="copiedLabel" class="copied-label">Copied!</div>
+                <div class="export-actions">
+                    <button class="btn-icon" id="refreshButton" title="Refresh export data">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-refresh"></use></svg>
+                    </button>
+                    <button class="btn-icon" id="copyButton" type="button" title="Copy to Clipboard" aria-label="Copy to clipboard">
+                        <span class="mobile-export-label">Copy</span>
+                        <svg class="desktop-export-label" viewBox="0 0 24 24" fill="currentColor"><use href="./icons/remix.svg#icon-copy"></use></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="exportPreviewStatus" class="export-preview-status" role="status" hidden>Updating preview…</div>
+            <div id="mobileExportFooter" class="popup-button-group export-footer"></div>
+        </div>
+    </div>
+
+    <div class="popup-window export-options-popup" id="popupExportOptions">
+        <div class="popup-title">More Options</div>
+        <div class="popup-content popup-form export-options-dialog-content">
+            <div id="mobileExportBasicOptions"></div>
+            <label class="popup-control">
+                <input type="checkbox" id="exportRelativeNotation">
+                <span>Relative Notation</span>
+            </label>
+            <label class="popup-control">
+                <input type="checkbox" id="exportOutcome">
+                <span>Outcome</span>
+            </label>
+            <div class="popup-fieldset export-scope-group" role="radiogroup" aria-labelledby="exportScopeLabel">
+                <div class="popup-fieldset-title" id="exportScopeLabel">Export scope</div>
+                <label class="popup-control">
+                    <input type="radio" name="exportScope" id="exportCompleteGameTree" value="complete">
+                    <span>Export complete game tree</span>
+                </label>
+                <label class="popup-control">
+                    <input type="radio" name="exportScope" id="exportGameHistory" value="history">
+                    <span>Export game history till now</span>
+                </label>
+            </div>
+            <label class="popup-control">
+                <input type="checkbox" id="exportStandardMetadataOnly">
+                <span>Standard metadata only</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="popup-window popup-standard" id="popupSettings">
+        <div class="popup-title">Settings</div>
+        <div class="popup-content popup-form">
+            <div class="popup-fieldset" role="group" aria-labelledby="settingsGameLabel">
+                <div class="popup-fieldset-title" id="settingsGameLabel">Game</div>
+                <label class="popup-control">
+                    <input type="checkbox" id="allowSubmitWithChecks">
+                    <span>Allow submit with checks</span>
+                </label>
+                <p class="popup-control-description">Allow submitting moves that leave your royal pieces attacked, and loading or viewing illegal history. Hint is unavailable in illegal history. Return to legal history to unlock this setting and turn it off.</p>
+                <label class="popup-control">
+                    <input type="checkbox" id="useShortMoveNotation" checked>
+                    <span>Use shortened notation for moves</span>
+                </label>
+                <label class="popup-control">
+                    <input type="checkbox" id="showMovablePieces">
+                    <span>Show movable pieces</span>
+                </label>
+            </div>
+            <div class="popup-fieldset" role="group" aria-labelledby="settingsInterfaceLabel">
+                <div class="popup-fieldset-title" id="settingsInterfaceLabel">Interface</div>
+                <label class="popup-control">
+                    <input type="checkbox" id="doNotReverseFilesWhenFlipped">
+                    <span>Do not reverse files when flipped</span>
+                </label>
+                <label class="popup-control popup-control-select">
+                    <span>Color scheme</span>
+                    <select id="colorSchemeSelect">
+                        <!-- Options are added in ui.js -->
+                    </select>
+                </label>
+                <label class="popup-control">
+                    <input type="checkbox" id="autoToggleComments" checked>
+                    <span>Automatically toggle comments area</span>
+                </label>
+                <label class="popup-control">
+                    <input type="checkbox" id="showMetadataPanel" checked>
+                    <span>Show metadata panel</span>
+                </label>
+                <label class="popup-control">
+                    <input type="checkbox" id="toggleDebugWindow">
+                    <span>Show debug window</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-window popup-standard popup-info" id="popupInfo">
+        <div class="popup-title">Information</div>
+        
+        <div class="info-tabs">
+            <button class="info-tab-btn active" data-tab="user-interface">User interface</button>
+            <button class="info-tab-btn" data-tab="game-rules">Game Rules</button>
+            <button class="info-tab-btn" data-tab="notation">Algebraic Notation</button>
+            <button class="info-tab-btn" data-tab="about">About</button>
+        </div>
+
+        <div class="popup-content info-tab-content" id="tab-user-interface">
+            <div class="interface-guide-options" role="group" aria-labelledby="interfaceGuideLabel">
+                <b id="interfaceGuideLabel">Show user guide for</b>
+                <label class="popup-control interface-guide-choice">
+                    <input type="radio" name="interfaceGuide" value="desktop" checked>
+                    <span>Desktop</span>
+                </label>
+                <label class="popup-control interface-guide-choice">
+                    <input type="radio" name="interfaceGuide" value="mobile">
+                    <span>Mobile</span>
+                </label>
+            </div>
+            <div id="interfaceGuideDesktop">
+                <p>Welcome to 5D Chess Engine! This guide introduces the controls for exploring and editing games.</p>
+                <p>Click outside this window to close it. Click <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-info"></use></svg> <b>Info</b> at the bottom to open it again.</p>
+                <h4>Viewport</h4>
+                <p>The main area displays the chessboards.</p>
+                <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
+                    <li><b>Zoom</b> — Scroll the mouse wheel to zoom in or out.</li>
+                    <li><b>Pan</b> — Click and drag to move the view.</li>
+                    <li><b>Select a piece</b> — Click a piece. Enable <b>Show movable pieces</b> in Settings to highlight pieces you can move.</li>
+                    <li><b>Move a piece</b> — Select a piece, then click a valid destination square.</li>
+                </ul>
+                <h4>Canvas keyboard navigation</h4>
+                <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
+                    <li><b>F</b> cycles through the game’s focus boards.</li>
+                    <li><b>Space</b> centers the nearest board. Press again to see surrounding boards, and again to return. <b>Shift+Space</b> shows surrounding boards directly.</li>
+                    <li><b>W / A / S / D</b> moves the view up, left, down, or right. Combine keys to move diagonally; hold to move faster.</li>
+                </ul>
+                <h4>Control Panel</h4>
+                <p>Use the controls at the top right to navigate the game:</p>
+                <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
+                    <li><b>PREV</b> — Go to the previous action. Shortcut: <b>↑</b></li>
+                    <li><b>NEXT</b> — Follow the selected continuation. Shortcut: <b>↓</b></li>
+                    <li><b>UNDO</b> — Undo a move. Shortcut: <b>←</b></li>
+                    <li><b>REDO</b> — Redo a move. Shortcut: <b>→</b></li>
+                    <li><b>SUBMIT</b> — Submit your moves to complete the turn. Shortcut: <b>Enter</b></li>
+                </ul>
+                <p>Expand the control panel to choose a continuation before using <b>NEXT</b>. Submitted turns are added to the list. Click <b>Hint</b> to add a suggested legal action, or press <b>H</b>.</p>
+                <p>Hover over a continuation to delete its branch; keyboard focus also reveals the action. Pending deletions are crossed out and can be restored. Collapsing the list keeps them pending. <b>Restore</b> and <b>Delete</b> appear below the panel. Previous, Next, Submit, and opening Export ask for confirmation before permanently deleting pending branches and their descendants. Submitting a pending branch preserves it. Loading another game replaces the current game and clears pending edits.</p>
+                <h4>Action Buttons</h4>
+                <p>The buttons at the bottom provide these actions:</p>
+                <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-focus"></use></svg> <b>Focus</b> — Cycle through the game’s focus boards.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-flip"></use></svg> <b>Flip</b> — Switch between White’s and Black’s perspectives. To keep files running left to right, enable <b>Do not reverse files when flipped</b> under <b>Settings → Interface</b>.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-screenshot"></use></svg> <b>Screenshot</b> — Download an image of the boards.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-import"></use></svg> <b>Import</b> — Open a game in Branched 5DPGN format.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-export"></use></svg> <b>Export</b> — Save the current game in Branched 5DPGN format.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-info"></use></svg> <b>Info</b> — Open this guide.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-edit"></use></svg> <b>Edit</b> — Under development.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-settings"></use></svg> <b>Settings</b> — Adjust the application’s preferences.</li>
+                </ul>
+                <h4>HUD</h4>
+                <p>The header at the top shows the game’s status. Expand it to read or edit comments.</p>
+                <p>Click the comment area to edit it, then choose <b>Update Comment</b> to save or <b>Discard Changes</b> to cancel. To delete a comment, clear its text and click <b>Delete Comment</b>.</p>
+                <p>A glowing red indicator means phantom checks are present. Click it to show or hide phantom boards.</p>
+            </div>
+            <div id="interfaceGuideMobile" hidden>
+                <p>Welcome to 5D Chess Engine! This guide introduces the controls for exploring and editing games.</p>
+                <p>Tap <b>Close</b> to close this window. To open it again, tap the <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-more-2-fill"></use></svg> three-dot menu in the header and choose <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-info"></use></svg> <b>Info</b>.</p>
+                <h4>Viewport</h4>
+                <p>The main area displays the chessboards.</p>
+                <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
+                    <li><b>Zoom</b> — Pinch to zoom in or out.</li>
+                    <li><b>Focus a board</b> — Double tap a board to center and zoom in. Double tap it again to see surrounding boards, and again to return.</li>
+                    <li><b>Pan</b> — Drag to move the view.</li>
+                    <li><b>Select a piece</b> — Tap a piece. Enable <b>Show movable pieces</b> in Settings to highlight pieces you can move.</li>
+                    <li><b>Move a piece</b> — Select a piece, then tap a valid destination square.</li>
+                </ul>
+                <h4>Control Panel</h4>
+                <p>Use the controls at the bottom to navigate the game:</p>
+                <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-previous"></use></svg> <b>Previous</b> — Go to the previous action.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0; transform: scaleX(-1);" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-previous"></use></svg> <b>Next</b> — Follow the selected continuation.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-undo"></use></svg> <b>Undo</b> — Undo a move.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-redo"></use></svg> <b>Redo</b> — Redo a move.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-submit"></use></svg> <b>Submit</b> — Submit your moves to complete the turn.</li>
+                </ul>
+                <p>Tap <b>Choose</b> to select a continuation before using <b>Next</b>. Submitted turns are added to the list. Tap <b>Hint</b> in the continuations panel to add a suggested legal action.</p>
+                <p>Tap <b>Edit</b> beside <b>Select Next Action</b> to show branch Delete/Restore icons. Tap <b>Done</b> to return to selection when no deletions are pending. Pending deletions replace Done with <b>Restore</b> and <b>Delete</b> in the fixed header; either action returns to normal selection. Closing the panel keeps deletions pending. Navigation, Submit, and Export still ask for confirmation before committing pending deletions.</p>
+                <p>Tap <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-close-line"></use></svg> to close the panel.</p>
+                <h4>Action Buttons</h4>
+                <p>Tap <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-focus"></use></svg> <b>Focus</b> at the lower-right of the board area to cycle through the game’s focus boards.</p>
+                <p>Open the <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-more-2-fill"></use></svg> three-dot menu in the header for these actions:</p>
+                <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-flip"></use></svg> <b>Flip</b> — Switch between White’s and Black’s perspectives. To keep files running left to right, enable <b>Do not reverse files when flipped</b> under <b>Settings → Interface</b>.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-screenshot"></use></svg> <b>Screenshot</b> — Download an image of the boards.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-import"></use></svg> <b>Import</b> — Open a game in Branched 5DPGN format.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-export"></use></svg> <b>Export</b> — Save the current game in Branched 5DPGN format. Use <b>Options</b> to adjust the export, then <b>Copy</b> or <b>Download</b>.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-info"></use></svg> <b>Info</b> — Open this guide.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-edit"></use></svg> <b>Edit</b> — Under development.</li>
+                    <li><svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-settings"></use></svg> <b>Settings</b> — Adjust the application’s preferences.</li>
+                </ul>
+                <h4>HUD</h4>
+                <p>The header at the top shows the game’s status. Tap the <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-price-tag-3-line"></use></svg> tag icon to view game details, or the <svg style="width: 20px; height: 20px; vertical-align: middle; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="./icons/remix.svg#icon-comment-empty"></use></svg> comment icon to read or edit comments.</p>
+                <p>Tap the comment area to edit it, then choose <b>Update Comment</b> to save or <b>Discard Changes</b> to cancel. To delete a comment, clear its text and tap <b>Delete Comment</b>.</p>
+                <p>A glowing red indicator means phantom checks are present. Tap it to show or hide phantom boards.</p>
+            </div>
+        </div>
+
+        <div class="popup-content info-tab-content" id="tab-game-rules" style="display: none;">
+            <h4>Game Rules</h4>
+            <p>While I am working on the documentation, for rules of 5D Chess with Multiverse Time Travel, please visit:</p>
+            <p style="margin-top: 12px; text-align: center;">
+                <a href="https://5d-chess.fandom.com/wiki/Tutorial" target="_blank" style="color: var(--ui-primary); text-decoration: none;">
+                    5D Chess on Fandom
+                </a>
+            </p>
+            <p style="margin-top: 16px; font-size: 13px; color: var(--ui-muted);">
+                This application implements the official rules of 5D Chess with Multiverse Time Travel. Click the link above to learn about piece movements, time dimension mechanics, and game objectives.
+            </p>
+        </div>
+
+        <div class="popup-content info-tab-content" id="tab-notation" style="display: none;">
+            <p>The <b>Branched 5DPGN</b> used by this application is similar to <a href="https://github.com/adri326/5dchess-notation">Shad’s notation</a>. Take this f7-sacrifice game record as an example:</p>
+
+            <pre>
+            [Mode "5D"]
+            [Board "Standard"]
+            1. e3 / Nf6
+            2w. Bb5 {Be careful!}
+            (2b. d5 {Another move})
+            2b. c6
+            3. c3 / cxb5
+            4. Qb3 / Qa5
+            5. Q>>xf7+ {f7-sacrifice!} / (1T1)Kxf7
+            6. (1T2)Nh3 / (1T2)e6
+            7. (1T3)e3 / (1T3)Qf6
+            8. (1T4)Qh5*
+            </pre>
+
+            <p>At the top of each game record are several tags (headers) that define the background information of the position.</p>
+
+            <ol>
+            <li>
+            <p><code>[Mode "5D"]</code> is unused. If the engine encounters an unknown tag, it records it silently without reporting an error.</p>
+            </li>
+
+            <li>
+            <p><code>[Board "Standard"]</code> indicates that the opening is Standard, meaning there is only one initial board.</p>
+            <p>Two other preset openings are also supported: <strong>Standard – Turn Zero</strong> and <strong>Very Small – Open</strong>.</p>
+            </li>
+
+            <li>
+            <p>If you want to play other openings, you may use <code>[Board "Custom - Even"]</code> or <code>[Board "Custom - Odd"]</code> to specify whether you are using an even or odd timeline. Use <code>[Size "5x5"]</code> to declare the board size (replace 5x5 with your desired size; up to 8x8 is supported). Then use <strong>5dFEN</strong> to declare the starting board layout.</p>
+
+            <p>If you do not specify whether the timeline is even or odd, the engine will determine it based on whether <code>+0</code> or <code>-0</code> appears in the 5dFEN. If you do not declare a board size, the default is 8x8.</p>
+
+            <ul>
+            <li>For compatibility with other engines, <code>[Board "Custom"]</code> is also allowed and will simply be ignored.</li>
+            <li>If your record uses <code>[Board "xxx"]</code> and <code>xxx</code> is not a preset recognized by the engine, an error will be reported.</li>
+            </ul>
+            </li>
+
+            <li>
+            <p>The format of 5dFEN is:</p>
+            <p><code>[&lt;FEN&gt;:&lt;timeline&gt;:&lt;turn&gt;:&lt;color&gt;]</code></p>
+
+            <p>Example:</p>
+            <p><code>[nbrk/3p*/P*3/KRBN:0:1:w]</code></p>
+
+            <p>This indicates that on timeline L=0, turn T=1, there is a White board whose FEN is <code>nbrk/3p*/P*3/KRBN</code>.</p>
+
+            <p>FEN stands for <em>Forsyth-Edwards Notation</em>. In general:</p>
+            <ul>
+            <li>Lowercase letters <code>pnbrqk</code> represent Black pieces.</li>
+            <li>Uppercase letters <code>PNBRQK</code> represent White pieces.</li>
+            <li>Digits <code>1–8</code> indicate number of consecutive empty squares.</li>
+            <li>Slashes separate ranks.</li>
+            </ul>
+
+            <p>In 5dFEN, letters marked with an asterisk (only <code>p*/P* r*/R* k*/K* w*/W*</code>) indicate pieces that have not moved. These markers determine whether special moves such as castling are allowed.</p>
+
+            <p>Some non-standard pieces are also supported. The engine supports the following pieces:</p>
+            <ul>
+            <li>P — pawn</li>
+            <li>W — brawn</li>
+            <li>K — king</li>
+            <li>C — common king</li>
+            <li>Q — queen</li>
+            <li>Y — queen</li>
+            <li>S — princess</li>
+            <li>N — knight</li>
+            <li>R — rook</li>
+            <li>B — bishop</li>
+            <li>U — unicorn</li>
+            <li>D — dragon</li>
+            </ul>
+            </li>
+
+            <li>
+            <p>The notation of 5dpgn imitates standard chess PGN (Portable Game Notation). Its format is:</p>
+
+            <p><code>&lt;origin-board&gt;&lt;piece&gt;&lt;origin-square&gt;&lt;jump-indicator&gt;&lt;capture-marker&gt;&lt;target-board&gt;&lt;target-square&gt;</code></p>
+
+            <p>Where:</p>
+            <ul>
+            <li>The board must be enclosed in English parentheses, e.g., <code>(L1T2)</code>, meaning timeline L=1, turn T=2. L may be omitted. There must be no space between L1 and T2.</li>
+            <li>Piece letters must be uppercase.</li>
+            <li>Squares are written like <code>a7</code>. Files (x-axis, from White’s perspective left to right) use <code>a–g</code>. Ranks (y-axis, from White’s perspective bottom to top) use <code>1–8</code>.</li>
+            <li>The capture marker is a lowercase <code>x</code>. If no capture occurs, omit it.</li>
+            <li>jump-indicators are <code>&gt;</code> and <code>&gt;&gt;</code>.  
+            <ul>
+            <li><code>&gt;</code> indicates time travel without creating a new timeline.</li>
+            <li><code>&gt;&gt;</code> indicates the target board is in the past and a new timeline must be created.</li>
+            </ul>
+            </li>
+            <li>If the move is not a time-travel move, there should be no jump-indicator or target board.</li>
+            <li>Castling may be written as <code>O-O</code> or <code>Ke1g1/Ke8g8</code>. Similarly, queenside castling may be written as <code>O-O-O</code> or <code>Ke1c1/Ke8c8</code>.</li>
+            </ul>
+            </li>
+
+            <li>
+            <p>Additional information may be appended to each move. The engine will read but ignore this information.</p>
+            <ul>
+            <li>If a pawn/brawn promotes, append <code>=Q</code> at the end of the move. Replace Q with any uppercase piece letter.</li>
+            <li>You may append markers such as <code>+</code>, <code>#</code>, or <code>*</code> after a move, indicating check, checkmate, or soft mate respectively.</li>
+            <li>Shad’s notation defines formats such as <code>~</code>, <code>(~T6)</code>, <code>(&gt;L-5)</code>, etc. For example, <code>Q&gt;&gt;xf7+</code> in the example may also be written as <code>Q&gt;&gt;xf7+~ (~T1) (&gt;L1)</code>. The engine can read these formats but will ignore them.</li>
+            </ul>
+            </li>
+
+            <li>
+            <p>Not all information must be written in full. As long as the information provided uniquely determines the move, parts may be omitted. The engine generates all legal moves and performs pattern matching; if unambiguous, it is accepted.</p>
+
+            <p>For example, the first move <code>e3</code> in the example would be fully written as <code>(0T1)Pe2e3</code>, but may also be written as <code>(0T1)e3</code>, <code>(L0)e3</code>, or simply <code>e3</code>.</p>
+            </li>
+
+            <li>
+            <p>Each turn (half-move) consists of one or more moves separated by spaces. Before each turn, there should be a move number followed by a dot.</p>
+
+            <ul>
+            <li>Black’s turn may be written as <code>2b.</code> or with a slash <code>/</code>.</li>
+            <li>Correspondingly, White’s turn may be written as <code>2.</code> or <code>2w.</code>.</li>
+            </ul>
+
+            <p>Within the engine, all moves in a turn are sorted in a standard order. This ensures that the player’s “next move” button matches the “next move” in the game record.</p>
+            </li>
+
+            <li>
+            <p>Each turn may be followed by one or more comments enclosed in curly braces <code>{}</code>. Comments may be nested, but the number of opening and closing braces must match. The last comment will be displayed in the engine’s text window.</p>
+
+            <ul>
+            <li>Due to standard sorting, if comments are placed elsewhere, the engine will ignore them.</li>
+            </ul>
+            </li>
+
+            <li>
+            <p>A 5dpgn record consists of multiple turns. All turns, including the final move, must be legally submittable turns. Turns may be separated by spaces or line breaks.</p>
+            </li>
+
+            <li>
+            <p>Branching syntax: For variations, use the format recommended by @IceMoe. Parentheses represent branches, with the main line following afterward. For example:</p>
+
+            <pre>
+            1.e4 e5
+            (2. xx xx (3. xx xx) 3. xx xx)
+            (2. xx xx)
+            2. xx xx
+            3. xx xx
+            </pre>
+
+            <p>This indicates there are three possible moves on move 2.</p>
+
+            <p>The parentheses of the last branch may be omitted. Therefore,  
+            <code>1.e3 / Nf6 2.Nf3 / d5</code>  
+            is equivalent to  
+            <code>1.e3 ( / Nf6 ( 2.Nf3 ( / d5)))</code>.</p>
+            </li>
+            </ol>
+        </div>
+
+        <div class="popup-content info-tab-content" id="tab-about" style="display: none;">
+            <h4>About 5D Chess Engine</h4>
+            <p>Version <span id="infoVersionNumber">0.0.0</span></p>
+            <p><b>&copy; <a href="https://github.com/ftxi/5dchess_engine">ftxi</a></b> 2024-2026.</p>
+            <p><b>Github Repository:</b> <a href="https://github.com/ftxi/5dchess_engine">https://github.com/ftxi/5dchess_engine</a></p>
+            <p>This software is free and distributed under the BSD 2-Clause License.</p>
+            <h4>Resources</h4>
+            <p>Icons: <a href="https://remixicon.com/license">RemixIcon</a></p>
+            <p>Chess pieces: adopted from <a href="https://github.com/adri326/5dchess-designer/tree/main/assets">5dchess-designer</a></p>
+            <p>Some fairy chess pieces are obtained from <a href="https://en.wikipedia.org/wiki/5D_Chess_with_Multiverse_Time_Travel">Wikipedia</a> from Wikimedia Commons. See <a href="assets/attributions.txt">asset attributions and licenses</a>.</p>
+            <h4>Disclaimer</h4>
+            <p>This Project was made without reference to source or decompiled code from the software "5d Chess With Multiverse Time Travel" developed by LLC. Thunkspace. All code, assets, libraries and other files in this project are either open source or made by myself.</p>
+        </div>
+
+        <label class="info-startup-toggle">
+            <input type="checkbox" id="showInfoPageCheckbox" checked>
+            <span>Show this page on startup</span> 
+        </label>
+    </div>
+</div>
+
+<div class="debug-window" style="display:none">
+    <p id="camera">camera</p>
+    <p id="status">status</p>
+</div>
+
+</body>
+</html>

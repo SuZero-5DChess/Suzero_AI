@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.02.17"]
+[Round "577"]
+[White "Tones"]
+[Black "Sapphia"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{14:59}(0T1)e2e3 / {16:33}(0T1)Ng8f6 
+2.{14:59}(0T2)Ng1f3 / {16:33}(0T2)c7c5 
+3.{14:59}(0T3)c2c3 / {16:33}(0T3)Qd8b6 
+4.{14:59}(0T4)g2g4 / {16:33}(0T4)e7e6 
+5.{14:59}(0T5)g4g5 / {16:33}(0T5)Nf6g4 
+6.{14:59}(0T6)Nf3h4 / {16:33}(0T6)c5c4 
+7.{14:59}(0T7)Qd1g4 / {16:33}(0T7)h7h5 
+8.{14:59}(0T8)g5h6 / {16:33}(0T8)g7h6 
+9.{14:59}(0T9)Qg4h5 / {16:33}(0T9)Qb6d8 
+10.{14:59}(0T10)Qh5>>(0T8)f7 / {16:33}(0T10)Qd8>>(0T6)d8 
+11.{14:59}(-1T7)Qd1g4 / {16:33}(-1T7)d7d5 
+12.{14:59}(-1T8)g5g6 / {16:33}(-1T8)Qd8>>(0T7)c7 
+13.{14:59}(-2T8)Qg4e6 / {16:33}(1T8)Ke8f7 (-2T8)d7e6 
+14.{14:59}(-1T9)Qg4h5 (-2T9)Bf1e2 (1T9)Nh4f5

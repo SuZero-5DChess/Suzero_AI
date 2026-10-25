@@ -1,0 +1,21 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.12.29"]
+[Round "706"]
+[White "Romad"]
+[Black "Sapphia"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)c2c3 / {19:51}(0T2)c7c5 
+3.{19:58}(0T3)Qd1b3 / {19:50}(0T3)Qd8b6 
+4.{19:39}(0T4)Qb3f7 / {19:42}(0T4)Ke8f7 
+5.{19:38}(0T5)Nf3e5 / {19:47}(0T5)Kf7e8 
+6.{19:42}(0T6)Ne5>>(0T4)f5 / {19:33}(0T6)Qb6>>(0T3)b3 
+7.{19:35}(-1T4)a2b3 / {19:33}(-1T4)Nf6>(1T4)f5 
+8.{18:00}(1T5)Qb3f7 (-1T5)Ra1a4 / {17:44}(1T5)Ke8f7 (-1T5)Qd8c7 
+9.{18:10}(1T6)Nf3>>(1T5)f5 / {16:29}(1T6)Qb6>>(-1T4)d6 
+10.{17:59}(-2T5)Ra1a7 / {13:59}(-2T5)Qd6>>(0T3)f4 
+11.{17:37}(-3T4)e2e3 / {13:15}(-3T4)Qf4e3 
+12.{17:30}(-3T5)d2e3

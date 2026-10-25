@@ -1,0 +1,19 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.14"]
+[Round "331"]
+[White "tesseract"]
+[Black "thetntm"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Ng1f3 / {20:05}(0T2)d7d5 
+3.{18:41}(0T3)Bf1b5 / {20:05}(0T3)c7c6 
+4.{18:41}(0T4)Qd1e2 / {20:01}(0T4)Qd8d7 
+5.{18:12}(0T5)Nf3e5 / {19:22}(0T5)Nf6e4 
+6.{18:05}(0T6)Ne5d7 / {19:22}(0T6)Bc8d7 
+7.{17:59}(0T7)Qe2f3 / {19:10}(0T7)c6b5 
+8.{17:16}(0T8)Nb1c3 / {18:57}(0T8)Ne4g5 
+9.{16:24}(0T9)Qf3d5 / {19:02}(0T9)e7e6 
+10.{16:02}(0T10)Qd5>>(0T8)f7

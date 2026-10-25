@@ -1,0 +1,15 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.11"]
+[Round "168"]
+[White "tesseract"]
+[Black "Los Bro SPQR"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+{
+t0database/game 244 records the same game with conflicting information:
+ date: 2021.05.12
+}
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 2.(0T2)d2d4 / (0T2)c7c5 3.(0T3)c2c3 / (0T3)Qd8b6 4.(0T4)Nf3e5 / (0T4)Qb6e6 5.(0T5)Bc1f4 / (0T5)c5d4 6.(0T6)Qd1d4 / (0T6)Nb8c6 7.(0T7)Ne5c6 / (0T7)d7c6 8.(0T8)e2e3 / (0T8)Bc8d7 9.(0T9)Nb1d2 / (0T9)Nf6d5 10.(0T10)Bf1c4 / (0T10)Ra8d8 11.(0T11)Bc4d5 / (0T11)Qe6d5 12.(0T12)Qd4d5 / (0T12)c6d5 13.(0T13)b2b3 / (0T13)g7g6 14.(0T14)Bf4g5 / (0T14)Bd7f5 15.(0T15)Bg5>>(0T12)d5 / (1T12)c6d5 16.(1T13)Qd4d5 / (1T13)g7g5 17.(1T14)Qd5a5 / (1T14)g5f4 18.(1T15)Nd2f3 / (0T15)Bf5d7 (1T15)f4e3 19.(1T16)f2e3 (0T16)h2h4 / (0T16)Bf8g7 (1T16)Bf8h6 20.(1T17)Qa5c5 (0T17)Rh1h3 / (1T17)Rh8g8 (0T17)Bg7e5 21.(0T18)Rh3f3 (1T18)Rh1g1 / (0T18)Be5>(1T18)e6 22.(1T19)Nf3e5 (0T19)Rf3f7 / (1T19)Be6>>(1T16)e3 23.(1T20)Qc5>>(1T15)h5 / (2T15)f4e3 24.(2T16)Qh5h3 / (2T16)e3d2

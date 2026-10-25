@@ -1,0 +1,26 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.05"]
+[Round "29"]
+[White "cirtus"]
+[Black "Neathp"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1f3 / (0T2)Nf6g4 
+3.(0T3)Nf3g5 / (0T3)f7f5 
+4.(0T4)Ng5f7 / (0T4)e7e6 
+5.(0T5)Qd1g4 / (0T5)f5g4 
+6.(0T6)Nf7d8 / (0T6)Ke8d8 
+7.(0T7)Nb1c3 / (0T7)Nb8c6 
+8.(0T8)f2f4 / (0T8)g4f3 
+9.(0T9)g2f3 / (0T9)Bf8>>(0T3)f2 
+10.(0T10)Bf1>>(0T3)f8 / (1T3)Rh8f8 
+11.(1T4)Nf3>(-1T4)f2 / (-1T4)Ng4e3 (1T4)Ng4e3 
+12.(1T5)f2e3 (-1T5)d2e3 / (-1T5)e7e6 (1T5)e7e6 
+13.(1T6)Qd1h5 (-1T6)Qd1h5 / (-1T6)Qd8f6 (1T6)g7g6 
+14.(1T7)Qh5h3 (-1T7)Nf2e4 / (-1T7)g7g6 (1T7)Qd8f6 
+15.(1T8)Qh3e6 (-1T8)Ne4f6 / (-1T8)Ke8d8 (1T8)f7e6  
+16.(-1T9)Qh5>(1T9)h3 / (1T9)Qf6f2 (-1T9)Bf8b4  
+17.(-1T10)Ke1>>(-1T9)d1 / (2T9)Bf8b4

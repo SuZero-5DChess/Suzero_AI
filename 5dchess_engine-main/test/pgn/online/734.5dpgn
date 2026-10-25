@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.10.15"]
+[Round "700"]
+[White "Mauer"]
+[Black "qxyzpk"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "league season 5"]
+
+ 1.{19:42}(0T1)e2e3 / {18:40}(0T1)Ng8f6 
+2.{19:42}(0T2)b2b4 / {18:40}(0T2)d7d5 
+3.{19:42}(0T3)Bc1b2 / {18:40}(0T3)e7e6 
+4.{19:42}(0T4)Ng1h3 / {18:40}(0T4)c7c6 
+5.{19:42}(0T5)Nh3f4 / {18:40}(0T5)Bf8b4 
+6.{19:31}(0T6)Nf4h5 / {16:48}(0T6)Rh8g8 
+7.{19:31}(0T7)Nh5f6 / {16:47}(0T7)g7f6 
+8.{19:31}(0T8)Qd1h5 / {16:31}(0T8)Rg8g6 
+9.{19:23}(0T9)Qh5h7 / {16:23}(0T9)Ke8e7 
+10.{19:14}(0T10)Qh7>>(0T8)f7 / {16:23}(1T8)Ke8f7 
+11.{19:14}(1T9)Bb2f6 / {16:23}(1T9)Qd8f6 
+12.{19:19}(1T10)Qd1h5 / {14:11}(0T10)Bb4>>(0T4)h4 
+13.{19:11}(-1T5)Bb2f6 / {14:11}(-1T5)Qd8f6 
+14.{19:09}(-1T6)Qd1h5

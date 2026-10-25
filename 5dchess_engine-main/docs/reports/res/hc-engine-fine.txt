@@ -1,0 +1,14 @@
+Native build-gcc, isolated test_global_search run, 2026-10-22.
+Slow fixture: test/pgn/slow/flat-ucb-match-123.5dpgn
+Times include HC construction / fine-root construction.
+Random generators are seeded once per row and consumed sequentially by the
+random, default-weighted, and fine searches.
+
+zero evaluator: 36.741 ms
+natural fine search: 38.252 ms
+seed 7 (ms): random=33.077 weighted=140.776 fine=98.378
+seed 42 (ms): random=91.448 weighted=138.408 fine=104.913
+seed 123 (ms): random=32.244 weighted=139.854 fine=102.134
+
+All searches exhaust with no legal action; zero evaluation reports Black wins.
+Full native CTest suite: 42/42 passed (8.38 s, -j 3).

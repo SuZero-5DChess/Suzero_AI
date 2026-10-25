@@ -1,0 +1,11 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.19"]
+[Round "35"]
+[White "Mauer"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{10:03}(0T1)Ng1f3 / {10:03}(0T1)Ng8f6 2.{10:03}(0T2)d2d4 / {10:03}(0T2)c7c5 3.{10:03}(0T3)c2c3 / {10:03}(0T3)Qd8b6 4.{9:55}(0T4)e2e3 / {10:03}(0T4)c5d4 5.{reconstructed from a player's recollection}(0T5)Nf3xd4 / (0T5)Nb8c6 6.{9:36}(0T6)Bf1e2 / {9:50}(0T6)Nc6d4 7.{9:35}(0T7)e3d4 / {9:40}(0T7)Qb6c6 8.{9:19}(0T8)Be2f3 / {9:05}(0T8)Qc6b5 9.{9:14}(0T9)Bc1e3 / {8:55}(0T9)Qb5b2 10.{9:03}(0T10)Nb1d2 / {8:29}(0T10)e7e6 11.{8:37}(0T11)Qd1b3 / {8:07}(0T11)Qb2a1 12.{8:36}(0T12)Nd2b1 / {6:06}(0T12)Bf8a3 13.{7:45}(0T13)Ke1g1 / {2:36}(0T13)Qa1>>(0T12)b1 14.{7:15}(0T14)Nb1>>(0T12)a1 / {1:24}(1T12)Bf8a3 15.{6:48}(-1T13)Qb3b1 (1T13)Qb3a3 / {0:00}(-1T13)Qa1c3 (1T13)Nf6g4
+{recorded:white wins}

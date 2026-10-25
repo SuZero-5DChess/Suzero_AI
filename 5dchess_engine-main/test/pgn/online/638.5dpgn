@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.02.04"]
+[Round "601"]
+[White "write_and_wrong"]
+[Black "Tones"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{18:23}(0T1)Ng1f3 / {19:40}(0T1)Ng8f6 
+2.{18:23}(0T2)e2e3 / {19:40}(0T2)e7e6 
+3.{18:23}(0T3)c2c3 / {19:40}(0T3)c7c6 
+4.{18:23}(0T4)Qd1b3 / {19:40}(0T4)Qd8a5 
+5.{17:47}(0T5)d2d4 / {18:58}(0T5)Qa5h5 
+6.{16:47}(0T6)Bf1e2 / {17:00}(0T6)Qh5g6 
+7.{16:16}(0T7)Rh1g1 / {16:56}(0T7)Bf8e7 
+8.{14:39}(0T8)Nb1a3 / {16:26}(0T8)Ke8g8 
+9.{13:45}(0T9)Nf3e5 / {14:48}(0T9)Qg6f5 
+10.{12:05}(0T10)Rg1f1 / {13:43}(0T10)d7d6 
+11.{10:53}(0T11)g2g4 / {13:15}(0T11)Qf5g5 
+12.{9:07}(0T12)e3e4 / {13:10}(0T12)Qg5h4 
+13.{9:05}(0T13)Ne5f3 / {11:55}(0T13)Qh4g4 
+14.{5:22}(0T14)Rf1g1 / {11:21}(0T14)Qg4e4 
+15.{5:01}(0T15)Rg1g7 / {11:20}(0T15)Kg8h8 
+16.{3:11}(0T16)Nf3g5 / {9:41}(0T16)Qe4h1

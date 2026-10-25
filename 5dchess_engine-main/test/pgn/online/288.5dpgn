@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.08"]
+[Round "235"]
+[White "Tesseract, Narik, 5Deez Nuts, ConclusiveNinja"]
+[Black "Mage, CrazyPenguin, Nice, Dong Harvey"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)e7e6 
+3.(0T3)c2c3 / (0T3)c7c5 
+4.(0T4)Qd1b3 / (0T4)Qd8a5 
+5.(0T5)Bc1g5 / (0T5)c5d4 
+6.(0T6)Nf3d4 / (0T6)Qa5g5 
+7.(0T7)e2e3 / (0T7)Nf6g4 
+8.(0T8)Bf1e2 / (0T8)Qg5e3 
+9.(0T9)Ke1g1 / (0T9)Qe3e4 
+10.(0T10)Qb3c4 / (0T10)Qe4>>(0T8)g2 
+11.(0T11)Qc4>>(0T7)c8 / (1T7)Ke8e7 
+12.(1T8)Nd4e6 / (0T11)Bc8>>(0T6)c3 
+13.(-2T7)Nb1c3 / (-2T7)Ke8e7 
+14.(-2T8)Ke1c1

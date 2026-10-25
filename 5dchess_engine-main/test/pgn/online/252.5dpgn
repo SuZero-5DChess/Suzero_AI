@@ -1,0 +1,29 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.03.27"]
+[Round "199"]
+[White "MeTaricAndEz"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1f4 / (0T4)Bc8f5 
+5.(0T5)e2e3 / (0T5)Nb8d7 
+6.(0T6)Bf1d3 / (0T6)Nf6e4 
+7.(0T7)Bd3e4 / (0T7)d5e4 
+8.(0T8)Nf3h4 / (0T8)e7e6 
+9.(0T9)Nb1d2 / (0T9)Qd8h4 
+10.(0T10)Bf4g3 / (0T10)Qh4g5 
+11.(0T11)Ke1g1 / (0T11)Qg5h6 
+12.(0T12)Ra1c1 / (0T12)Nd7f6 
+13.(0T13)Bg3>>(0T11)g5 / (1T11)g7g6 
+14.(1T12)f2f3 / (0T13)Qh6>(1T12)g5 
+15.(1T13)f3f4 (0T14)Nd2c4 / (1T13)Qg5h6 
+16.(1T14)Qd1e2 / (0T14)Nf6g4 (1T14)Bf8e7 
+17.(1T15)Ke1c1 (0T15)h2h3 / (1T15)Qh6>(0T15)h5 
+18.(1T16)h2h4 (0T16)h3g4 / (0T16)Qh5>>(0T13)h2 
+19.(0T17)Qd1>>(0T13)h5
+{recorded:white wins}

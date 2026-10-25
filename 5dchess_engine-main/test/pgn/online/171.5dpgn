@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.12.27"]
+[Round "115"]
+[White "Mage"]
+[Black "Sapphia"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e4 / {20:05}(0T1)Ng8f6 
+2.{20:02}(0T2)Qd1f3 / {20:05}(0T2)d7d5 
+3.{19:57}(0T3)e4d5 / {20:05}(0T3)Qd8d5 
+4.{19:43}(0T4)Qf3d5 / {20:10}(0T4)Bc8e6 
+5.{19:37}(0T5)Qd5>>(0T4)d5 / {20:10}(1T4)Nf6d5 
+6.{19:37}(1T5)Qf3d5 / {20:03}(1T5)Bc8e6 (0T5)Nb8d7 
+7.{19:02}(1T6)Qd5>(0T6)e6 / {19:59}(0T6)f7e6 (1T6)Ke8d7 
+8.{18:52}(0T7)d2d4 (1T7)Bf1b5 / {19:56}(1T7)Kd7d6 (0T7)Ke8f7 
+9.{18:37}(1T8)f2f4 (0T8)Bf1c4 / {19:41}(1T8)Kd6d5 (0T8)Kf7g6

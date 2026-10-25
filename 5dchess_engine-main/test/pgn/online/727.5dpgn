@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.05.18"]
+[Round "693"]
+[White "Tones"]
+[Black "Sapphia"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Nb1c3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Nc3e4 / {20:04}(0T2)Nf6e4 
+3.{20:03}(0T3)e2e3 / {19:29}(0T3)e7e6 
+4.{19:43}(0T4)Qd1f3 / {19:16}(0T4)Qd8h4 
+5.{18:19}(0T5)g2g3 / {19:13}(0T5)Qh4>>(0T3)f2 
+6.{18:24}(0T6)Qf3>>(0T2)f7 / {19:13}(1T2)Ke8f7 
+7.{18:24}(1T3)Ng1f3 / {18:39}(1T3)d7d5 
+8.{18:33}(1T4)Nf3>>(1T3)f5 / {18:22}(1T4)Nf6>>(1T2)f7 
+9.{18:18}(-2T3)e2e3

@@ -1,0 +1,32 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.22"]
+[Round "500"]
+[White "Mage"]
+[Black "Neathp"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Nb1a3 / (0T1)Ng8f6
+2.(0T2)Ng1f3 / (0T2)d7d5
+3.(0T3)Na3b5 / (0T3)c7c6
+4.(0T4)Nb5d4 / (0T4)Qd8b6
+5.(0T5)e2e3 / (0T5)c6c5
+6.(0T6)c2c4 / (0T6)Bc8d7
+7.(0T7)Nd4f5 / (0T7)d5c4
+8.(0T8)Bf1c4 / (0T8)Nb8c6
+9.(0T9)Bc4f7 / (0T9)Ke8d8
+10.(0T10)Nf5g3 / (0T10)Nc6b4
+11.(0T11)Nf3e5 / (0T11)Qb6d6
+12.(0T12)Ne5d7 / (0T12)Nf6d7
+13.(0T13)Bf7e8 / (0T13)Kd8e8
+14.(0T14)Ke1g1 / (0T14)g7g6
+15.(0T15)a2a3 / (0T15)Nb4c2
+16.(0T16)Qd1f3 / (0T16)Nc2e1
+17.(0T17)Rf1e1 / (0T17)Bf8>>(0T11)f2
+18.(-1T12)Ke1f2 / (-1T12)Nf6e4
+19.(-1T13)Kf2g1 / (-1T13)Ne4g3
+20.(-1T14)h2g3 / (-1T14)Bd7f5
+21.(0T18)Qf3>>(0T14)f7 / (1T14)Ke8f7
+22.(1T15)Ng3>>(-1T14)g3 / (2T14)Kd8c7
+{original data: white wins; verification: black wins}

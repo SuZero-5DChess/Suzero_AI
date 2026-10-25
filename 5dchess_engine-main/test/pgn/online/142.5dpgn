@@ -1,0 +1,55 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.02"]
+[Round "306"]
+[White "tesseract"]
+[Black "Neathp"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Blitz and Blunders Tourney"]
+
+{
+t0database/game 86 records the same game with conflicting information:
+ white: Public Match
+ black: Neathp
+}
+
+1.{5:05}(0T1)Ng1f3 / {5:04}(0T1)Ng8f6 
+2.{5:05}(0T2)d2d4 / {5:05}(0T2)c7c5 
+3.{5:05}(0T3)c2c3 / {5:05}(0T3)c5d4 
+4.{4:32}(0T4)Qd1b3 / {5:05}(0T4)Qd8a5 
+5.{4:32}(0T5)Nf3d4 / {4:56}(0T5)e7e6 
+6.{3:55}(0T6)f2f4 / {3:41}(0T6)Nb8a6 
+7.{3:55}(0T7)g2g3 / {3:41}(0T7)Na6c5 
+8.{3:39}(0T8)Qb3b5 / {2:32}(0T8)Nc5b3 
+9.{3:12}(0T9)Qb5b3 / {1:23}(0T9)Bf8c5 
+10.{2:08}(0T10)Bc1e3 / {0:50}(0T10)Bc5d4 
+11.{2:08}(0T11)Be3d4 / {0:50}(0T11)Nf6e4 
+12.{1:17}(0T12)Qb3b4 / {0:55}(0T12)Ne4>>(0T10)e3 
+13.{0:39}(0T13)Qb4>>(0T1)b4 / {1:00}(1T1)Ng8f6 
+14.{0:39}(1T2)e2e3 / {1:00}(1T2)e7e6 
+15.{0:30}(1T3)c2c3 / {0:53}(1T3)Bf8b4 
+16.{0:30}(1T4)c3b4 / {0:53}(1T4)Qd8e7 
+17.{0:30}(1T5)b4b5 / {0:46}(1T5)Qe7c5 
+18.{0:23}(1T6)a2a4 / {0:38}(1T6)a7a6 
+19.{0:23}(1T7)Nb1c3 / {0:38}(1T7)a6b5 
+20.{0:21}(1T8)Nc3b5 / {0:23}(1T8)b7b6 
+21.{0:21}(1T9)Ng1f3 / {0:23}(1T9)Nb8a6 
+22.{0:21}(1T10)Nb5c7 / {0:23}(1T10)Na6c7 
+23.{0:21}(1T11)Nf3>(-1T11)e3 / {0:22}(1T11)Qc5f5 (-1T11)Bc5d4 
+24.{0:16}(1T12)Qd1b3 (-1T12)Qb3b4 / {0:27}(-1T12)Qa5b4 (1T12)Nf6e4 
+25.{0:21}(1T13)Qb3>>(1T2)b3 / {0:27}(2T2)e7e6 
+26.{0:21}(2T3)Qb4f8 / {0:27}(2T3)Rh8f8 
+27.{0:21}(2T4)e2e3 / {0:27}(2T4)Qd8e7 
+28.{0:21}(2T5)Qd1f3 / {0:27}(2T5)Nb8c6 
+29.{0:21}(2T6)Bf1b5 / {0:27}(2T6)Nc6e5 
+30.{0:21}(2T7)Qf3f4 / {0:27}(2T7)a7a6 
+31.{0:21}(2T8)Qf4e5 / {0:27}(2T8)a6b5 
+32.{0:21}(2T9)Qe5c7 / {0:27}(2T9)Nf6d5 
+33.{0:21}(2T10)Qc7e5 / {0:27}(2T10)Nd5e3 
+34.{0:21}(2T11)Qb3e3 / {0:27}(2T11)b7b6 
+35.{0:21}(2T12)Qe5e4 / {0:27}(2T12)Ra8b8 
+36.{0:21}(2T13)Qe4>(-1T13)b4 / {0:26}(0T13)Qa5f5 (-1T13)Bd4e3 (2T13)Qe7f6 (1T13)Nc7d5 
+37.{0:21}(2T14)Ng1f3 (0T14)Bd4g7 (-1T14)Qb4e7 (1T14)Bf1d3 / {0:26}(-1T14)Ke8e7 (0T14)Rh8f8 (1T14)Nd5e3 (2T14)Bc8b7 
+38.{0:25}(1T15)d2e3 (2T15)Nf3g5 (0T15)Bg7f8 (-1T15)Bf1g2 / {0:31}(1T15)Qf5>>(1T12)f2
+{recorded:black wins}

@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.12"]
+[Round "107"]
+[White "Mage"]
+[Black "Sapphia"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Nb1a3 / {19:55}(0T2)Nb8a6 
+3.{20:05}(0T3)Na3c4 / {18:48}(0T3)Na6c5 
+4.{19:44}(0T4)Nc4e5 / {18:16}(0T4)Nc5e6 
+5.{19:43}(0T5)Ne5f7 / {18:21}(0T5)Ke8f7 
+6.{19:53}(0T6)Nf3>>(0T5)f5 / {18:11}(0T6)Ne6>>(0T4)e5 
+7.{19:26}(-1T5)Nf3e5 / {18:11}(-1T5)Nf6>(1T5)f5 
+8.{19:31}(-1T6)Ne5>(1T6)f5 / {17:15}(-1T6)Nc5>>(-1T5)e5 
+9.{19:24}(-2T6)e2e4

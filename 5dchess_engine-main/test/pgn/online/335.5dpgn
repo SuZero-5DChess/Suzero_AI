@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.07.04"]
+[Round "284"]
+[White "tesseract"]
+[Black "gjorbajarb"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Ng1f3 / {20:05}(0T2)g7g6 
+3.{20:05}(0T3)c2c3 / {20:05}(0T3)c7c6 
+4.{20:05}(0T4)Qd1b3 / {20:05}(0T4)Qd8b6 
+5.{19:56}(0T5)Qb3>>(0T1)f7 / {20:05}(1T1)Ke8f7 
+6.{19:56}(1T2)Ng1f3 / {20:05}(1T2)Ng8f6 
+7.{19:56}(1T3)Nf3>>(1T2)f5 / {19:32}(1T3)d7d5 
+8.{19:50}(1T4)e2e3 / {19:23}(1T4)Bc8g4 
+9.{19:50}(1T5)Qd1g4 / {17:09}(0T5)Nf6h5 (1T5)Nf6g4 
+10.{17:23}(1T6)Bf1d3 (0T6)Ke1>>(0T5)d1 / {11:02}(1T6)Qd8d7 (0T6)Qb6a5 
+11.{16:32}(1T7)Ke1>>(1T6)d1 (0T7)g2g4 / {11:05}(0T7)Qa5>>(0T0)a5 
+12.{16:40}(-1T1)e2e3 / {9:30}(-1T1)Qa5>>(0T0)b6 
+13.{16:10}(-2T1)e2e3
+{recorded:white wins}

@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.06.03"]
+[Round "266"]
+[White "Macfor"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)Nb8c6 
+4.(0T4)Nf3g5 / (0T4)Bc8e6 
+5.(0T5)Qd1a4 / (0T5)g7g6 
+6.(0T6)Ng5e6 / (0T6)f7e6 
+7.(0T7)Bc1g5 / (0T7)Nf6g4 
+8.(0T8)Qa4>>(0T6)c6 / (1T6)Be6d7 
+9.(1T7)Qc6f6 / (1T7)e7f6 
+10.(1T8)Qa4b3 / (0T8)e6>(1T8)e6 
+11.(1T9)Ng5h3 (0T9)Nb1d2 / (0T9)Qd8d7 (1T9)Ra8b8 
+12.(1T10)Bc1f4 (0T10)h2h3 / (0T10)Ng4e3 (1T10)Bf8d6 
+13.(0T11)Bg5e3 (1T11)g2g3 / (0T11)Qd7f5 (1T11)Bd6f4 
+14.(0T12)Be3>>(0T8)e7 (1T12)Nh3f4 / (0T12)Qf5>>(0T9)f2 (2T8)Bf8e7 
+15.(2T9)Bg5e7 / (2T9)Qd8e7

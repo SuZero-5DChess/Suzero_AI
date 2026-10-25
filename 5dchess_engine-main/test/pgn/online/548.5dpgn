@@ -1,0 +1,35 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.08"]
+[Round "504"]
+[White "Mage"]
+[Black "Gjorbajarb"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Blitz Tournament"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6
+2.(0T2)e2e3 / (0T2)c7c6
+3.(0T3)Bf1c4 / (0T3)d7d5
+4.(0T4)Bc4d3 / (0T4)Qd8d6
+5.(0T5)b2b3 / (0T5)Bc8g4
+6.(0T6)Bc1b2 / (0T6)Nb8d7
+7.(0T7)Qd1e2 / (0T7)Nd7e5
+8.(0T8)Bb2e5 / (0T8)Bg4f3
+9.(0T9)Be5d6 / (0T9)Bf3e2
+10.(0T10)Bd3e2 / (0T10)e7d6
+11.(0T11)Nb1c3 / (0T11)Ke8c8
+12.(0T12)Ke1c1 / (0T12)Rd8e8
+13.(0T13)f2f3 / (0T13)Nf6e4
+14.(0T14)f3e4 / (0T14)d5e4
+15.(0T15)Rh1f1 / (0T15)f7f6
+16.(0T16)d2d3 / (0T16)e4d3
+17.(0T17)Be2d3 / (0T17)d6d5
+18.(0T18)Rf1e1 / (0T18)Bf8c5
+19.(0T19)Nc3a4 / (0T19)Bc5e3
+20.(0T20)Re1e3 / (0T20)Re8e3
+21.(0T21)Bd3f5 / (0T21)Kc8b8
+22.(0T22)Na4c5 / (0T22)Re3e7
+23.(0T23)Kc1b2 / (0T23)g7g6
+24.(0T24)Bf5d3 / (0T24)Rh8e8
+{recorded:black wins}

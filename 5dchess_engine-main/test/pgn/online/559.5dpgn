@@ -1,0 +1,33 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.22"]
+[Round "518"]
+[White "Dreamer"]
+[Black "Mage"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6
+2.(0T2)d2d4 / (0T2)b7b6
+3.(0T3)c2c3 / (0T3)Bc8b7
+4.(0T4)Bc1g5 / (0T4)e7e6
+5.(0T5)e2e3 / (0T5)Bf8d6
+6.(0T6)Bf1d3 / (0T6)Qd8e7
+7.(0T7)e3e4 / (0T7)h7h6
+8.(0T8)Bg5f6 / (0T8)g7f6
+9.(0T9)Qd1e2 / (0T9)c7c5
+10.(0T10)Nb1d2 / (0T10)c5d4
+11.(0T11)c3d4 / (0T11)Bd6b4
+12.(0T12)a2a3 / (0T12)Bb4d2
+13.(0T13)Qe2d2 / (0T13)Nb8c6
+14.(0T14)Ra1c1 / (0T14)Ra8c8
+15.(0T15)Rc1c3 / (0T15)f6f5
+16.(0T16)Qd2e3 / (0T16)Nc6a5
+17.(0T17)Rc3c8 / (0T17)Bb7c8
+18.(0T18)e4f5 / (0T18)Bc8b7
+19.(0T19)Qe3e5 / (0T19)Ke8g8
+20.(0T20)f5f6 / (0T20)Rf8>>(0T6)f8
+21.(-1T7)Qd1e2 / (-1T7)Nb8c6
+22.(-1T8)Nb1d2 / (-1T8)Nc6e7
+23.(-1T9)e3e4
+{recorded:white wins}

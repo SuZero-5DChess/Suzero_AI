@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.19"]
+[Round "133"]
+[White "Neutron3529"]
+[Black "Sapphia"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)g7g5 
+2.{20:05}(0T2)f2f4 / {20:05}(0T2)g5f4 
+3.{20:05}(0T3)g2g3 / {20:04}(0T3)f4g3 
+4.{20:05}(0T4)h2g3 / {19:57}(0T4)c7c6 
+5.{20:05}(0T5)Ng1e2 / {19:57}(0T5)Qd8c7 
+6.{20:01}(0T6)Rh1g1 / {19:35}(0T6)Qc7d6 
+7.{20:03}(0T7)a2a3 / {19:27}(0T7)Qd6>>(0T4)g3 
+8.{19:30}(-1T5)Ke1e2 / {19:27}(-1T5)e7e6 
+9.{19:24}(-1T6)Ng1f3 / {19:09}(-1T6)Qd8g5 
+10.{19:22}(-1T7)Nb1c3 / {18:40}(-1T7)Qg3f3 
+11.{18:57}(0T8)Ne2>>(0T6)f2 / {18:40}(1T6)Qc7d6 
+12.{18:57}(1T7)Ne2d4 / {18:40}(1T7)Qd6g3 
+13.{18:57}(1T8)Bf1>(-1T8)f3 / {16:02}(-1T8)Qg5>>(-1T7)h4
+{recorded:black wins}

@@ -1,0 +1,34 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.07.10"]
+[Round "532"]
+[White "Mage"]
+[Black "Gjorbajarb"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6
+2.(0T2)Ng1f3 / (0T2)c7c6
+3.(0T3)c2c4 / (0T3)e7e6
+4.(0T4)b2b3 / (0T4)a7a5
+5.(0T5)Bc1b2 / (0T5)a5a4
+6.(0T6)b3a4 / (0T6)Ra8a5
+7.(0T7)Bf1d3 / (0T7)Nb8a6
+8.(0T8)a2a3 / (0T8)Na6c5
+9.(0T9)Nf3e5 / (0T9)d7d6
+10.(0T10)Qd1f3 / (0T10)d6e5
+11.(0T11)Bd3c2 / (0T11)e5e4
+12.(0T12)Qf3h3 / (0T12)Nc5d3
+13.(0T13)Bc2d3 / (0T13)Qd8d3
+14.(0T14)Nb1c3 / (0T14)Bf8d6
+15.(0T15)g2g3 / (0T15)Qd3>>(0T14)d2
+16.(0T16)d2>(-1T15)d2 / (-1T15)Bf8d6 (0T16)Ra5h5
+17.(-1T16)g2g3 / (-1T16)Ra5h5
+18.(-1T17)Qh3f1 (0T17)Qh3f1 / (-1T17)Qd3>(0T17)d2
+19.(0T18)Ke1d2 (-1T18)Nc3b5 / (0T18)Rh5d5 (-1T18)c6b5
+20.(0T19)c4d5 (-1T19)c4b5 / (0T19)Nf6d5 (-1T19)Nf6d5
+21.(0T20)Nc3d5 (-1T20)Qf1c4 / (-1T20)Bd6>(0T20)d5
+22.(-1T21)Qc4>(0T21)d5 / (0T21)e6d5 (-1T21)Nd5b6
+23.(-1T22)Bb2c3 (0T22)Bb2d4 / (-1T22)Rh5c5 (0T22)Bc8g4
+24.(-1T23)Bc3>>(-1T18)c8
+{recorded:white wins}

@@ -1,0 +1,30 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.29"]
+[Round "498"]
+[White "Mage"]
+[Black "Tones"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6
+2.(0T2)e2e3 / (0T2)c7c6
+3.(0T3)Bf1c4 / (0T3)d7d5
+4.(0T4)Bc4d3 / (0T4)Bc8g4
+5.(0T5)b2b3 / (0T5)e7e5
+6.(0T6)Bc1b2 / (0T6)Nb8d7
+7.(0T7)h2h3 / (0T7)Bg4h5
+8.(0T8)Bd3f5 / (0T8)Bf8e7
+9.(0T9)g2g4 / (0T9)Bh5g6
+10.(0T10)g4g5 / (0T10)Nf6e4
+11.(0T11)Bf5d7 / (0T11)Qd8d7
+12.(0T12)Qd1e2 / (0T12)Bg6h5
+13.(0T13)Nb1c3 / (0T13)Bh5f3
+14.(0T14)Qe2f3 / (0T14)Ne4>>(0T13)e2
+15.(-1T14)Nc3e2 / (-1T14)Bh5f3
+16.(-1T15)Ke1c1 (0T15)Nc3b5 / (-1T15)Bf3e2 (0T15)c6b5
+17.(-1T16)Bb2e5 (0T16)Ke1c1 / (-1T16)Be7a3 (0T16)f7f5
+18.(0T17)Qf3h5 (-1T17)Be5b2 / (0T17)g7g6 (-1T17)Ba3b2
+19.(0T18)Qh5>>(0T16)f7 / (0T18)Qd7>>(0T14)h3
+20.(-2T15)Qf3f7 / (-2T15)Ke8f7
+21.(-2T16)Ke1e2

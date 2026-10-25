@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.11.07"]
+[Round "456"]
+[White "Macfor"]
+[Black "RyanFourPM"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{19:47}(0T1)e2e3 / {15:46}(0T1)Ng8f6 
+2.{19:47}(0T2)f2f4 / {15:46}(0T2)d7d5 
+3.{19:47}(0T3)g2g3 / {15:46}(0T3)c7c6 
+4.{19:47}(0T4)Ng1f3 / {15:46}(0T4)Bc8g4 
+5.{19:47}(0T5)Nb1c3 / {15:46}(0T5)d5d4 
+6.{19:47}(0T6)Nc3a4 / {15:46}(0T6)d4e3 
+7.{19:47}(0T7)d2e3 / {15:43}(0T7)Qd8d1 
+8.{19:47}(0T8)Ke1d1 / {15:41}(0T8)Bg4f3 
+9.{19:47}(0T9)Kd1e1 / {14:08}(0T9)Bf3h1 
+10.{19:37}(0T10)Na4c3 / {13:55}(0T10)e7e6 
+11.{19:37}(0T11)Bc1d2 / {13:50}(0T11)Bf8d6 
+12.{19:11}(0T12)Nc3d5 / {13:01}(0T12)Bd6>>(0T7)d1 
+13.{19:11}(-1T8)Bf1e2 / {12:58}(-1T8)Qd8d2 
+14.{19:13}(0T13)Bd2>>(0T7)d8 / {12:58}(1T7)Ke8d8 
+15.{18:39}(1T8)Nf3e5 / {12:48}(1T8)Bg4d1

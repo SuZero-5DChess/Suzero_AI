@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.29"]
+[Round "464"]
+[White "Mahlon Miller"]
+[Black "RyanFourPM"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:00}(0T2)d2d4 / {20:05}(0T2)d7d5 
+3.{19:57}(0T3)c2c3 / {20:05}(0T3)c7c6 
+4.{19:42}(0T4)Bc1f4 / {20:05}(0T4)Bc8g4 
+5.{19:37}(0T5)Nb1d2 / {20:10}(0T5)Nb8d7 
+6.{19:25}(0T6)Qd1>>(0T3)a4 / {20:10}(1T3)c7c6 
+7.{19:01}(1T4)Bc1f4 / {19:48}(1T4)b7b5 
+8.{18:46}(1T5)Bf4e5 / {19:42}(1T5)b5a4 
+9.{17:55}(1T6)c2c3 / {19:32}(1T6)Qd8a5 (0T6)Bg4f3

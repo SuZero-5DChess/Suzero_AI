@@ -1,0 +1,39 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.30"]
+[Round "555"]
+[White "Mage"]
+[Black "Los Bro SPQR"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6
+2.(0T2)Ng1f3 / (0T2)e7e6
+3.(0T3)b2b3 / (0T3)Nb8c6
+4.(0T4)Bc1b2 / (0T4)Nc6e7
+5.(0T5)Bf1d3 / (0T5)Ne7g6
+6.(0T6)Qd1e2 / (0T6)Bf8d6
+7.(0T7)Nb1c3 / (0T7)Qd8e7
+8.(0T8)Nc3e4 / (0T8)Rh8g8
+9.(0T9)g2g3 / (0T9)Bd6a3
+10.(0T10)Bb2a3 / (0T10)Qe7a3
+11.(0T11)Bd3c4 / (0T11)Qa3e7
+12.(0T12)Ne4c3 / (0T12)a7a6
+13.(0T13)a2a4 / (0T13)b7b6
+14.(0T14)Ra1b1 / (0T14)Bc8b7
+15.(0T15)Rh1f1 / (0T15)c7c5
+16.(0T16)Nc3a2 / (0T16)Nf6e4
+17.(0T17)Bc4d3 / (0T17)Ne4f6
+18.(0T18)b3b4 / (0T18)Bb7d5
+19.(0T19)Na2c3 / (0T19)c5b4
+20.(0T20)Nc3d5 / (0T20)Nf6d5
+21.(0T21)Bd3a6 / (0T21)Nd5c7
+22.(0T22)Ba6b7 / (0T22)Ra8b8
+23.(0T23)Bb7e4 / (0T23)Nc7d5
+24.(0T24)Qe2c4 / (0T24)Rb8d8
+25.(0T25)Nf3d4 / (0T25)Ng6e5
+26.(0T26)Qc4b5 / (0T26)Qe7c5
+27.(0T27)Be4d5 / (0T27)Qc5b5
+28.(0T28)Bd5e6 / (0T28)d7e6
+29.(0T29)Nd4b5 / (0T29)Ne5f3
+{recorded:black wins}

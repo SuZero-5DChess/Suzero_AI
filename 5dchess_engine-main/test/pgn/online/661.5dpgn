@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.03.29"]
+[Round "625"]
+[White "Tones"]
+[Black "Neathp"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League Season 4"]
+
+1.{7:24}(0T1)e2e4 / {13:48}(0T1)Ng8f6 
+2.{7:24}(0T2)d2d4 / {13:48}(0T2)e7e6 
+3.{7:24}(0T3)Bc1g5 / {13:48}(0T3)c7c5 
+4.{7:24}(0T4)b2b4 / {13:48}(0T4)c5b4 
+5.{7:24}(0T5)e4e5 / {13:48}(0T5)b4b3 
+6.{7:24}(0T6)Bg5d2 / {13:48}(0T6)b3c2 
+7.{7:24}(0T7)Qd1c2 / {13:48}(0T7)Nb8c6 
+8.{7:24}(0T8)Ng1f3 / {13:48}(0T8)Nf6d5 
+9.{7:24}(0T9)Nb1c3 / {13:48}(0T9)f7f5 
+10.{7:24}(0T10)Nc3d5 / {13:48}(0T10)e6d5 
+11.{7:24}(0T11)Qc2f5 / {13:48}(0T11)Bf8>>(0T5)f2 
+12.{7:24}(-1T6)Ke1f2 / {13:48}(-1T6)Nf6e4 
+13.{7:24}(-1T7)Kf2e1 / {13:48}(-1T7)Qd8g5 
+14.{7:24}(-1T8)Qd1f3 / {13:48}(-1T8)Qg5c1

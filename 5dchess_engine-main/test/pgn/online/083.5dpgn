@@ -1,0 +1,39 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.26"]
+[Round "27"]
+[White "Los Bro SPQR"]
+[Black "cirtus"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Anniversary Tourney"]
+
+{
+t0database/game 373 records the same game with conflicting information:
+ white: Public Match
+ black: Citrus
+}
+
+1.{5:18}(0T1)Ng1f3 / {0:29}(0T1)Ng8f6 
+2.{5:18}(0T2)e2e3 / {0:29}(0T2)d7d5 
+3.{5:18}(0T3)Nb1c3 / {0:29}(0T3)c7c6 
+4.{5:18}(0T4)Nc3e2 / {0:29}(0T4)Bc8f5 
+5.{5:18}(0T5)Ne2g3 / {0:29}(0T5)Bf5g6 
+6.{5:18}(0T6)b2b4 / {0:29}(0T6)a7a6 
+7.{5:18}(0T7)Bc1b2 / {0:29}(0T7)e7e6 
+8.{5:18}(0T8)c2c4 / {0:29}(0T8)Bf8b4 
+9.{5:18}(0T9)c4d5 / {0:29}(0T9)Qd8d5 
+10.{5:18}(0T10)a2a3 / {0:29}(0T10)Bb4d6 
+11.{5:18}(0T11)Ra1c1 / {0:29}(0T11)Qd5a2 
+12.{5:18}(0T12)Bb2f6 / {0:29}(0T12)g7f6 
+13.{5:18}(0T13)Bf1c4 / {0:29}(0T13)Qa2a3 
+14.{5:18}(0T14)Nf3d4 / {0:29}(0T14)Bd6e7 
+15.{5:18}(0T15)Bc4e6 / {0:29}(0T15)Ke8g8 
+16.{5:18}(0T16)Ng3f5 / {0:29}(0T16)f7e6 
+17.{5:18}(0T17)Nf5h6 / {0:29}(0T17)Kg8g7 
+18.{5:18}(0T18)Nd4e6 / {0:29}(0T18)Kg7h6 
+19.{5:18}(0T19)Ke1g1 / {0:29}(0T19)Be7d6 
+20.{5:18}(0T20)g2g3 / {0:29}(0T20)Bd6g3 
+21.{5:18}(0T21)f2g3 / {0:29}(0T21)Qa3d6 
+22.{5:18}(0T22)Qd1>>(0T18)h5
+{original data: black wins; verification: white wins}

@@ -1,0 +1,41 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.08"]
+[Round "595"]
+[White "Public Match"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1f3 / (0T2)c7c5 
+3.(0T3)c2c3 / (0T3)Qd8b6 
+4.(0T4)Nb1a3 / (0T4)e7e6 
+5.(0T5)Na3c4 / (0T5)Qb6c7 
+6.(0T6)b2b3 / (0T6)Nb8c6 
+7.(0T7)Qd1e2 / (0T7)b7b5 
+8.(0T8)Nc4a3 / (0T8)a7a6 
+9.(0T9)Bc1b2 / (0T9)Qc7d8 
+10.(0T10)Na3c2 / (0T10)Bc8b7 
+11.(0T11)a2a4 / (0T11)b5a4 
+12.(0T12)Ra1a4 / (0T12)Nc6a5 
+13.(0T13)b3b4 / (0T13)c5b4 
+14.(0T14)c3b4 / (0T14)Ra8c8 
+15.(0T15)Nc2d4 / (0T15)Na5c4 
+16.(0T16)Bb2c3 / (0T16)Nc4b6 
+17.(0T17)Ra4a6 / (0T17)Bf8b4 
+18.(0T18)Nf3g5 / (0T18)Rc8c3 
+19.(0T19)d2c3 / (0T19)Bb4c3 
+20.(0T20)Ke1d1 / (0T20)Bb7a6 
+21.(0T21)Qe2a6 / (0T21)Bc3>>(0T19)c1 
+22.(0T22)Qa6>>(0T17)a1 / (1T17)Nb6a4 
+23.(1T18)Qa1>(-1T20)c1 / (1T18)Bf8b4 
+24.(1T19)Nf3e5 / (1T19)Rc8c3 
+25.(1T20)Qe2d1 / (-1T20)Bb4c3 (1T20)Na4b2 
+26.(-1T21)Qc1c3 (1T21)Nd4e6 / (1T21)f7e6 (-1T21)Bb7a6 
+27.(1T22)Qd1h5 (-1T22)Nd4e6 / (-1T22)f7e6 (1T22)Nf6h5 (0T22)Qd8c7 
+28.(0T23)Ng5e6 (1T23)Ne5>(-1T23)e6 / (1T23)Nb2>>(0T21)b2 
+29.(-2T22)Kd1e2 / (-2T22)Bc3d2 
+30.(-2T23)Ke2d2 / (-2T23)Nf6e4 (-1T23)d7e6 (0T23)f7e6 
+31.(-1T24)Qe2>>(-1T22)c4 / (2T22)Ba6c4
+{recorded:white wins}

@@ -1,0 +1,21 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.07.04"]
+[Round "282"]
+[White "tesseract"]
+[Black "cirtus"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Ng1f3 / {19:58}(0T2)e7e6 
+3.{20:05}(0T3)c2c3 / {19:57}(0T3)c7c6 
+4.{20:04}(0T4)Qd1b3 / {20:02}(0T4)Qd8a5 
+5.{20:12}(0T5)Qb3>>(0T1)f7 / {19:58}(0T5)Qa5>>(0T0)f5 
+6.{20:01}(-1T1)Ng1f3 / {19:58}(-1T1)Qf5>(1T1)f7 
+7.{19:18}(1T2)Ng1f3 (-1T2)e2e3 / {19:08}(-1T2)Ng8f6 (1T2)d7d5 
+8.{17:25}(-1T3)Bf1b5 (1T3)e2e3 / {18:25}(-1T3)c7c6 (1T3)c7c6 
+9.{15:56}(-1T4)c2c3 (1T4)Bf1d3 / {14:46}(-1T4)Qd8b6 (1T4)Qd8b6 
+10.{15:51}(-1T5)Bb5>>(-1T2)e5 / {13:19}(-1T5)Qb6>>(-1T1)b6 
+11.{13:35}(-2T2)e2e3 / {10:08}(-2T2)Qf5>>(-1T1)e5 
+12.{13:14}(-3T2)Nf3e5

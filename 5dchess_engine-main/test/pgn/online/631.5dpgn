@@ -1,0 +1,43 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.11.24"]
+[Round "592"]
+[White "Icemoe"]
+[Black "cirtus"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1. e3 / Nf6
+2. Nf3 / c6
+3. c3 / Qb6
+4. d4 / d5
+5. Bd3 / Bg4
+6. Nbd2 / e6
+7. h3 / Bh5
+8. g4 / Bg6
+9. Bxg6 / hxg6
+10. g5 / Ng4
+11. Nh2 / Nxh2
+12. Rxh2 / Qc7
+13. Rh1 / Na6
+14. Qf3 / Nb4
+15. (0T15)Qf3>>x(0T11)f7~ (>L1) / (1T11)Kxf7
+16. (1T12)Ne5 / (1T12)Nxe5
+17. (1T13)dxe5 / (1T13)Rxh3
+18. (1T14)Rxh3 / (1T14)Qxe3
+19. (1T15)fxe3 / (1T15)Bc5 (0T15)Qd6
+20. (1T16)Qf3 (0T16)Rg1 / (0T16)Qd6>>x(0T12)h2~ (>L-1)
+21. (-1T13)Nf1 / (-1T13)Qg1
+22. (0T17)Rg1>>(0T3)g1~ (>L2) / (2T3)d5
+23. (2T4)c4 / (2T4)Bf5
+24. (2T5)Nc3 / (2T5)dxc4
+25. (2T6)Bxc4 / (2T6)e6
+26. (2T7)Qb3 / (2T7)Qe7
+27. (2T8)Nb5 / (2T8)Ne4
+28. (2T9)g4 / (2T9)a6
+29. (2T10)Nc7 / (2T10)Qxc7
+30. (2T11)gxf5 / (2T11)Nc5
+31. (2T12)Bxe6 / (2T12)fxe6
+32. (2T13)Qxe6 / (2T13)Nxe6
+33. (2T14)Rg1>x(-1T14)g1 / (-1T14)Rxh3 (2T14)Nf4
+34. (-1T15)Qg4 (2T15)Ng5 / (-1T15)Qb5 (2T15)Ne2

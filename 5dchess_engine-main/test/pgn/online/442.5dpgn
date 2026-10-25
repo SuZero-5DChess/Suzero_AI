@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.25"]
+[Round "397"]
+[White "Andrey"]
+[Black "RyanFourPM"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Ng1f3 / {20:05}(0T2)d7d5 
+3.{20:05}(0T3)b2b3 / {19:50}(0T3)c7c5 
+4.{19:46}(0T4)Bc1b2 / {19:41}(0T4)Nb8c6 
+5.{17:17}(0T5)Nf3g5 / {19:29}(0T5)Bc8g4 
+6.{15:05}(0T6)Bf1e2 / {18:35}(0T6)Bg4f5 
+7.{11:35}(0T7)Be2d3 / {17:53}(0T7)Bf5g6 
+8.{9:09}(0T8)Qd1e2 / {16:57}(0T8)e7e6 
+9.{8:57}(0T9)Bd3g6 / {16:57}(0T9)h7g6 
+10.{8:55}(0T10)Ng5f7 / {16:53}(0T10)Ke8f7 
+11.{8:48}(0T11)e3e4 / {15:26}(0T11)d5d4 
+12.{6:50}(0T12)e4e5 / {14:01}(0T12)Qd8d5 
+13.{6:45}(0T13)Qe2>>(0T9)e6 / {12:32}(1T9)f7e6 
+14.{6:40}(1T10)Ng5e6

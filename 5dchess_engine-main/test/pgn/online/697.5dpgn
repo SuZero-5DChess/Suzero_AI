@@ -1,0 +1,22 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.04.16"]
+[Round "663"]
+[White "cirtus"]
+[Black "RyanFourPM"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{1:35}(0T1)e2e3 / {16:27}(0T1)Ng8f6 
+2.{1:35}(0T2)Ng1f3 / {16:27}(0T2)e7e6 
+3.{1:35}(0T3)b2b3 / {16:27}(0T3)c7c5 
+4.{1:35}(0T4)Bc1b2 / {16:27}(0T4)Nb8c6 
+5.{1:35}(0T5)c2c4 / {16:27}(0T5)Nc6e7 
+6.{1:35}(0T6)Bb2f6 / {16:27}(0T6)g7f6 
+7.{1:35}(0T7)Nf3d4 / {16:27}(0T7)Ne7g6 
+8.{1:35}(0T8)Nd4>>(0T7)d6 / {16:27}(1T7)Ke8>(0T8)e7 
+9.{1:35}(1T8)Nf3e5 / {16:27}(1T8)f6e5 
+10.{1:35}(1T9)Qd1h5 (0T9)Qd1f3 / {16:27}(0T9)Bf8g7 (1T9)Ne7g6 
+11.{1:35}(1T10)Qh5f3 (0T10)Nb1c3 / {16:27}(1T10)Qd8e7 (0T10)Ng6e5 
+12.{1:35}(0T11)Nc3d5 (1T11)Qf3f6 / {16:27}(1T11)Qe7f6 (0T11)e6d5 
+13.{1:35}(0T12)Qf3f6 (1T12)Nd6e8

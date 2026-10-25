@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.07.20"]
+[Round "677"]
+[White "qqqqkkk"]
+[Black "Sapphia"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)b2b4 / {19:52}(0T2)Nb8a6 
+3.{19:29}(0T3)c2c3 / {18:42}(0T3)c7c5 
+4.{19:24}(0T4)Qd1b3 / {18:29}(0T4)Qd8b6 
+5.{19:31}(0T5)Qb3>>(0T1)f7 / {18:16}(0T5)Qb6>>(0T0)b6 
+6.{19:31}(-1T1)e2e3 / {17:24}(1T1)Ke8f7 (-1T1)Ng8f6 
+7.{19:28}(1T2)Ng1f3 (-1T2)Qd1f3 / {16:18}(1T2)Ng8f6 (-1T2)Qb6d6 
+8.{19:37}(1T3)Nf3>>(1T2)f5 / {16:23}(1T3)Nf6>>(1T1)f7 
+9.{19:35}(-2T2)e2e3

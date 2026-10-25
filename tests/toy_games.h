@@ -21,8 +21,9 @@ class SubtractionGame final : public IGameState {
   static constexpr int kTarget = 5;
   static constexpr int kActionCount = 2;
 
-  explicit SubtractionGame(int position = 0, PlayerId player = 0)
-      : position_(position), player_(player) {}
+  explicit SubtractionGame(int position = 0, PlayerId player = 0,
+                           int move_count = 0)
+      : position_(position), player_(player), move_count_(move_count) {}
 
   std::unique_ptr<IGameState> clone() const override {
     return std::make_unique<SubtractionGame>(*this);
@@ -44,6 +45,7 @@ class SubtractionGame final : public IGameState {
 
   PlayerId currentPlayer() const override { return player_; }
   bool isTerminal() const override { return position_ == kTarget; }
+  int moveCount() const override { return move_count_; }
 
   /// The side to move after the winning move has, by definition, lost.
   double terminalUtility() const override { return -1.0; }
@@ -58,6 +60,7 @@ class SubtractionGame final : public IGameState {
  private:
   int position_;
   PlayerId player_;
+  int move_count_;
 };
 
 /// Every action ends the game. Only action 2 wins for the mover.
@@ -267,6 +270,41 @@ class SkewedWinEvaluator final : public IEvaluator {
     const float priors[] = {0.6f, 0.25f, 0.15f};
     for (int action = 0; action < state.actionCount(); ++action) {
       evaluation.policy[static_cast<std::size_t>(action)] = priors[action];
+    }
+    evaluation.utility = 0.0;
+    return evaluation;
+  }
+};
+
+/// Gives action 0 a zero prior and every other legal action an equal positive
+/// prior. Used to check that legal zero-probability moves stay visible.
+class ZeroActionPriorEvaluator final : public IEvaluator {
+ public:
+  Evaluation evaluate(const IGameState& state) override {
+    Evaluation evaluation;
+    evaluation.policy.assign(state.actionCount(), -1.0f);
+    for (int action = 0; action < state.actionCount(); ++action) {
+      if (!state.isLegal(static_cast<ActionId>(action))) {
+        continue;
+      }
+      evaluation.policy[static_cast<std::size_t>(action)] =
+          action == 0 ? 0.0f : 1.0f;
+    }
+    evaluation.utility = 0.0;
+    return evaluation;
+  }
+};
+
+/// Gives every legal action a zero prior.
+class AllZeroPriorEvaluator final : public IEvaluator {
+ public:
+  Evaluation evaluate(const IGameState& state) override {
+    Evaluation evaluation;
+    evaluation.policy.assign(state.actionCount(), -1.0f);
+    for (int action = 0; action < state.actionCount(); ++action) {
+      if (state.isLegal(static_cast<ActionId>(action))) {
+        evaluation.policy[static_cast<std::size_t>(action)] = 0.0f;
+      }
     }
     evaluation.utility = 0.0;
     return evaluation;

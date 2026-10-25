@@ -1,0 +1,38 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.07.24"]
+[Round "530"]
+[White "Mage"]
+[Black "cirtus"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)f2f3 / (0T1)Ng8f6
+2.(0T2)c2c3 / (0T2)c7c6
+3.(0T3)Qd1a4 / (0T3)Qd8b6
+4.(0T4)e2e3 / (0T4)e7e6
+5.(0T5)Qa4h4 / (0T5)Qb6c5
+6.(0T6)Ke1d1 / (0T6)Qc5a5
+7.(0T7)b2b3 / (0T7)Qa5f5
+8.(0T8)Qh4e1 / (0T8)Qf5d5
+9.(0T9)d2d3 / (0T9)Nb8a6
+10.(0T10)e3e4 / (0T10)Qd5b5
+11.(0T11)c3c4 / (0T11)Qb5e5
+12.(0T12)Qe1c3 / (0T12)Qe5c3
+13.(0T13)Nb1c3 / (0T13)Na6b4
+14.(0T14)a2a3 / (0T14)Nb4a6
+15.(0T15)b3b4 / (0T15)Na6c7
+16.(0T16)Bc1f4 / (0T16)Nc7a6
+17.(0T17)Ng1e2 / (0T17)h7h5
+18.(0T18)Ne2g3 / (0T18)h5h4
+19.(0T19)Ng3f5 / (0T19)g7g6
+20.(0T20)Nf5d6 / (0T20)Bf8d6
+21.(0T21)Bf4d6 / (0T21)g6g5
+22.(0T22)Kd1c1 / (0T22)Rh8g8
+23.(0T23)Nc3d1 / (0T23)Na6b8
+24.(0T24)Nd1e3 / (0T24)b7b6
+25.(0T25)Bd6e7 / (0T25)Ke8e7
+26.(0T26)Ne3>>(0T25)e5 / (0T26)Nf6>>(0T24)g6
+27.(-1T25)Kc1c2 / (-1T25)Ng6>>(0T23)g6
+28.(-2T24)Kc1c2 / (-2T24)Ke8d8
+29.(-1T26)Kc2>(-2T25)c3

@@ -1,0 +1,39 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.17"]
+[Round "508"]
+[White "Andrey"]
+[Black "cirtus"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+{
+t0database/game 370 records the same game with conflicting information:
+ white: Citrus
+ black: Public Match
+}
+
+1. e3 / Nf6
+2. Nf3 / Ng4
+3. Ng5 / f5
+4. Nf7 / e6
+5. h4 / Kxf7
+6. Bc4 / Ke8
+7. Nc3 / g6
+8. Qf3 / f4
+9. Qxg4 / Qf6
+10. Qg5 / Qxg5
+11. hxg5 / fxe3
+12. dxe3 / Nc6
+13. b3 / Nb4
+14. O-O / Bg7
+15. Bb2 / Nxc2
+16. Rab1 / Bxc3
+17. Bxc3 / Rf8
+18. Bg7 / Nb4
+19. Bxf8 / Kxf8
+20. Be2 / b6
+21. Bf3 / Bb7
+22. e4 / Bxe4
+23. Bxe4
+{recorded:white wins}

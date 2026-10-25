@@ -1,0 +1,15 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.05"]
+[Round "97"]
+[White "Neathp"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)d7d5 
+2.(0T2)Qd1f3 / (0T2)Qd8d6 
+3.(0T3)Bf1b5 / (0T3)c7c6 
+4.(0T4)Qf3h5 / (0T4)Ng8f6 
+5.(0T5)Qh5>>(0T3)f7
+{recorded:white wins}

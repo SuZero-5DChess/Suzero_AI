@@ -1,0 +1,36 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.03.22"]
+[Round "194"]
+[White "tesseract"]
+[Black "Aquababy"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)c7c5 
+3.(0T3)c2c3 / (0T3)c5c4 
+4.(0T4)Bc1f4 / (0T4)d7d5 
+5.(0T5)Bf4b8 / (0T5)Ra8b8 
+6.(0T6)Nf3e5 / (0T6)b7b5 
+7.(0T7)e2e3 / (0T7)Qd8a5 
+8.(0T8)b2b4 / (0T8)Qa5a4 
+9.(0T9)Qd1a4 / (0T9)b5a4 
+10.(0T10)Bf1e2 / (0T10)Bc8f5 
+11.(0T11)g2g4 / (0T11)Bf5c2 
+12.(0T12)Nb1d2 / (0T12)Bc2>>(0T10)e2 
+13.(-1T11)Ke1e2 / (-1T11)Nf6e4 
+14.(0T13)Ne5>>(0T11)f5 / (1T11)Rb8b4 
+15.(1T12)Ne5>(-1T12)e4 / (-1T12)d5e4 (1T12)Rb4b2 
+16.(-1T13)Nb1>(1T13)b2 / (1T13)e7e6 (-1T13)e7e6 (0T13)e7e6 
+17.(1T14)Nb2a4 (-1T14)Ra1b1 (0T14)Ra1b1 / (-1T14)Bc8>>(-1T11)c5 
+18.(-2T12)Nb1d2 / (-2T12)Rb8b4 
+19.(-2T13)Ra1b1 / (-2T13)Bc8f5 
+20.(-2T14)c3b4 / (-2T14)Bf5d3 (1T14)g7g6 (0T14)Bf8d6 
+21.(-2T15)Ne5d3 (-1T15)Ke2e1 (1T15)Na4>(0T15)a6 / (-2T15)c4d3 (1T15)g6f5 (0T15)Rb8b6 (-1T15)f7f5 
+22.(-2T16)Ke2e1 (1T16)Be2d1 (0T16)Na6c5 (-1T16)g2g3 / (-2T16)Bc5d4 (-1T16)Bf8e7 (0T16)Bd6c5 (1T16)Nf6e4 
+23.(0T17)d4c5 (1T17)Bd1a4 (-2T17)e3d4 (-1T17)a2a3 / (-1T17)Be7g5 (0T17)Nf6e4 (1T17)Ke8e7 (-2T17)e7e6 
+24.(0T18)Nd2e4 (1T18)Ba4b5 (-1T18)Ne5c6 (-2T18)a2a3 / (-1T18)Ke8g8 (-2T18)Nf6e4 (1T18)Bf8h6 (0T18)f7f6 
+25.(1T19)Bb5>>(1T16)b8 / (1T19)Bh6>>(1T15)h2 
+26.(-3T16)Rh1h2
+{original data: black wins; verification: white wins}

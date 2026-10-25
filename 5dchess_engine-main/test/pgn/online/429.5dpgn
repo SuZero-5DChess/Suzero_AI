@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.24"]
+[Round "384"]
+[White "Public Match"]
+[Black "cirtus"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{3:20}(0T1)Ng1f3 / {4:53}(0T1)Ng8f6 
+2.{3:20}(0T2)d2d4 / {4:53}(0T2)c7c5 
+3.{3:20}(0T3)c2c3 / {4:53}(0T3)Qd8b6 
+4.{3:20}(0T4)Nb1a3 / {4:53}(0T4)c5d4 
+5.{3:20}(0T5)Na3c4 / {4:53}(0T5)Qb6c5 
+6.{3:20}(0T6)Qd1d4 / {4:53}(0T6)Qc5d4 
+7.{3:20}(0T7)Nf3d4 / {4:53}(0T7)Nb8c6 
+8.{3:20}(0T8)Bc1f4 / {4:53}(0T8)e7e6 
+9.{3:20}(0T9)Nd4b5 / {4:53}(0T9)Nf6d5 
+10.{3:20}(0T10)Nc4d6 / {4:53}(0T10)Bf8d6 
+11.{3:20}(0T11)Bf4d6 / {4:53}(0T11)a7a6 
+12.{3:20}(0T12)Nb5a3 / {4:53}(0T12)Nd5f6 
+13.{3:20}(0T13)f2f3 / {4:53}(0T13)Nf6d5 
+14.{3:20}(0T14)Ke1c1 / {4:53}(0T14)Nd5e3 
+15.{3:20}(0T15)Bd6c5 / {4:53}(0T15)Ne3d1 
+16.{3:20}(0T16)Kc1d1 / {4:53}(0T16)b7b5 
+17.{3:20}(0T17)e2e3 / {4:53}(0T17)Bc8b7
+{recorded:black wins}

@@ -1,0 +1,12 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.09"]
+[Round "323"]
+[White "AI Aggressive"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Defended Pawn"]
+
+1.(0T1)f2f4 / (0T1)c7c6 
+2.(0T2)d2d3 / (0T2)Qb8d6 
+3.(0T3)a2a4 / (0T3)Qd6b4

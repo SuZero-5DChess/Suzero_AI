@@ -1,0 +1,33 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.06.07"]
+[Round "593"]
+[White "Icemoe"]
+[Black "Dreamer"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1. e3 / Nf6
+2. Nf3 / c6
+3. b3 / d5
+4. Bb2 / Bg4
+5. c4 / e6
+6. h3 / Bh5
+7. g4 / Bg6
+8. cxd5 / Qxd5
+9. Nc3 / Qa5
+10. g5 / Nd5
+11. Nxd5 / cxd5
+12. b4 / Bxb4
+13. a3 / Bc5
+14. Bxg7 / Rg8
+15. Bc3 / Nc6
+16. Bxa5 / Rc8
+17. Bb5 / Bh5
+18. Bxc6 / bxc6
+19. Qe2 / (0T19)Bc5>>(0T16)c2~ (>L-1)
+20. (-1T17)Qc1 / (-1T17)Bxa3
+21. (-1T18)Rxa3 / (-1T18)Nxa5
+22. (-1T19)Rxa5 / (-1T19)Bc2>>x(-1T18)c1 (>L-2)
+23. (-1T20)Qc1>x(-2T19)c1 (0T20)Qa6 / (-1T20)Bb1 (0T20)Ke8>>(-1T20)f8 (>L-3)
+24. (0T21)Qa6>>x(0T19)c8~ (>L1)

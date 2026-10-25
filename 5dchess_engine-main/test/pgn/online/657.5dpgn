@@ -1,0 +1,29 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.03.27"]
+[Round "621"]
+[White "qqqqkkk"]
+[Black "Mauer"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "5D Pogchamps season 1"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)d2d4 / {20:05}(0T2)d7d5 
+3.{20:05}(0T3)c2c3 / {20:05}(0T3)c7c6 
+4.{20:05}(0T4)Bc1f4 / {20:05}(0T4)Bc8f5 
+5.{20:05}(0T5)e2e3 / {19:54}(0T5)e7e6 
+6.{20:00}(0T6)Nb1d2 / {19:54}(0T6)Nb8d7 
+7.{19:43}(0T7)Nd2b3 / {19:54}(0T7)b7b6 
+8.{19:32}(0T8)Bf1d3 / {19:06}(0T8)Bf5d3 
+9.{19:32}(0T9)Qd1d3 / {19:06}(0T9)Qd8c8 
+10.{18:41}(0T10)Ke1c1 / {16:34}(0T10)b6b5 
+11.{15:02}(0T11)Rd1d2 / {16:26}(0T11)Qc8a6 
+12.{14:04}(0T12)Qd3b1 / {13:33}(0T12)b5b4 
+13.{12:15}(0T13)Rd2d3 / {10:19}(0T13)Nf6e4 
+14.{5:48}(0T14)Qb1c2 / {10:13}(0T14)Qa6a2 
+15.{5:00}(0T15)Nf3d2 / {8:26}(0T15)Ne4f2 
+16.{3:08}(0T16)Rh1f1 / {8:26}(0T16)Nf2d3 
+17.{3:06}(0T17)Qc2d3 / {8:14}(0T17)Qa2b2 
+18.{3:06}(0T18)Kc1b2 / {8:14}(0T18)b4c3 
+19.{2:23}(0T19)Qd3c3 / {8:08}(0T19)Nd7>>(0T17)e7

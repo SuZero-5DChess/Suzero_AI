@@ -1,0 +1,40 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.09"]
+[Round "147"]
+[White "Tones"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1. f4 / e6
+2. g3 / c6
+3. c3 / Qb6
+4. Qb3 / Qc5
+5. d4 / Qf5
+6. Nd2 / Nf6
+7. e4 / Nxe4
+8. Bd3 / Nxd2
+9. Bxf5 / Nxb3
+10. Bh3 / Nxa1
+11. Be3 / Nc2
+12. Kd2 / Nxe3
+13. Kxe3 / f5
+14. Nf3 / d6
+15. Ne5 / dxe5
+16. dxe5 / Bc5
+17. Kf3 / Nd7
+18. Rd1 / Nb6
+19. Bf1 / Na4
+20. Rd2 / g6
+21. b3 / Nxc3
+22. Kg2 / Ne4
+23. Bd3 / Bf2
+24. Rxf2 / Nxf2
+25. Kxf2 / Kg8
+26. (0T26)Bd3>>(0T21)d8~ (>L1) / (0T26)Rf8>>(0T17)f8~ (>L-1)
+27. (-1T18)Rd1 / (-1T18)Nd7
+28. (-1T19)Bxf5 / (-1T19)Nxe5
+29. (-1T20)fxe5 / (-1T20)Rxf5
+30. (-1T21)Ke4
+{recorded:white wins}

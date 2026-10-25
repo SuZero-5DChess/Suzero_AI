@@ -1,0 +1,22 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.06.18"]
+[Round "278"]
+[White "Andrey"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{1205}(0T1)e2e3 / {1205}(0T1)e7e6 
+2.{1204}(0T2)b2b3 / {1170}(0T2)Qd8f6 
+3.{1196}(0T3)Bc1b2 / {1156}(0T3)Qf6b2 
+4.{1191}(0T4)Nb1c3 / {1111}(0T4)f7f5 
+5.{1068}(0T5)Nc3d5 / {1111}(0T5)g7g6 
+6.{1057}(0T6)Nd5c7 / {1085}(0T6)Ke8f7 
+7.{909}(0T7)Nc7>>(0T5)c8 / {1095}(0T7)Bf8>>(0T1)f2 
+8.{896}(-1T2)Ke1f2 / {1065}(-1T2)e7e6 
+9.{748}(-1T3)Qd1h5 / {1048}(-1T3)Qd8f6 
+10.{744}(-1T4)Ng1f3 / {966}(-1T4)g7g6 
+11.{434}(-1T5)Qh5>>(0T5)h5 / {653}(-1T5)Qf6>>(-1T3)h4 
+12.{245}(-2T4)g2g3 / {653}(-2T4)Qd8f6 
+13.{38}(-2T5)Qh5f5 / {644}(-2T5)Qh4>>(0T3)f2

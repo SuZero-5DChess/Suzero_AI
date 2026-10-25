@@ -1,0 +1,34 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.08"]
+[Round "239"]
+[White "tesseract"]
+[Black "Mage"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League Season 2"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)e7e6 
+3.(0T3)c2c3 / (0T3)c7c5 
+4.(0T4)Bc1g5 / (0T4)c5d4 
+5.(0T5)Nf3d4 / (0T5)Qd8b6 
+6.(0T6)b2b4 / (0T6)Nb8c6 
+7.(0T7)e2e3 / (0T7)Nc6b4 
+8.(0T8)Bf1c4 / (0T8)h7h5 
+9.(0T9)Nb1d2 / (0T9)Nb4c6 
+10.(0T10)Qd1f3 / (0T10)Nc6d4 
+11.(0T11)c3d4 / (0T11)Qb6a5 
+12.(0T12)Ra1d1 / (0T12)b7b5 
+13.(0T13)Bc4e6 / (0T13)f7e6 
+14.(0T14)Ke1g1 / (0T14)Qa5>>(0T11)d2 
+15.(0T15)Rf1>>(0T10)f1 / (1T10)Qb6b2 
+16.(1T11)Nd4c2 / (1T11)Nf6g4 
+17.(1T12)Nc2>(-1T12)d2 / (1T12)Qb2>(-1T12)d2 
+18.(-1T13)Ke1d2 (1T13)h2h3 / (-1T13)Qb6b4 (1T13)Nc6d4 
+19.(-1T14)Kd2d1 (1T14)Bc4e6 / (1T14)Nd4e6 (-1T14)Nf6e4 
+20.(1T15)Qd1>>(1T13)b1 / (2T13)Ng4e3 
+21.(2T14)f2e3 / (2T14)Nc6e5 
+22.(2T15)Qb1>(-1T15)b4 / (2T15)Ne5>(1T15)e3 (0T15)Bf8e7 (-1T15)Ne4g5 
+23.(1T16)Bg5e3 (-1T16)Qb4f8 (0T16)Bg5f6 (2T16)Bg5d8 / (-1T16)Rh8f8 (0T16)Be7f6 (1T16)Ng4e3 (2T16)Ke8d8
+{recorded:black wins}

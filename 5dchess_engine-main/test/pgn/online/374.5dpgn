@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.10"]
+[Round "324"]
+[White "AI Balanced"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Defended Pawn"]
+
+1.(0T1)Ng1f3 / (0T1)c7c6 
+2.(0T2)Nd1e3 / (0T2)d7d5 
+3.(0T3)g2g4 / (0T3)Bc8g4 
+4.(0T4)Ne3g4 / (0T4)Qb8f4 
+5.(0T5)Bf1h3 / (0T5)Ng8f6 
+6.(0T6)d2d4 / (0T6)Nf6g4 
+7.(0T7)Bc1f4 / (0T7)Ng4f6 
+8.(0T8)Qb1c1 / (0T8)Nf6e4 
+9.(0T9)Bf4c7 / (0T9)Ra8c8 
+10.(0T10)Bh3c8 / (0T10)e7e6 
+11.(0T11)Bc8>>(0T10)d8 / (1T10)Rc8d8 
+12.(1T11)Bc7d8 / (1T11)Ke8d8 (0T11)Bf8d6 
+13.(0T12)Bc7>(1T12)c8 / (0T12)Ne4>>(0T10)e3 
+14.(-1T11)Qc1e3 / (-1T11)Ne4f2 
+15.(-1T12)Qe3e7

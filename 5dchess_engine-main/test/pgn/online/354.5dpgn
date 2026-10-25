@@ -1,0 +1,21 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.26"]
+[Round "303"]
+[White "Tones"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e4 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)e7e6 
+3.(0T3)Bc1g5 / (0T3)c7c6 
+4.(0T4)Bg5d2 / (0T4)Nf6e4 
+5.(0T5)Qd1h5 / (0T5)Qd8f6 
+6.(0T6)Qh5>>(0T4)f7 / (1T4)Ke8f7 
+7.(1T5)Bg5f6 / (0T6)Qf6>>(0T4)d4 
+8.(-1T5)Qd1h5 / (1T5)g7f6 (-1T5)Nf6h5 
+9.(1T6)Qd1h5 (-1T6)Bf1c4 / (-1T6)Qd4>>(-1T5)e4 
+10.(-1T7)e4>(-2T6)e4 / (-1T7)Nh5>(1T6)h5 (-2T6)Qd4e4 
+11.(-1T8)Bc4>>(1T6)c4
+{recorded:black wins}

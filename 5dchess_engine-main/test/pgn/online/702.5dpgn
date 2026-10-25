@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.06.30"]
+[Round "668"]
+[White "Public Match"]
+[Black "Los Bro SPQR"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6
+2.(0T2)e2e3 / (0T2)c7c6
+3.(0T3)c2c3 / (0T3)Qd8b6
+4.(0T4)Qd1a4 / (0T4)d7d5
+5.(0T5)Qa4b3 / (0T5)Qb6b3
+6.(0T6)a2b3 / (0T6)Bc8f5
+7.(0T7)Nb1a3 / (0T7)Nb8d7
+8.(0T8)Nf3g5 / (0T8)Bf5g6
+9.(0T9)f2f4 / (0T9)h7h6
+10.(0T10)Ng5f3 / (0T10)Nd7c5
+11.(0T11)Bf1>>(0T7)f5 / (1T7)e7e6
+12.(1T8)b3b4 / (1T8)e6f5
+13.(1T9)Nf3e5 / (1T9)Nf6e4
+14.(1T10)Ne5f7 / (1T10)Ke8f7
+15.(1T11)f2f3 / (0T11)Nc5d3 (1T11)Bf8c5
+16.(0T12)Ke1f1 (1T12)b4c5 / (0T12)Nf6e4 (1T12)Ne4d2
+17.(0T13)b3b4 (1T13)Bc1d2 / (0T13)Nd3>>(0T12)d1
+{recorded:black wins}

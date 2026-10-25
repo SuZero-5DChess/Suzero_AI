@@ -1,0 +1,48 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.23"]
+[Round "151"]
+[White "Sapphia"]
+[Black "Tones"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)c2c4 / (0T2)c7c5 
+3.(0T3)b2b3 / (0T3)Nb8c6 
+4.(0T4)Bc1b2 / (0T4)e7e6 
+5.(0T5)g2g3 / (0T5)Bf8e7 
+6.(0T6)Bf1g2 / (0T6)Nf6g4 
+7.(0T7)h2h3 / (0T7)Be7f6 
+8.(0T8)Qd1c2 / (0T8)Bf6b2 
+9.(0T9)Qc2b2 / (0T9)Qd8f6 
+10.(0T10)Qb2f6 / (0T10)Ng4f6 
+11.(0T11)Ke1g1 / (0T11)d7d5 
+12.(0T12)Nb1a3 / (0T12)a7a6 
+13.(0T13)Ra1e1 / (0T13)Nc6d4 
+14.(0T14)c4d5 / (0T14)Nd4f3 
+15.(0T15)Bg2f3 / (0T15)Nf6d5 
+16.(0T16)Na3c4 / (0T16)Ke8g8 
+17.(0T17)Nc4e5 / (0T17)Nd5f6 
+18.(0T18)Re1c1 / (0T18)Rf8d8 
+19.(0T19)d2d3 / (0T19)Rd8d5 
+20.(0T20)Bf3g4 / (0T20)Nf6g4 
+21.(0T21)Ne5g4 / (0T21)e6e5 
+22.(0T22)e2e4 / (0T22)Bc8g4 
+23.(0T23)h3g4 / (0T23)Rd5d3 
+24.(0T24)Rc1c5 / (0T24)Ra8e8 
+25.(0T25)Kg1g2 / (0T25)Re8d8 
+26.(0T26)Rf1c1 / (0T26)f7f6 
+27.(0T27)Rc5c8 / (0T27)h7h6 
+28.(0T28)Rc8>>(0T27)c8 / (1T27)h7h6 
+29.(1T28)Rc8d8 / (1T28)Rd3d8 (0T28)Rd3d2 
+30.(1T29)Rc5c8 (0T29)a2a3 / (1T29)Kg8h7 (0T29)Kg8h7 
+31.(0T30)Rc1c7 (1T30)a2a3 / (0T30)Rd2f2 (1T30)Rd8d2 
+32.(0T31)Kg2f2 (1T31)Rc8e8 / (1T31)Rd2>(0T31)d2 
+33.(0T32)Kf2g1 (1T32)Rc1c8 / (0T32)Rd2d1 (1T32)Kh7g6 
+34.(0T33)Kg1g2 (1T33)Re8g8 / (0T33)Rd1>>(0T7)d1 
+35.(-1T8)Ke1d1 / (-1T8)Ng4f2 
+36.(-1T9)Kd1e1 / (-1T9)Nc6d4 
+37.(-1T10)Bb2d4 / (-1T10)Be7f6 
+38.(-1T11)Bd4f6 / (-1T11)Qd8f6 
+39.(-1T12)Nb1c3 / (-1T12)Nf2>>(-1T10)g2

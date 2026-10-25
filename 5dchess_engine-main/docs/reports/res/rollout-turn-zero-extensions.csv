@@ -1,0 +1,7 @@
+phase,trial_id,seed,action_limit,actions,numbered_turns,termination,time_ms,error
+extension,724,5000723,20000,,,ERROR,,Native process exited -11 (SIGSEGV); censored main observation retained
+extension,724,5000723,4000,4000,2000,ACTION_LIMIT,55.478125,
+extension,5820,5005819,4000,4000,2000,ACTION_LIMIT,60.701458,
+extension,6836,5006835,4000,4000,2000,ACTION_LIMIT,58.914833,
+extension,9535,5009534,4000,4000,2000,ACTION_LIMIT,51.016875,
+diagnostic,724,5000723,8000,,,ERROR,,SIGSEGV reproduced; ASan shows null read in check_position::scan with wrapped time -2048

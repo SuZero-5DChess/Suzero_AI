@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.07.11"]
+[Round "686"]
+[White "Sapphia"]
+[Black "ya"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Nb1a3 / {19:56}(0T2)d7d5 
+3.{20:05}(0T3)c2c4 / {19:53}(0T3)c7c6 
+4.{20:05}(0T4)Qd1b3 / {19:51}(0T4)Nf6e4 
+5.{19:58}(0T5)c4d5 / {19:43}(0T5)Ne4f2 
+6.{19:34}(0T6)d5d6 / {19:42}(0T6)Nf2h1 
+7.{19:34}(0T7)Qb3f7 / {19:46}(0T7)Ke8f7 
+8.{19:03}(0T8)Nf3>>(0T7)f5 / {19:32}(0T8)Qd8>>(0T5)a5 
+9.{19:00}(-1T6)Na3c4 / {19:32}(-1T6)Ne4f6 
+10.{18:44}(-1T7)Nc4a5 / {19:32}(-1T7)Nf6>(1T7)f5 
+11.{17:44}(-1T8)Na5c6 (1T8)Qb3c4 / {19:37}(1T8)Nh1>>(1T7)f1 
+12.{17:44}(-2T8)Ke1f1 / {18:22}(-1T8)Qd8b6 (-2T8)Bc8e6 
+13.{17:44}(-1T9)Rh1>(-2T9)h1 (1T9)Nf3>(0T9)f5 / {18:03}(-2T9)Be6b3 (0T9)Bc8f5 (1T9)e7e6 (-1T9)b7c6 
+14.{16:46}(1T10)Qc4c6 (-1T10)Nf3>(0T10)f5 (-2T10)Nf5e7

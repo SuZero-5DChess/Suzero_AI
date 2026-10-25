@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.17"]
+[Round "6"]
+[White "MaSK78"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)g7g6 
+2.(0T2)c2c3 / (0T2)Nb8c6 
+3.(0T3)Qd1b3 / (0T3)e7e6 
+4.(0T4)e2e3 / (0T4)Bf8e7 
+5.(0T5)Qb3>>(0T1)f7 / (1T1)Ke8f7 
+6.(1T2)Ng1h3 / (1T2)Ng8f6 (0T5)Ng8f6 
+7.(1T3)Nh3g5 / (1T3)Kf7g8 
+8.(1T4)c2c3 / (1T4)h7h6 
+9.(1T5)Qd1b3

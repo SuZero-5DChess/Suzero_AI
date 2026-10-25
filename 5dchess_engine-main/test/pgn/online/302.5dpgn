@@ -1,0 +1,17 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.18"]
+[Round "251"]
+[White "tesseract"]
+[Black "thetntm"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)c7c5 
+2.(0T2)Qd1h5 / (0T2)g7g6 
+3.(0T3)Qh5f3 / (0T3)Qd8b6 
+4.(0T4)Nb1c3 / (0T4)e7e6 
+5.(0T5)Nc3d5 / (0T5)Qb6c6 
+6.(0T6)Bf1c4 / (0T6)Bf8e7 
+7.(0T7)Nd5e7 / (0T7)Ng8e7 
+8.(0T8)Qf3>>(0T4)f7

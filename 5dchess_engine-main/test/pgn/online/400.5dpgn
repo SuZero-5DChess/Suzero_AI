@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.29"]
+[Round "350"]
+[White "Mahlon Miller"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:00}(0T2)d2d4 / {20:05}(0T2)d7d5 
+3.{20:00}(0T3)c2c3 / {20:05}(0T3)c7c6 
+4.{19:51}(0T4)Nb1d2 / {19:54}(0T4)Bc8f5 
+5.{19:47}(0T5)Qd1a4 / {19:33}(0T5)e7e6 
+6.{19:39}(0T6)Nf3e5 / {19:17}(0T6)Nf6g4 
+7.{19:03}(0T7)Ne5f7 / {19:17}(0T7)Ke8f7 
+8.{18:18}(0T8)Qa4c6 / {19:17}(0T8)b7c6 
+9.{17:57}(0T9)Nd2f3 / {18:40}(0T9)Qd8f6 
+10.{17:52}(0T10)Nf3g5 / {18:30}(0T10)Kf7e8 
+11.{17:44}(0T11)Bc1f4 / {17:36}(0T11)h7h6 
+12.{15:25}(0T12)Ng5f7 / {17:13}(0T12)Qf6f7 
+13.{14:39}(0T13)h2h4 / {17:06}(0T13)Bf5b1 
+14.{14:32}(0T14)Ra1b1 / {17:06}(0T14)Qf7f4 
+15.{14:10}(0T15)f2f3 / {16:49}(0T15)Qf4>>(0T13)f2

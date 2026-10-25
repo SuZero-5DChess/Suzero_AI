@@ -117,10 +117,28 @@ struct SearchParams {
   /// Temperature applied to the root prior before noise. 1 = unchanged.
   double rootPolicyTemperature = 1.0;
 
+  /// Temperature used at the start of the game. The effective temperature is
+  /// interpolated from this value towards `rootPolicyTemperature` using
+  /// `chosenMoveTemperatureHalflife` and IGameState::moveCount().
+  /// 1 = unchanged (default, matching KataGo).
+  double rootPolicyTemperatureEarly = 1.0;
+
   // ---------------------------------------------------------- move selection --
 
   /// Sampling temperature for `chooseAction`. <= 1e-4 means argmax.
   double chosenMoveTemperature = 0.0;
+
+  /// Temperature used at the start of the game by `chooseAction()` (the
+  /// overload without an explicit temperature). Interpolated towards
+  /// `chosenMoveTemperature` with `chosenMoveTemperatureHalflife`.
+  double chosenMoveTemperatureEarly = 0.0;
+
+  /// Number of moves after which the early temperatures have moved halfway
+  /// towards their final values. Must be > 0.
+  ///
+  /// KataGo also scales this by the board size (19/sqrt(area)); this library
+  /// has no board concept, so the halflife is expressed directly in moves.
+  double chosenMoveTemperatureHalflife = 19.0;
 
   /// Temperatures only dampen moves whose pre-temperature probability is at
   /// most this value. 1 means every move is affected.

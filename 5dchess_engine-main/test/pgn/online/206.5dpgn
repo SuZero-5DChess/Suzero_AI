@@ -1,0 +1,40 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.27"]
+[Round "150"]
+[White "tesseract"]
+[Black "Tones"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+{
+t0database/game 353 records the same game with conflicting information:
+ date: 2021.10.28
+}
+
+1.{0:41}(0T1)Ng1f3 / {2:12}(0T1)Ng8f6 
+2.{0:41}(0T2)d2d4 / {2:12}(0T2)c7c5 
+3.{0:41}(0T3)c2c3 / {2:12}(0T3)Qd8b6 
+4.{0:41}(0T4)Nf3e5 / {2:12}(0T4)c5d4 
+5.{0:41}(0T5)b2b4 / {2:12}(0T5)Nb8c6 
+6.{0:41}(0T6)Ne5c6 / {2:12}(0T6)d7c6 
+7.{0:41}(0T7)Qd1b3 / {2:12}(0T7)Bc8e6 
+8.{0:41}(0T8)c3c4 / {2:12}(0T8)Be6h3 
+9.{0:41}(0T9)Qb3>>(0T5)f7 / {2:12}(0T9)Bh3>>(0T4)c3 
+10.{0:41}(-1T5)b2c3 / {2:12}(-1T5)Nf6>(1T5)f7 
+11.{0:41}(1T6)Ne5f7 (-1T6)e2e4 / {2:12}(1T6)d4c3 (-1T6)Qb6f6 
+12.{0:41}(-1T7)Qd1h5 (1T7)Bc1e3 / {2:12}(1T7)Qb6e3 (-1T7)Qf6f2 
+13.{0:41}(-1T8)Ke1f2 (1T8)f2e3 / {2:12}(1T8)Nf6>>(1T7)f4 
+14.{0:41}(-2T8)Be3f4 / {2:12}(-2T8)c3b2 (-1T8)g7g6 
+15.{0:41}(-1T9)Qh5f3 (1T9)Nf7d6 (-2T9)Qd1d2 / {2:12}(-1T9)f7f6 (-2T9)b2a1 (1T9)e7d6 
+16.{0:41}(-1T10)Qf3>>(-1T6)f3 / {2:12}(2T6)Qb6f6 
+17.{0:41}(2T7)Qf3f6 / {2:12}(2T7)g7f6 
+18.{0:41}(2T8)e2e3 / {2:12}(2T8)Bf8h6 
+19.{0:41}(2T9)Qd1h5 / {2:12}(2T9)Bh6e3 
+20.{0:41}(2T10)f2e3 (1T10)Qd1d5 (0T10)a2a3 (-2T10)Qd2d7 / {2:12}(0T10)Qb6>>(-2T8)b4 
+21.{0:41}(0T11)Bc1>>(0T6)c6 / {2:12}(3T6)Qb6c6 
+22.{0:41}(3T7)e2e3 / {2:12}(3T7)d4d3 
+23.{0:41}(3T8)Qd1>>(0T5)d4 / {2:12}(4T5)Qb6d4 
+24.{0:41}(4T6)Qd1d4 / {2:12}(4T6)Nb8c6 
+25.{0:41}(4T7)Ne5c6 / {2:12}(4T7)b7c6 
+26.{0:41}(4T8)Qd4a4 / {2:12}(3T8)Qc6c3 (4T8)Bc8a6

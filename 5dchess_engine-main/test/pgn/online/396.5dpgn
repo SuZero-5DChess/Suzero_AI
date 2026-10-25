@@ -1,0 +1,22 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.25"]
+[Round "346"]
+[White "Tones"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Two Timelines"]
+
+1.{20:10}(-0T1)Ng1f3 (+0T1)Ng1f3 / {20:10}(-0T1)Ng8h6 (+0T1)e7e6 
+2.{19:07}(-0T2)c2c3 (+0T2)d2d4 / {19:03}(+0T2)Ng8f6 (-0T2)c7c6 
+3.{18:32}(-0T3)Qd1b3 (+0T3)Bc1g5 / {18:39}(-0T3)e7e6 (+0T3)c7c6 
+4.{16:28}(-0T4)d2d4 (+0T4)Qd1d2 / {18:20}(-0T4)Qd8g5 (+0T4)h7h6 
+5.{15:27}(-0T5)Bc1g5 (+0T5)Bg5f6 / {17:53}(+0T5)Qd8f6 (-0T5)Bf8d6 
+6.{14:20}(+0T6)c2c3 (-0T6)Bg5h6 / {17:23}(-0T6)g7h6 (+0T6)b7b5 
+7.{13:28}(+0T7)g2g3 (-0T7)Nb1d2 / {16:26}(-0T7)Bd6>(+0T7)d5 
+8.{13:05}(-0T8)Nd2e4 (+0T8)Bf1g2 / {15:13}(+0T8)Qf6e7 (-0T8)Rh8g8 
+9.{12:41}(+0T9)Qd2f4 (-0T9)Nf3e5 / {14:52}(+0T9)Bd5>(-0T9)e5 
+10.{12:23}(-0T10)d4e5 (+0T10)Nf3e5 / {12:19}(-0T10)Rg8g6 (+0T10)b5b4 
+11.{12:06}(-0T11)Ne4d6 (+0T11)Qf4f7 / {12:19}(+0T11)Qe7f7 (-0T11)Ke8f8 
+12.{12:01}(-0T12)Nd6c8 (+0T12)Ne5f7 / {12:07}(+0T12)Ke8f7 (-0T12)c6c5 
+13.{11:24}(-0T13)Nc8>>(-0T12)e8

@@ -1,0 +1,49 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.15"]
+[Round "223"]
+[White "Gumby Gord"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1f4 / (0T4)Bc8g4 
+5.(0T5)e2e3 / (0T5)Nb8d7 
+6.(0T6)Nb1d2 / (0T6)Nf6h5 
+7.(0T7)Bf4e5 / (0T7)f7f6 
+8.(0T8)h2h3 / (0T8)f6e5 
+9.(0T9)h3g4 / (0T9)Nh5f4 
+10.(0T10)Nf3e5 / (0T10)Nd7e5 
+11.(0T11)d4e5 / (0T11)e7e6 
+12.(0T12)e3f4 / (0T12)g7g6 
+13.(0T13)Bf1d3 / (0T13)Bf8g7 
+14.(0T14)Qd1c2 / (0T14)Bg7e5 
+15.(0T15)f4e5 / (0T15)Qd8g5 
+16.(0T16)Bd3g6 / (0T16)h7g6 
+17.(0T17)Rh1h8 / (0T17)Ke8d7 
+18.(0T18)Rh8h7 / (0T18)Kd7e8 
+19.(0T19)Qc2>>(0T15)g6 / (1T15)Ke8d7 
+20.(1T16)Rh1h7 / (1T16)Qd8e7 
+21.(1T17)Rh7e7 / (1T17)Kd7e7 
+22.(1T18)f4e5 / (0T19)g6>(1T18)g6 
+23.(1T19)Bd3g6 / (1T19)Rh8h1 
+24.(1T20)Nd2f1 (0T20)Rh7h8 / (0T20)Ke8d7 (1T20)Ra8f8 
+25.(1T21)Bg6>(0T21)g5 / (0T21)Ra8h8 (1T21)c6c5 
+26.(0T22)Nd2f1 (1T22)Qc2g6 / (1T22)Rh1f1 (0T22)Rh8g8 
+27.(0T23)Bg5f6 (1T23)Ke1f1 / (0T23)Rg8>>(0T2)g8 
+28.(-1T3)c2c3 / (-1T3)e7e6 
+29.(-1T4)Bc1g5 / (-1T4)Bf8e7 
+30.(-1T5)Nb1d2 / (-1T5)Nf6g4 
+31.(-1T6)Bg5e7 / (-1T6)Qd8e7 
+32.(-1T7)g2g3 / (-1T7)Ng4f2 
+33.(-1T8)Ke1f2 / (-1T8)b7b6 
+34.(-1T9)Kf2e1 / (-1T9)Bc8b7 
+35.(-1T10)e2e3 / (-1T10)Qe7f6 
+36.(-1T11)Bf1b5 / (-1T11)c7c6 
+37.(-1T12)Bb5c4 / (-1T12)b6b5 
+38.(-1T13)Bc4d3 / (-1T13)h7h5 
+39.(-1T14)Rh1f1
+{recorded:white wins}

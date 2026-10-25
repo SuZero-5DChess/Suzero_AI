@@ -1,0 +1,28 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.30"]
+[Round "174"]
+[White "Mage"]
+[Black "Tones"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Blitz Tourney"]
+
+1.{15:34}(0T1)Ng1f3 / {15:42}(0T1)Ng8f6 
+2.{15:34}(0T2)d2d4 / {15:42}(0T2)e7e5 
+3.{15:34}(0T3)c2c3 / {15:42}(0T3)c7c6 
+4.{15:34}(0T4)Qd1b3 / {15:42}(0T4)Qd8a5 
+5.{15:34}(0T5)Qb3f7 / {15:42}(0T5)Ke8f7 
+6.{15:34}(0T6)Nf3>>(0T5)f5 / {15:42}(0T6)Qa5>>(0T1)f5 
+7.{15:34}(-1T2)c2c3 / {15:42}(-1T2)e7e6 
+8.{15:34}(-1T3)Qd1b3 / {15:42}(-1T3)Qf5>(1T5)f5 
+9.{15:34}(-1T4)Qb3b5 / {15:42}(-1T4)Ng8f6 
+10.{15:34}(-1T5)Nf3>>(0T5)f5 / {15:42}(2T5)d7d5 (-1T5)Nf6d5 
+11.{15:34}(-1T6)Qb5d7 (1T6)Qb3f7 (2T6)Qb3d5 / {15:42}(2T6)Qa5>>(-1T3)d5 
+12.{15:34}(-2T4)e2e3 / {15:42}(-2T4)Qd5f3 
+13.{15:34}(-2T5)g2f3 / {15:42}(-2T5)Qd8e7 
+14.{15:34}(-2T6)Qb3e6 (0T7)Ke1d2 (2T7)Ke1d2 / {15:42}(0T7)Nf6>>(0T5)f7 
+15.{15:34}(-3T6)Ke1d2 / {15:42}(1T6)Ke8f7 (-1T6)Bc8d7 (-2T6)Qe7e6 (-3T6)Nf6e4 
+16.{15:34}(1T7)Nf3e5 (-2T7)Bf1d3 (-3T7)Kd2e3 (-1T7)e2e3 / {15:42}(1T7)Kf7g8 (2T7)Nf6d5 (-1T7)Nd5e3 (-2T7)Qf5d3 (-3T7)Ne4c3 
+17.{15:34}(2T8)Nf5>>(2T7)f7 / {15:42}(2T8)f7>(3T7)f7 
+18.{15:34}(3T8)Qd5>>(1T6)f7

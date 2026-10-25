@@ -1,0 +1,720 @@
+#include <stdexcept>
+#include "action.h"
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdio>
+#include <iterator>
+#include <sstream>
+#include "state.h"
+#include "check_position.h"
+
+full_move::full_move(std::string str): from{0,0,0,0}, to{0,0,0,0}
+{
+    // LAN may include a piece letter after the first timeline coordinate.
+    const auto first_close = str.find(')');
+    if(first_close != std::string::npos && first_close + 1 < str.size()
+       && str[first_close + 1] >= 'A' && str[first_close + 1] <= 'Z')
+    {
+        str.erase(first_close + 1, 1);
+    }
+
+    // Normalize the optional timeline separator ("", ">", or ">>").
+    const auto second_open = str.find('(', first_close == std::string::npos ? 0 : first_close + 1);
+    if(second_open != std::string::npos)
+    {
+        auto separator_begin = second_open;
+        while(separator_begin > 0 && str[separator_begin - 1] == '>')
+        {
+            --separator_begin;
+        }
+        str.erase(separator_begin, second_open - separator_begin);
+    }
+
+    int l1 = 0, t1 = 0, x1 = 0, y1 = 0;
+    int l2 = 0, t2 = 0, x2 = 0, y2 = 0;
+    char from_x, from_y, to_x, to_y;
+    int consumed = -1;
+    const auto valid_square = [](char file, char rank) {
+        return file >= 'a' && file <= 'h' && rank >= '1' && rank <= '8';
+    };
+
+    const bool physical = std::sscanf(
+        str.c_str(), "(%dT%d)%c%c%c%c%n",
+        &l1, &t1, &from_x, &from_y, &to_x, &to_y, &consumed) == 6
+        && consumed == static_cast<int>(str.size())
+        && valid_square(from_x, from_y) && valid_square(to_x, to_y);
+
+    if(physical)
+    {
+        l2 = l1;
+        t2 = t1;
+        x1 = static_cast<int>(from_x - 'a');
+        y1 = static_cast<int>(from_y - '1');
+        x2 = static_cast<int>(to_x - 'a');
+        y2 = static_cast<int>(to_y - '1');
+    }
+    else
+    {
+        consumed = -1;
+        if(std::sscanf(
+               str.c_str(), "(%dT%d)%c%c(%dT%d)%c%c%n",
+               &l1, &t1, &from_x, &from_y, &l2, &t2, &to_x, &to_y,
+               &consumed) != 8
+           || consumed != static_cast<int>(str.size())
+           || !valid_square(from_x, from_y) || !valid_square(to_x, to_y))
+        {
+            throw std::runtime_error("Cannot match this move in any known pattern: " + str);
+        }
+        x1 = static_cast<int>(from_x - 'a');
+        y1 = static_cast<int>(from_y - '1');
+        x2 = static_cast<int>(to_x - 'a');
+        y2 = static_cast<int>(to_y - '1');
+    }
+
+    from = vec4(x1, y1, t1, l1);
+    to = vec4(x2, y2, t2, l2);
+}
+
+std::string full_move::to_string() const
+{
+    std::ostringstream os;
+    vec4 p = from, q = to;
+    vec4 d = q - p;
+    if(d.t() == 0 && d.l() == 0)
+    {
+        os << '(' << p.l() << 'T' << p.t() << ')' << (char)(p.x()+'a') << (char)(p.y()+'1') << (char)(q.x()+'a') << (char)(q.y()+'1');
+    }
+    else
+    {
+        os << '(' << p.l() << 'T' << p.t() << ')' << (char)(p.x()+'a') << (char)(p.y()+'1') << "(" << q.l() << 'T' << q.t() << ')' << (char)(q.x()+'a') << (char)(q.y()+'1');
+    }
+    return os.str();
+}
+
+vec4 full_move::new_position(const state &s) const
+{
+    const bool player = s.get_present().c();
+    const bool branching = from.tl() != to.tl()
+        && s.get_timeline_end(to.l()) != turn{to.t(), player};
+    return vec4(to.x(), to.y(), to.t() + 1,
+                branching ? s.new_line() : to.l());
+}
+
+piece_t full_move::moved_piece(const state &s) const
+{
+    return s.get_piece(from, s.get_present().c());
+}
+
+piece_t full_move::captured_piece(const state &s) const
+{
+    const bool player = s.get_present().c();
+    if (from.tl() == to.tl()) {
+        const board *source = s.get_board_ptr(from.l(), from.t(), player);
+        const bitboard_t origin = pmask(from.xy());
+        if ((source->king() & origin)
+            && std::abs(from.x() - to.x()) > 1)
+        {
+            return NO_PIECE;
+        }
+        const piece_t destination = source->get_piece(to.xy());
+        if ((source->lpawn() & origin)
+            && from.x() != to.x()
+            && destination == NO_PIECE)
+        {
+            return source->get_piece(ppos(to.x(), from.y()));
+        }
+        return destination;
+    }
+    return s.get_piece(to, player);
+}
+
+special_move_t full_move::move_type(const state &s) const
+{
+    special_move_t result = special_move_t::NONE;
+    const bool player = s.get_present().c();
+    const board *source = s.get_board_ptr(from.l(), from.t(), player);
+    const bitboard_t origin = pmask(from.xy());
+    const auto height = s.get_board_size().second;
+    const bool physical = from.tl() == to.tl();
+    if (!physical)
+    {
+        result |= special_move_t::SUPERPHYSICAL;
+        if (s.get_timeline_end(to.l()) != turn{to.t(), player})
+            result |= special_move_t::BRANCHING;
+    }
+    if (captured_piece(s) != NO_PIECE)
+    {
+        result |= special_move_t::CAPTURE;
+    }
+    if (physical && (source->lpawn() & origin))
+    {
+        if (from.x() != to.x() && source->get_piece(to.xy()) == NO_PIECE)
+            result |= special_move_t::EN_PASSANT;
+        else if (to.y() == 0 || to.y() == height - 1)
+            result |= special_move_t::PROMOTION;
+    }
+    else if (!physical && (source->lrawn() & origin)
+               && (to.y() == 0 || to.y() == height - 1))
+    {
+        result |= special_move_t::PROMOTION;
+    }
+    else if (physical && (source->king() & origin)
+               && std::abs(from.x() - to.x()) > 1)
+    {
+        result |= to.x() > from.x()
+            ? special_move_t::CASTLE_KINGSIDE
+            : special_move_t::CASTLE_QUEENSIDE;
+    }
+    return result;
+}
+
+std::string full_move::lan(const state &s, piece_t promote_to) const
+{
+    const bool player = s.get_present().c();
+    const piece_t pic = to_white(piece_name(s.get_piece(from, player)));
+    std::string result = to_string();
+    if(promote_to != NO_PIECE
+        && (pic == PAWN_W || pic == BRAWN_W)
+        && to.y() == (player ? 0 : (s.get_board_size().second - 1)))
+    {
+        result += static_cast<char>(promote_to);
+    }
+    return result;
+}
+
+bool full_move::operator<(const full_move &other) const noexcept
+{
+    return std::tie(from, to) < std::tie(other.from, other.to); 
+}
+
+bool full_move::operator==(const full_move &other) const noexcept
+{
+    return std::tie(from, to) == std::tie(other.from, other.to);
+}
+
+std::ostream &operator<<(std::ostream &os, const full_move &fm)
+{
+    os << fm.to_string();
+    return os;
+}
+
+/*********************************/
+
+ext_move::ext_move(full_move move, const state &s)
+    : fm(move), promote_to(NO_PIECE)
+{
+    const auto normalized = s.normalize_promotion(move);
+    if(!normalized)
+        throw std::invalid_argument("ext_move: cannot normalize promotion");
+    *this = *normalized;
+}
+
+ext_move::ext_move(std::string s)
+    : fm(s.empty() || s.back() < 'A' || s.back() > 'Z'
+             ? s : s.substr(0, s.size() - 1)),
+      promote_to(s.empty() || s.back() < 'A' || s.back() > 'Z'
+             ? NO_PIECE : static_cast<piece_t>(s.back()))
+{
+}
+
+std::string ext_move::to_string() const
+{
+    std::string result = fm.to_string();
+    if(promote_to != NO_PIECE)
+    {
+        result += static_cast<char>(promote_to);
+    }
+    return result;
+}
+
+std::string ext_move::lan(const state &s) const
+{
+    const auto normalized = s.normalize_promotion(fm, promote_to);
+    return normalized
+        ? fm.lan(s, normalized->promote_to)
+        : "---INVALID MOVE---";
+}
+
+/*********************************/
+
+int action::sort(std::vector<ext_move> &mvs, const state &s)
+{
+    size_t rbranching_index = 0;
+    const bool player = s.get_present().c();
+    std::set<int> moved_lines;
+    for(size_t i=0; i<mvs.size(); i++)
+    {
+        vec4 p = mvs[i].fm.from;
+        vec4 q = mvs[i].fm.to;
+        const turn tc1{q.t(), player};
+        auto tc2 = s.get_timeline_end(q.l());
+        bool branching =  tc1 < tc2 || (tc1 == tc2 && moved_lines.contains(q.l()));
+        moved_lines.insert(p.l());
+        if(branching)
+        {
+            std::swap(mvs[i], mvs[rbranching_index]);
+            rbranching_index++;
+        }
+        else
+        {
+            moved_lines.insert(q.l());
+        }
+    }
+    if(rbranching_index < mvs.size())
+    {
+        int sign = player ? -1 : 1;
+        std::sort(mvs.begin()+rbranching_index, mvs.end(), [sign](ext_move m1, ext_move m2){
+            return sign*m1.get_to().l() < sign*m2.get_to().l();
+        });
+        std::rotate(mvs.begin(), mvs.begin()+rbranching_index, mvs.end());
+    }
+    return static_cast<int>(mvs.size() - rbranching_index);
+}
+
+bool ext_move::operator<(const ext_move &other) const noexcept
+{
+    return std::tie(fm, promote_to) < std::tie(other.fm, other.promote_to);
+}
+
+bool action::operator<(const action &other) const noexcept
+{
+    return std::lexicographical_compare(
+        mvs.begin(), mvs.end(), other.mvs.begin(), other.mvs.end());
+}
+
+action action::from_vector(const std::vector<ext_move> &mvs, const state &s)
+{
+    action a{mvs};
+    a.branching_index = sort(a.mvs, s);
+    for(ext_move &move : a.mvs)
+    {
+        const auto normalized = s.normalize_promotion(move.fm, move.promote_to);
+        if(!normalized)
+        {
+            throw std::runtime_error(
+                "action::from_vector(): Invalid promotion piece");
+        }
+        move = *normalized;
+    }
+    return a;
+}
+
+action action::from_moveseq(const moveseq &mvs, const state &s)
+{
+    std::vector<ext_move> ext_mvs;
+    ext_mvs.reserve(mvs.size());
+    std::transform(mvs.begin(), mvs.end(), std::back_inserter(ext_mvs),
+                   [&s](const auto &fm) { return ext_move(fm, s); });
+    return action::from_vector(ext_mvs, s);
+}
+
+std::string action::to_string() const
+{
+    std::ostringstream os;
+    for(const auto &mv : mvs)
+    {
+        os << mv.to_string() << " ";
+    }
+    return os.str();
+}
+
+std::string action::lan(const state &initial_state) const
+{
+    state s = initial_state;
+    std::string result;
+    for(const auto &raw_move : mvs)
+    {
+        const auto normalized = s.normalize_promotion(raw_move.fm, raw_move.promote_to);
+        if(!normalized)
+        {
+            return "---INVALID ACTION---";
+        }
+        const ext_move &mv = *normalized;
+        result += mv.lan(s) + " ";
+        s.apply_move<true>(mv);
+    }
+    if(!result.empty())
+    {
+        result.pop_back();
+    }
+    return result;
+}
+
+std::ostream &operator<<(std::ostream &os, const action &act)
+{
+    os << act.to_string();
+    return os;
+}
+
+/*********************************/
+
+
+std::string full_move::pgn(const state &s, piece_t pt, pgn_options options) const
+{
+    options &= pgn_options::SHOW_ALL;
+    char check_symbol = 0;
+    if(static_cast<bool>(options & pgn_options::SHOW_MATE))
+    {
+        state after = s;
+        const ext_move prepared = pt == NO_PIECE
+            ? ext_move(*this, s) : ext_move(*this, pt);
+        const bool applied = after.apply_move<true>(prepared);
+        if (applied)
+        {
+            const bool moving_player = s.get_present().c();
+            const auto check_view = check_position::for_check_symbols(after);
+            if (check_view.first_check(moving_player)) check_symbol = '+';
+        }
+    }
+    return pgn_impl(s, pt, options, check_symbol, false);
+}
+
+std::string full_move::pgn_impl(const state &s, piece_t pt, pgn_options options,
+                                char check_symbol, bool multimove) const
+{
+    std::ostringstream oss;
+    vec4 p = from, q = to;
+    bool player = s.get_present().c();
+    piece_t pic = to_white(piece_name(s.get_piece(p, player)));
+    auto display_from_tl = [&](bool from_tl) -> std::string {
+        std::ostringstream oss;
+        if(from_tl)
+        {
+            oss << s.pretty_lt(p.tl());
+        }
+        else if (multimove)
+        {
+            oss << "(L" << s.pretty_l(p.l()) << ")";
+        }
+        else
+        {
+            auto [mandatory_timelines, optional_timelines, unplayable_timelines] = s.get_timeline_status();
+            auto it = std::find(mandatory_timelines.begin(), mandatory_timelines.end(), p.l());
+            /* if this timeline is the only mandatory timeline, omit it;
+            otherwise display it to avoid ambiguity */
+            if(mandatory_timelines.size() > 1 || it == mandatory_timelines.end())
+            {
+                oss << "(L" << s.pretty_l(p.l()) << ")";
+            }
+        }
+        return oss.str();
+    };
+
+    auto display_rest = [&](bool from_file, bool from_rank, bool to_tl) -> std::string {
+        std::ostringstream oss;
+        if(static_cast<bool>(options & pgn_options::SHOW_PAWN))
+        {
+            oss << pic;
+        }
+        else
+        {
+            if(pic != PAWN_W)
+            {
+                oss << pic;
+            }
+        }
+        if(from_file)
+        {
+            oss << static_cast<char>(p.x() + 'a');
+        }
+        else if(!static_cast<bool>(options & pgn_options::SHOW_PAWN))
+        {
+            if (pic==PAWN_W)
+            {
+                /* pawn captures include the file letter of the originating square
+                of the capturing pawn immediately prior to the "x" character. */
+                if(static_cast<bool>(options & pgn_options::SHOW_CAPTURE)
+                   && captured_piece(s) != NO_PIECE)
+                {
+                    oss << static_cast<char>(p.x() + 'a');
+                }
+                /* pawn jump should include the file letter */
+                else if ((p-q).tl()!=vec4(0,0,0,0))
+                {
+                    oss << static_cast<char>(p.x() + 'a');
+                }
+            }
+        }
+        if(from_rank)
+        {
+            oss << static_cast<char>(p.y() + '1');
+        }
+        if(p.tl() != q.tl())
+        {
+            //        std::cout << "p=" << p << "\t q=" << q << "\t";        // superphysical move
+            if(turn{q.t(), player} < s.get_timeline_end(q.l()))
+            {
+                oss << ">>";
+            }
+            else
+            {
+                oss << ">";
+            }
+            if(static_cast<bool>(options & pgn_options::SHOW_CAPTURE))
+            {
+                if(captured_piece(s) != NO_PIECE)
+                {
+                    oss << "x";
+                }
+            }
+            if(to_tl)
+            {
+                if(static_cast<bool>(options & pgn_options::SHOW_RELATIVE))
+                {
+                    vec4 d = q - p;
+                    auto show_diff = [&oss](int w){
+                        if(w>0)
+                            oss << "+" << w;
+                        else if(w<0)
+                            oss << "-" << (-w);
+                        else
+                            oss << "=";
+                    };
+                    oss << "$(L";
+                    show_diff(d.l());
+                    oss << "T";
+                    show_diff(d.t());
+                    oss << ")";
+                }
+                else
+                {
+                    oss << s.pretty_lt(q.tl());
+                }
+            }
+        }
+        else
+        {
+            //physical move
+            if(static_cast<bool>(options & pgn_options::SHOW_CAPTURE))
+            {
+                if(captured_piece(s) != NO_PIECE)
+                {
+                    oss << "x";
+                }
+            }
+        }
+        oss << static_cast<char>(q.x() + 'a') << static_cast<char>(q.y() + '1');
+        return oss.str();
+    };
+    if(static_cast<bool>(options & pgn_options::SHOW_SHORT))
+    {
+        bool success = false;
+        /* policy: try hide everything first, if not successful,
+            1. display source file; if fails again
+            2. display source rank; if fails
+            3. display source TL while hiding file and rank; if fails
+            4. display source and target TL; if fails
+            5. in addition, display file or rank
+            6. display everything (no need to check correctness anymore)
+         */
+        constexpr static auto attempts = std::array{
+            //        from: tl, file, rank; to: tl
+            std::tuple{false, false, false, false},
+            std::tuple{false, true,  false, false},
+            std::tuple{false, false, true,  false},
+            std::tuple{true,  false, false, false},
+            std::tuple{true,  false, false, true},
+            std::tuple{true,  true,  false, true},
+            std::tuple{true,  false, true,  true},
+        };
+        for(const auto &[from_tl, from_file, from_rank, to_tl] : attempts)
+        {
+            std::string tl_part = display_from_tl(from_tl);
+            std::string rest_part = display_rest(from_file, from_rank, to_tl);
+            std::string mv_str = tl_part + rest_part;
+            //check this move has no ambiguity
+            auto res = s.parse_move(mv_str);
+            auto mv_opt = std::get<0>(res);
+            if(mv_opt.has_value())
+            {
+                success = true;
+                /* extra work for castling in standard chessboard:
+                 Replace Ke1g1 and Ke8g8 with O-O
+                 Replace Ke1c1 and Ke8c8 with O-O-O */
+                if(pic == KING_W && std::abs(q.x() - p.x()) == 2
+                && (q.y() == 0 || q.y() == 7)
+                && q.y() == p.y() && q.tl() == p.tl() )
+                {
+                    if(q.x() == 6)
+                    {
+                        mv_str = tl_part + "O-O";
+                    }
+                    else if(q.x() == 2)
+                    {
+                        mv_str = tl_part + "O-O-O";
+                    }
+                }
+                oss << mv_str;
+                break;
+            }
+        }
+        if(!success)
+        {
+            oss << display_from_tl(true) << display_rest(true, true, true);
+        }
+    }
+    else
+    {
+        oss << display_from_tl(true) << display_rest(true, true, true);
+    }
+    if(static_cast<bool>(options & pgn_options::SHOW_PROMOTION))
+    {
+        if(pt != NO_PIECE && (pic == PAWN_W || pic == BRAWN_W)
+            && (q.y() == (player ? 0 : (s.get_board_size().second - 1))))
+        {
+            oss << "=" << pt;
+        }
+    }
+    if(static_cast<bool>(options & pgn_options::SHOW_MATE))
+    {
+        /* display all checks here */
+        /* if this is not a check, full_move::pgn/action::pgn will set the
+        check symbol to 0 */
+        if(check_symbol)
+        {
+            oss << check_symbol;
+        }
+    }
+    return oss.str();
+}
+
+std::string ext_move::pgn(const state &s, pgn_options options) const
+{
+    const auto normalized = s.normalize_promotion(fm, promote_to);
+    return normalized
+        ? fm.pgn(s, normalized->promote_to, options)
+        : "---INVALID MOVE---";
+}
+
+std::string action::pgn_impl(
+    const state &initial_state,
+    pgn_options options,
+    const std::vector<char> &check_symbols
+) const
+{
+    state s = initial_state;
+    std::string pgn;
+    bool multimove = mvs.size() > 1;
+    for(size_t i = 0; i < mvs.size(); i++)
+    {
+        const auto normalized = s.normalize_promotion(mvs[i].fm, mvs[i].promote_to);
+        if(!normalized)
+        {
+            return "---INVALID ACTION---";
+        }
+        auto [m, pt] = *normalized;
+        pgn += m.pgn_impl(s, pt, options, check_symbols[i], multimove) + " ";
+        s.apply_move<true>(*normalized);
+    }
+    if(!pgn.empty())
+    {
+        pgn.pop_back();
+    }
+    return pgn;
+}
+
+std::string action::pgn(const state &initial_state, pgn_options options) const
+{
+    return pgn_advanced(
+        initial_state,
+        options & ~pgn_options::SHOW_OUTCOME
+    ).first;
+}
+
+std::pair<std::string, std::optional<mate_type>> action::pgn_advanced(
+    const state &initial_state,
+    pgn_options options
+) const
+{
+    return pgn_advanced(initial_state, options, action{});
+}
+
+std::pair<std::string, std::optional<mate_type>> action::pgn_advanced(
+    const state &initial_state,
+    pgn_options options,
+    const action &witness
+) const
+{
+    options &= pgn_options::SHOW_ALL;
+    if(!static_cast<bool>(options & (pgn_options::SHOW_MATE | pgn_options::SHOW_OUTCOME)))
+    {
+        return {
+            pgn_impl(initial_state, options, std::vector<char>(mvs.size(), 0)),
+            std::nullopt
+        };
+    }
+
+    state final_state = initial_state;
+    std::vector<char> check_symbols(mvs.size(), 0);
+    if(static_cast<bool>(options & pgn_options::SHOW_MATE))
+    {
+        for(size_t i = 0; i < mvs.size(); ++i)
+        {
+            const auto &[move, promote_to] = mvs[i];
+            const bool moving_player = final_state.get_present().c();
+            const ext_move prepared = promote_to == NO_PIECE
+                ? ext_move(move, final_state) : ext_move(move, promote_to);
+            if(!final_state.apply_move<false>(prepared))
+            {
+                return {"---INVALID ACTION---", std::nullopt};
+            }
+            const auto check_view = check_position::for_check_symbols(final_state);
+            if(check_view.first_check(moving_player))
+            {
+                check_symbols[i] = '+';
+            }
+        }
+        if(!final_state.submit())
+        {
+            return {"---INVALID ACTION---", std::nullopt};
+        }
+    }
+    else
+    {
+        std::optional<state> submitted = initial_state.can_apply(*this);
+        if(!submitted.has_value())
+        {
+            return {"---INVALID ACTION---", std::nullopt};
+        }
+        final_state = std::move(*submitted);
+    }
+
+    mate_type mt;
+    if(witness.mvs.empty())
+    {
+        mt = final_state.get_mate_type();
+    }
+    else if(final_state.can_apply(witness).has_value())
+    {
+        std::vector<ext_move> witness_moves = witness.mvs;
+        const bool has_branching_jump = sort(witness_moves, final_state)
+            < static_cast<int>(witness_moves.size());
+        mt = has_branching_jump && final_state.get_mate_type(true) == mate_type::SOFTMATE
+            ? mate_type::SOFTMATE
+            : mate_type::NONE;
+    }
+    else
+    {
+        mt = final_state.get_mate_type();
+    }
+
+    char mate_symbol = 0;
+    switch(mt)
+    {
+        case mate_type::NONE: mate_symbol = '+'; break;
+        case mate_type::SOFTMATE: mate_symbol = '*'; break;
+        case mate_type::CHECKMATE: mate_symbol = '#'; break;
+        case mate_type::STALEMATE: break;
+    }
+    if(mate_symbol)
+    {
+        auto it = std::find(check_symbols.rbegin(), check_symbols.rend(), '+');
+        if(it != check_symbols.rend())
+        {
+            *it = mate_symbol;
+        }
+    }
+
+    return {pgn_impl(initial_state, options, check_symbols), mt};
+}

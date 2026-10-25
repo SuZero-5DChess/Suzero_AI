@@ -13,6 +13,8 @@
 #include <string>
 #include <utility>
 
+#include "internal_math.h"
+
 namespace suzero::mcts {
 
 namespace {
@@ -20,9 +22,7 @@ namespace {
 constexpr double kTotalChildWeightPuctOffset = 0.01;
 constexpr double kValueWeightingVarianceFloor = 1e-8;
 
-double normalCdf(double z) {
-  return 0.5 * std::erfc(-z / std::sqrt(2.0));
-}
+using internal::studentTCdf3;
 
 double elapsedSeconds(std::chrono::steady_clock::time_point start) {
   const auto now = std::chrono::steady_clock::now();
@@ -103,9 +103,15 @@ void PuctSearch::validateParams() const {
   }
   require(params_.rootPolicyTemperature > 0.0,
           "rootPolicyTemperature must be > 0");
+  require(params_.rootPolicyTemperatureEarly > 0.0,
+          "rootPolicyTemperatureEarly must be > 0");
 
   require(params_.chosenMoveTemperature >= 0.0,
           "chosenMoveTemperature must be >= 0");
+  require(params_.chosenMoveTemperatureEarly >= 0.0,
+          "chosenMoveTemperatureEarly must be >= 0");
+  require(params_.chosenMoveTemperatureHalflife > 0.0,
+          "chosenMoveTemperatureHalflife must be > 0");
   require(params_.chosenMoveTemperatureOnlyBelowProb > 0.0 &&
               params_.chosenMoveTemperatureOnlyBelowProb <= 1.0,
           "chosenMoveTemperatureOnlyBelowProb must be in (0, 1]");
@@ -123,12 +129,16 @@ void PuctSearch::resetRoot(std::shared_ptr<IGameState> rootState) {
   if (!rootState) {
     throw std::invalid_argument("PuctSearch::resetRoot: null state");
   }
-  if (rootState->actionCount() != action_count_) {
+  // actionCount() may be state-dependent. Every node builds its own priors
+  // from its own state, so only the new root needs to be valid here.
+  const int new_action_count = rootState->actionCount();
+  if (new_action_count <= 0) {
     throw std::invalid_argument(
-        "PuctSearch::resetRoot: actionCount changed between states");
+        "PuctSearch::resetRoot: actionCount() must be positive");
   }
   clearGraph();
   root_state_ = std::move(rootState);
+  action_count_ = new_action_count;
   root_ = std::make_unique<SearchNode>(root_state_->stateKey(),
                                        root_state_->currentPlayer());
   root_priors_.clear();
@@ -180,19 +190,24 @@ void PuctSearch::expandNode(SearchNode& node, const IGameState& state) {
 
 void PuctSearch::buildPriors(SearchNode& node, const IGameState& state,
                              const std::vector<float>& policy) {
-  if (static_cast<int>(policy.size()) != action_count_) {
+  // The action space may be state-dependent: each node's policy and priors use
+  // that node's own candidate list, which is stable for a given stateKey().
+  const int state_action_count = state.actionCount();
+  if (static_cast<int>(policy.size()) != state_action_count) {
     throw std::runtime_error(
         "PuctSearch: evaluator policy size " +
         std::to_string(policy.size()) + " does not match actionCount() " +
-        std::to_string(action_count_));
+        std::to_string(state_action_count));
   }
 
   node.priors_.clear();
   double sum = 0.0;
-  for (int action_index = 0; action_index < action_count_; ++action_index) {
+  for (int action_index = 0; action_index < state_action_count;
+       ++action_index) {
     const float probability = policy[action_index];
-    // NaN fails the > 0 test. Negative and zero entries are unavailable.
-    if (!(probability > 0.0f)) {
+    // KataGo treats negative policy entries as unavailable and keeps legal
+    // moves whose policy value is exactly zero. NaN also fails this test.
+    if (!(probability >= 0.0f)) {
       continue;
     }
     const ActionId action = static_cast<ActionId>(action_index);
@@ -213,7 +228,10 @@ void PuctSearch::buildPriors(SearchNode& node, const IGameState& state,
 }
 
 void PuctSearch::applyRootPolicyTemperature(std::vector<Prior>& priors) const {
-  const double temperature = params_.rootPolicyTemperature;
+  const double temperature =
+      interpolateEarly(params_.chosenMoveTemperatureHalflife,
+                       params_.rootPolicyTemperatureEarly,
+                       params_.rootPolicyTemperature);
   if (temperature == 1.0 || priors.empty()) {
     return;
   }
@@ -227,28 +245,21 @@ void PuctSearch::applyRootPolicyTemperature(std::vector<Prior>& priors) const {
     return;
   }
 
-  if (temperature <= 1e-4) {
-    // Zero-temperature limit: one-hot on the largest prior.
-    std::size_t best = 0;
-    for (std::size_t i = 1; i < priors.size(); ++i) {
-      if (priors[i].probability > priors[best].probability) {
-        best = i;
-      }
-    }
-    for (std::size_t i = 0; i < priors.size(); ++i) {
-      priors[i].probability = (i == best) ? 1.0f : 0.0f;
-    }
-    return;
-  }
-
+  // KataGo has no hard one-hot branch here: even at very small temperatures
+  // near-tied moves keep a share of the probability until exp() underflows.
   const double log_max = std::log(max_probability);
+  const double inverse_temperature = 1.0 / temperature;
   double sum = 0.0;
   for (Prior& prior : priors) {
-    const double log_p = std::log(static_cast<double>(prior.probability));
-    const double scaled =
-        std::exp((log_p - log_max) / temperature);
-    prior.probability = static_cast<float>(scaled);
-    sum += scaled;
+    const double probability = static_cast<double>(prior.probability);
+    if (probability > 0.0) {
+      const double scaled =
+          std::exp((std::log(probability) - log_max) * inverse_temperature);
+      prior.probability = static_cast<float>(scaled);
+      sum += scaled;
+    } else {
+      prior.probability = 0.0f;
+    }
   }
   if (sum > 0.0) {
     for (Prior& prior : priors) {
@@ -275,7 +286,9 @@ void PuctSearch::addRootDirichletNoise(std::vector<Prior>& priors) {
   std::vector<double> alphas(priors.size(), 0.0);
   double log_policy_sum = 0.0;
   for (std::size_t i = 0; i < priors.size(); ++i) {
-    const double p = std::max(0.01, static_cast<double>(priors[i].probability));
+    // KataGo caps probabilities above 1% at a common value, so that the noise
+    // is nearly uniform over plausible moves instead of tracking the policy.
+    const double p = std::min(0.01, static_cast<double>(priors[i].probability));
     alphas[i] = std::log(p + 1e-20);
     log_policy_sum += alphas[i];
   }
@@ -416,20 +429,11 @@ int PuctSearch::selectPrior(SearchNode& node, bool is_root) {
   double best_value = kIllegalSelectionValue;
   int best_prior_index = -1;
 
+  // Existing children come first, as in KataGo. Strict > keeps the first
+  // expanded child on exact ties.
   for (std::size_t i = 0; i < priors.size(); ++i) {
     const int edge_index = node.edge_index_by_prior_[i];
-    const double probability = static_cast<double>(priors[i].probability);
-
     if (edge_index < 0) {
-      if (probability <= 0.0) {
-        continue;
-      }
-      // Unvisited action: FPU value plus its exploration term.
-      const double value = fpu_value + explore_scaling * probability;
-      if (value > best_value) {
-        best_value = value;
-        best_prior_index = static_cast<int>(i);
-      }
       continue;
     }
 
@@ -447,10 +451,37 @@ int PuctSearch::selectPrior(SearchNode& node, bool is_root) {
     // PUCT exploration term. With edge-visit weighting, a freshly expanded
     // child has zero weight and receives the full FPU exploration bonus.
     const double value =
-        child_value + explore_scaling * probability / (1.0 + child_weight);
+        child_value + explore_scaling * priors[i].probability /
+                          (1.0 + child_weight);
     if (value > best_value) {
       best_value = value;
       best_prior_index = static_cast<int>(i);
+    }
+  }
+
+  // Then only the unexpanded move with the highest policy probability, which
+  // is exactly KataGo's bestNewMoveLoc. Zero-probability legal moves are
+  // candidates too (their exploration term is simply zero).
+  int best_new_index = -1;
+  double best_new_probability = -1.0;
+  for (std::size_t i = 0; i < priors.size(); ++i) {
+    if (node.edge_index_by_prior_[i] >= 0) {
+      continue;
+    }
+    const double probability = static_cast<double>(priors[i].probability);
+    if (!(probability >= 0.0)) {
+      continue;
+    }
+    if (probability > best_new_probability) {
+      best_new_probability = probability;
+      best_new_index = static_cast<int>(i);
+    }
+  }
+  if (best_new_index >= 0) {
+    const double value = fpu_value + explore_scaling * best_new_probability;
+    if (value > best_value) {
+      best_value = value;
+      best_prior_index = best_new_index;
     }
   }
 
@@ -588,6 +619,7 @@ void PuctSearch::recomputeNodeStats(SearchNode& node, bool is_root) {
     double weight = 0.0;
     double original_weight = 0.0;
     double utility = 0.0;
+    double utility_sq = 0.0;
     std::int64_t visits = 0;
   };
 
@@ -606,8 +638,9 @@ void PuctSearch::recomputeNodeStats(SearchNode& node, bool is_root) {
         (edge.child->player() == node.player())
             ? child_stats.utilityAvg()
             : -child_stats.utilityAvg();
-    children.push_back(
-        ChildValueInternal{weight, weight, utility, child_stats.visits()});
+    children.push_back(ChildValueInternal{weight, weight, utility,
+                                          child_stats.utilitySqAvg(),
+                                          child_stats.visits()});
     original_total_weight += weight;
   }
 
@@ -660,17 +693,22 @@ void PuctSearch::recomputeNodeStats(SearchNode& node, bool is_root) {
         const double stdev =
             std::sqrt(kValueWeightingVarianceFloor + 1.0 / precision);
         const double p =
-            normalCdf((child.utility - simple_value) / stdev) + 0.0001;
+            studentTCdf3((child.utility - simple_value) / stdev) + 0.0001;
         child.weight *= std::pow(p, params_.valueWeightExponent);
         unnormalized_total += child.weight;
       }
-      if (unnormalized_total > 0.0) {
-        const double factor = total_child_weight / unnormalized_total;
+      total_child_weight = unnormalized_total;
+    }
+
+    // KataGo always normalizes the surviving children back to the total
+    // weight they had before subtract/prune, so pruning changes only the
+    // relative distribution, not the node's absolute weight.
+    if (total_child_weight > 0.0) {
+      const double factor = original_total_weight / total_child_weight;
+      if (factor != 1.0) {
         for (ChildValueInternal& child : children) {
           child.weight *= factor;
         }
-      } else {
-        total_child_weight = 0.0;
       }
     }
   } else {
@@ -689,7 +727,9 @@ void PuctSearch::recomputeNodeStats(SearchNode& node, bool is_root) {
       continue;
     }
     utility_sum += child.weight * child.utility;
-    utility_sq_sum += child.weight * child.utility * child.utility;
+    // Use the child's second moment rather than the square of its mean: the
+    // former also carries the child's internal variance, as in KataGo.
+    utility_sq_sum += child.weight * child.utility_sq;
     weight_sum += child.weight;
   }
 
@@ -734,12 +774,31 @@ std::unique_ptr<SearchNode> PuctSearch::copySubtree(
 
   copy_node(subtree_root);
 
-  // The promoted node stays in the table under its own key, exactly as in
-  // KataGo, where the old child remains a table node after being promoted.
-  // This matters for cycles: a descendant's back-edge resolves to this table
-  // copy, never to the new root.
+  // The promoted node's table copy is kept only if some copied edge still
+  // points back to it (a cycle). KataGo sweeps the new root's reachable set
+  // and deletes unreachable nodes, which removes the old promoted copy when
+  // there is no such back-edge. Keeping it unconditionally would leave a
+  // stale node with the new root's key in the table, visible to transposition
+  // lookups even though the new root itself is never in the table.
+  SearchNode* promoted_copy = owned.at(&subtree_root).get();
+  bool promoted_is_referenced = false;
+  for (const auto& entry : owned) {
+    for (const SearchNode::Edge& edge : entry.second->edges_) {
+      if (edge.child == promoted_copy) {
+        promoted_is_referenced = true;
+        break;
+      }
+    }
+    if (promoted_is_referenced) {
+      break;
+    }
+  }
+
   table.reserve(owned.size());
   for (auto& entry : owned) {
+    if (entry.second.get() == promoted_copy && !promoted_is_referenced) {
+      continue;
+    }
     StateKey key = entry.second->state_key_;
     table.emplace(std::move(key), std::move(entry.second));
   }
@@ -794,6 +853,7 @@ bool PuctSearch::advanceRoot(ActionId action) {
     root_state_ = std::move(new_state);
     root_ = std::move(new_root);
     node_table_ = std::move(new_table);
+    action_count_ = root_state_->actionCount();
     root_priors_.clear();
     root_prepared_ = false;
     return true;
@@ -811,7 +871,9 @@ bool PuctSearch::limitsReached(
       root_->stats().visits() >= params_.maxVisits) {
     return true;
   }
-  if (params_.maxTimeSeconds > 0.0 &&
+  // KataGo only lets the wall-clock limit stop the search after at least two
+  // playouts, so that a tiny limit still produces a usable root.
+  if (params_.maxTimeSeconds > 0.0 && playouts >= 2 &&
       elapsedSeconds(start) >= params_.maxTimeSeconds) {
     return true;
   }
@@ -861,6 +923,23 @@ SearchResult PuctSearch::runImpl(
   return buildResult(playouts, completed);
 }
 
+void PuctSearch::setRootNoise(bool enabled, double totalConcentration,
+                              double weight) {
+  if (!(weight >= 0.0 && weight <= 1.0)) {
+    throw std::invalid_argument(
+        "PuctSearch: rootDirichletNoiseWeight must be in [0, 1]");
+  }
+  if (enabled &&
+      !(totalConcentration > 0.0 && std::isfinite(totalConcentration))) {
+    throw std::invalid_argument(
+        "PuctSearch: rootDirichletNoiseTotalConcentration must be finite and "
+        "> 0 when noise is enabled");
+  }
+  params_.rootNoiseEnabled = enabled;
+  params_.rootDirichletNoiseTotalConcentration = totalConcentration;
+  params_.rootDirichletNoiseWeight = weight;
+}
+
 SearchResult PuctSearch::run() {
   return runImpl(nullptr, nullptr);
 }
@@ -886,9 +965,6 @@ SearchResult PuctSearch::buildResult(std::int64_t playouts,
       root_prepared_ ? root_priors_ : root_->priors();
 
   std::int64_t total_visits = 0;
-  ActionId best_action = kInvalidAction;
-  std::int64_t best_visits = -1;
-  float best_prior = -1.0f;
 
   for (std::size_t i = 0; i < priors.size(); ++i) {
     ActionStats stats;
@@ -922,13 +998,6 @@ SearchResult PuctSearch::buildResult(std::int64_t playouts,
     stats.visits = edge_visits;
     total_visits += edge_visits;
     result.actions.push_back(stats);
-
-    if (stats.visits > best_visits ||
-        (stats.visits == best_visits && stats.prior > best_prior)) {
-      best_visits = stats.visits;
-      best_prior = stats.prior;
-      best_action = stats.action;
-    }
   }
 
   if (total_visits > 0) {
@@ -939,7 +1008,21 @@ SearchResult PuctSearch::buildResult(std::int64_t playouts,
     }
   }
 
-  result.bestAction = best_action;
+  // Mirror getChosenMoveLoc: pick the action with the largest final
+  // play-selection weight, not the largest raw visit count.
+  std::vector<ActionId> best_actions;
+  std::vector<double> best_values;
+  if (computeRootPlaySelectionValues(best_actions, best_values) &&
+      !best_values.empty()) {
+    std::size_t best_index = 0;
+    for (std::size_t i = 1; i < best_values.size(); ++i) {
+      if (best_values[i] > best_values[best_index]) {
+        best_index = i;
+      }
+    }
+    result.bestAction = best_actions[best_index];
+  }
+
   return result;
 }
 
@@ -962,6 +1045,185 @@ std::vector<double> SearchResult::denseVisitDistribution(
     }
   }
   return distribution;
+}
+
+double PuctSearch::interpolateEarly(double halflife, double early_value,
+                                    double value) const {
+  if (!(halflife > 0.0)) {
+    return value;
+  }
+  const double halflives =
+      static_cast<double>(root_state_->moveCount()) / halflife;
+  return value + (early_value - value) * std::pow(0.5, halflives);
+}
+
+bool PuctSearch::computeRootPlaySelectionValues(
+    std::vector<ActionId>& actions, std::vector<double>& values) const {
+  actions.clear();
+  values.clear();
+
+  struct Candidate {
+    ActionId action = kInvalidAction;
+    double prior = 0.0;
+    const SearchNode::Edge* edge = nullptr;
+    double weight = 0.0;
+  };
+
+  std::vector<Candidate> candidates;
+  candidates.reserve(root_priors_.size());
+
+  double total_child_weight = 0.0;
+  for (std::size_t i = 0; i < root_priors_.size(); ++i) {
+    const int edge_index = root_->edge_index_by_prior_[i];
+    if (edge_index < 0) {
+      continue;
+    }
+    const SearchNode::Edge& edge = root_->edges_[edge_index];
+    const double weight = edge.child->stats().childWeight(edge.visits);
+    candidates.push_back(Candidate{root_priors_[i].action,
+                                   static_cast<double>(root_priors_[i].probability),
+                                   &edge, weight});
+    total_child_weight += weight;
+  }
+
+  // No expanded child: use the (noised) root policy directly, as KataGo's
+  // allowDirectPolicyMoves fallback does.
+  if (candidates.empty()) {
+    for (const Prior& prior : root_priors_) {
+      actions.push_back(prior.action);
+      values.push_back(static_cast<double>(prior.probability));
+    }
+    if (actions.empty()) {
+      return false;
+    }
+    double direct_max = 0.0;
+    for (double value : values) {
+      direct_max = std::max(direct_max, value);
+    }
+    if (direct_max <= 1e-50) {
+      actions.clear();
+      values.clear();
+      return false;
+    }
+    const double direct_subtract =
+        std::min(params_.chosenMoveSubtract, direct_max / 64.0);
+    const double direct_prune =
+        std::min(params_.chosenMovePrune, direct_max / 64.0);
+    for (double& value : values) {
+      if (value < direct_prune) {
+        value = 0.0;
+      } else {
+        value = std::max(0.0, value - direct_subtract);
+      }
+    }
+    return true;
+  }
+
+  // Choose the most stably explored child, with a small policy tie-breaker.
+  std::size_t best_index = 0;
+  double best_goodness = -1e30;
+  for (std::size_t i = 0; i < candidates.size(); ++i) {
+    const Candidate& candidate = candidates[i];
+    const double edge_visits = static_cast<double>(candidate.edge->visits);
+    const double goodness =
+        candidate.weight * std::max(0.0, edge_visits - 1.0) /
+            std::max(1.0, edge_visits) +
+        2.0 * candidate.prior;
+    if (goodness > best_goodness) {
+      best_goodness = goodness;
+      best_index = i;
+    }
+  }
+
+  // The FPU value itself is not needed here (the best child has weight), but
+  // computing it gives the same utility-stdev factor that search uses.
+  double utility_stdev_factor = 1.0;
+  const double fpu_value =
+      computeFpuValue(*root_, true, 1.0, utility_stdev_factor);
+  const double explore_scaling =
+      computeExploreScaling(total_child_weight, utility_stdev_factor);
+
+  const Candidate& best = candidates[best_index];
+  const NodeStats& best_stats = best.edge->child->stats();
+  double best_child_value = fpu_value;
+  if (best_stats.visits() > 0 && best.weight > 0.0) {
+    const double utility = best_stats.utilityAvg();
+    best_child_value = (best.edge->child->player() == root_->player())
+                           ? utility
+                           : -utility;
+  }
+  const double best_selection_value =
+      best_child_value + explore_scaling * best.prior / (1.0 + best.weight);
+
+  actions.reserve(candidates.size());
+  values.reserve(candidates.size());
+  for (std::size_t i = 0; i < candidates.size(); ++i) {
+    const Candidate& candidate = candidates[i];
+    actions.push_back(candidate.action);
+
+    // The best child keeps its full weight; every other child is reduced to
+    // the weight whose PUCT value would have tied the best child. This is
+    // KataGo's retrospective downweighting and is independent of LCB.
+    if (i == best_index) {
+      values.push_back(candidate.weight);
+      continue;
+    }
+
+    const NodeStats& child_stats = candidate.edge->child->stats();
+    double reduced = 0.0;
+    if (child_stats.visits() > 0 && candidate.weight > 0.0) {
+      const double utility = child_stats.utilityAvg();
+      const double child_value =
+          (candidate.edge->child->player() == root_->player()) ? utility
+                                                               : -utility;
+      const double explore_component = best_selection_value - child_value;
+      double wanted_weight = 1e100;
+      if (explore_component > 0.0) {
+        wanted_weight =
+            explore_scaling * candidate.prior / explore_component - 1.0;
+      }
+      if (wanted_weight < 0.0) {
+        wanted_weight = 0.0;
+      }
+      reduced = std::min(candidate.weight, wanted_weight);
+    }
+    values.push_back(std::ceil(reduced));
+  }
+
+  double max_value = 0.0;
+  for (double value : values) {
+    max_value = std::max(max_value, value);
+  }
+  if (max_value <= 1e-50) {
+    // Every child is weightless: fall back to the root policy.
+    for (std::size_t i = 0; i < candidates.size(); ++i) {
+      values[i] = std::max(0.0, candidates[i].prior);
+    }
+    max_value = 0.0;
+    for (double value : values) {
+      max_value = std::max(max_value, value);
+    }
+    if (max_value <= 1e-50) {
+      actions.clear();
+      values.clear();
+      return false;
+    }
+  }
+
+  // KataGo's chosenMoveSubtract / chosenMovePrune, capped relative to the
+  // largest value.
+  const double amount_to_subtract =
+      std::min(params_.chosenMoveSubtract, max_value / 64.0);
+  const double amount_to_prune =
+      std::min(params_.chosenMovePrune, max_value / 64.0);
+  for (double& value : values) {
+    if (value < amount_to_prune) {
+      value = 0.0;
+    } else {
+      value = std::max(0.0, value - amount_to_subtract);
+    }
+  }
+  return true;
 }
 
 ActionId PuctSearch::sampleWithTemperature(
@@ -1035,62 +1297,20 @@ ActionId PuctSearch::chooseAction(double temperature) {
 ActionId PuctSearch::chooseAction(double temperature, double onlyBelowProb) {
   ensureRootPrepared();
 
-  // Prefer expanded children, weighted by KataGo's child weight.
   std::vector<ActionId> actions;
   std::vector<double> values;
-  double max_value = 0.0;
-
-  for (std::size_t i = 0; i < root_priors_.size(); ++i) {
-    const int edge_index = root_->edge_index_by_prior_[i];
-    if (edge_index < 0) {
-      continue;
-    }
-    if (root_priors_[i].probability <= 0.0f) {
-      continue;
-    }
-    const SearchNode::Edge& edge = root_->edges_[edge_index];
-    const double weight = edge.child->stats().childWeight(edge.visits);
-    actions.push_back(root_priors_[i].action);
-    values.push_back(weight);
-    max_value = std::max(max_value, weight);
-  }
-
-  // No expanded child: fall back to the root prior (KataGo's direct policy
-  // fallback for an under-searched root).
-  if (actions.empty()) {
-    for (const Prior& prior : root_priors_) {
-      if (prior.probability <= 0.0f) {
-        continue;
-      }
-      actions.push_back(prior.action);
-      values.push_back(prior.probability);
-      max_value = std::max(max_value, static_cast<double>(prior.probability));
-    }
-  }
-
-  if (actions.empty()) {
+  if (!computeRootPlaySelectionValues(actions, values)) {
     return kInvalidAction;
   }
-
-  // KataGo's chosenMoveSubtract / chosenMovePrune, capped relative to the
-  // largest weight.
-  const double amount_to_subtract =
-      std::min(params_.chosenMoveSubtract, max_value / 64.0);
-  const double amount_to_prune =
-      std::min(params_.chosenMovePrune, max_value / 64.0);
-  for (double& value : values) {
-    if (value < amount_to_prune) {
-      value = 0.0;
-    } else {
-      value = std::max(0.0, value - amount_to_subtract);
-    }
-  }
-
   return sampleWithTemperature(actions, values, temperature, onlyBelowProb);
 }
 
 ActionId PuctSearch::chooseAction() {
-  return chooseAction(params_.chosenMoveTemperature);
+  const double temperature =
+      interpolateEarly(params_.chosenMoveTemperatureHalflife,
+                       params_.chosenMoveTemperatureEarly,
+                       params_.chosenMoveTemperature);
+  return chooseAction(temperature);
 }
 
 }  // namespace suzero::mcts

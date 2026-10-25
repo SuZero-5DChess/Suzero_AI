@@ -19,9 +19,15 @@ namespace suzero::mcts {
 /// actions, asks for the current player, and reads terminal utilities.
 ///
 /// Contract:
-///  * `actionCount()` is constant for every state of a given game instance.
-///    It is the policy-vector size returned by IEvaluator.
-///  * Action ids are dense in [0, actionCount()).
+///  * `actionCount()` is the number of candidate actions in *this* state and is
+///    the policy-vector size returned by IEvaluator. Games with a fixed action
+///    space return the same value everywhere; games whose legal moves are
+///    generated per position (for example 5D chess) return a state-dependent
+///    count. It must be a deterministic function of the state, and two states
+///    with equal `stateKey()` must return the same count and enumerate the same
+///    actions in the same order.
+///  * Action ids are dense in [0, actionCount()). They are local to a state:
+///    the same integer may name different actions in different states.
 ///  * `applyAction(a)` must only be called with a legal action. It mutates
 ///    *this* and returns nothing; call `clone()` first if the caller needs to
 ///    branch.
@@ -33,8 +39,9 @@ namespace suzero::mcts {
 ///    parameters (`utilityRadius`, FPU reductions) are expressed on that scale.
 ///  * `stateKey()` identifies a state for transposition merging. Equal keys
 ///    mean the two states are indistinguishable to the search: same player to
-///    move, same legal actions, same evaluator output, same terminal status and
-///    the same terminal utility. The key must therefore include every part of
+///    move, same action count and action order, same legal actions, same
+///    evaluator output, same terminal status and the same terminal utility.
+///    The key must therefore include every part of
 ///    the state that affects those things. If the game has repetition rules
 ///    (superko, draw by repetition, move counters), the history context that
 ///    those rules depend on must be folded into the key; otherwise the search
@@ -51,7 +58,7 @@ class IGameState {
   /// Deep copy. The search engine clones the root once per playout.
   virtual std::unique_ptr<IGameState> clone() const = 0;
 
-  /// Size of the policy vector, constant for the game.
+  /// Size of the policy vector in this state (see the contract above).
   virtual int actionCount() const = 0;
 
   /// Whether `action` is legal in this state.
@@ -75,6 +82,13 @@ class IGameState {
   /// search keeps at most one node per key and reuses it when the same state is
   /// reached through different move orders. See the contract above.
   virtual StateKey stateKey() const = 0;
+
+  /// Number of moves played from the start of the game.
+  ///
+  /// Used only for the optional early-temperature interpolation
+  /// (`rootPolicyTemperatureEarly`, `chosenMoveTemperatureEarly`). Games that
+  /// do not care about opening-temperature schedules can keep the default 0.
+  virtual int moveCount() const { return 0; }
 };
 
 }  // namespace suzero::mcts

@@ -1,0 +1,47 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.17"]
+[Round "3"]
+[White "Los Bro SPQR"]
+[Black "Dreamer"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1. Nf3 / Nf6 
+2. d4 / c5 
+3. c3 / Qb6 
+4. e3 / Nc6 
+5. d5 / Nb4 
+6. d6 / e6 
+7. Nbd2 / Nbd5 
+8. Nc4 / Qd8 
+9. a4 / Rb8 
+10. Bd3 / a6 
+11. a5 / b5 
+12. axb6 / Rxb6 
+13. e4 / Rxd6 
+14. Qe2 / Nc7 
+15. Nxd6 / Bxd6 
+16. e5 / Be7 
+17. exf6 / Bxf6 
+18. O-O / h6 
+19. Bf4 / Nd5 
+20. Bg3 / g5 
+21. Bxa6 / Bg7 
+22. Qxe6 / fxe6 
+23. Bd3 / O-O 
+24. Ne5 / Ne7 
+25. Ra8 / Rf5 
+26. Rxc8 / Qxc8 
+27. Bxf5 / exf5 
+28. (0T28)Ne5>>x(0T27)e7~ (>L1) / (1T27)Kh8 
+29. (1T28)N5g6 / (0T28)Bg7>x(1T28)g6 
+30. (0T29)Be5 (1T29)Nxg6 / (0T29)Kh7 (1T29)Kh7 
+31. (0T30)Bf6 (1T30)Bxf5 / (0T30)Qf8 (1T30)exf5 
+32. (0T31)Bf6>x(1T31)f5 / (0T31)Qf6 (1T31)Kh7>>(0T31)h8~ (>L-1) 
+33. (-1T32)Re1 (1T32)Bf5>x(0T32)f6 / (-1T32)Ng6 (1T32)Qe8 (0T32)Ng6 
+34. (-1T33)g3 (0T33)Re1 (1T33)Bd6 / (-1T33)Qd8 (1T33)Bg7>(0T33)f7 
+35. (-1T34)b4 (0T34)Re7 (1T34)Bf8 / (-1T34)Qf8 (0T34)Nxe7 (1T34)Qxf8 
+36. (1T35)Ng6>>x(1T33)g7~ (>L2) / (1T35)Qf8>>(1T31)f4~ (>L-2) 
+37. (-2T32)Nf8
+{original data: black wins; verification: white wins}

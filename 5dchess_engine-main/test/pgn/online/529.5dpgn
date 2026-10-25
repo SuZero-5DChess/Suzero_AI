@@ -1,0 +1,40 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.24"]
+[Round "485"]
+[White "qqqqkkk"]
+[Black "MaSK78"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1f4 / (0T4)Bc8g4 
+5.(0T5)e2e3 / (0T5)e7e6 
+6.(0T6)Nb1d2 / (0T6)Bf8d6 
+7.(0T7)Bf4g3 / (0T7)Bd6g3 
+8.(0T8)h2g3 / (0T8)Nf6e4 
+9.(0T9)Bf1d3 / (0T9)Ne4f6 
+10.(0T10)Nd2b3 / (0T10)Nb8d7 
+11.(0T11)Rh1h4 / (0T11)Qd8c7 
+12.(0T12)Qd1c2 / (0T12)Nd7f8 
+13.(0T13)Nb3c5 / (0T13)Qc7b8 
+14.(0T14)Nc5>>(0T13)c7 / (0T14)Qb8>(1T13)c7 
+15.(1T14)Ke1c1 / (1T14)Bg4f3 
+16.(1T15)g2f3 (0T15)Ke1c1 / (1T15)Qc7>(0T15)c7 
+17.(1T16)Nb3c5 (0T16)Rh4g4 / (0T16)Qc7>>(0T12)g3 
+18.(-1T13)Ke1c1 / (-1T13)Bg4f3 
+19.(-1T14)f2g3 / (-1T14)Qc7g3 
+20.(-1T15)g2f3 / (-1T15)Qg3f3 
+21.(-1T16)Qc2e2 / (-1T16)Qf3>>(-1T14)d1 
+22.(-2T15)Qc2d1 / (-2T15)Bf3d1 
+23.(-1T17)Qe2>(-2T16)d1 / (-2T16)Qc7>(-1T17)d6 (1T16)Nf8d7 
+24.(1T17)Nc5d7 (0T17)Rg4g7 (-1T18)Rh4h3 (-2T17)Qd1f3 / (1T17)Nf6d7 (0T17)Nf6h5 (-2T17)Ke8c8 
+25.(0T18)Qc2b3 (-2T18)Rh4h1 (1T18)Rh4h7 / (1T18)Rh8f8 (0T18)Nh5>(-1T18)h3 (-2T18)g7g6 
+26.(0T19)Rg7f7 (1T19)Qc2>(-1T19)e2 (-2T19)Nb3a5 / (-2T19)Nf6>(0T19)f7 (1T19)Rf8g8 (-1T19)Nh3g5 
+27.(-2T20)Na5b7 (0T20)Qb3b7 (1T20)Rh7g7 (-1T20)Nb3c5 / (1T20)Nd7>(0T20)b7 (-1T20)Nd7>(-2T20)b7 
+28.(1T21)Rg7g8 (0T21)Nf3e5 (-2T21)Bd3a6 (-1T21)Bd3c2 / (1T21)Ke8d7 (-1T21)Ng5>(0T21)e5 (-2T21)Rh8f8 
+29.(-2T22)Ba6b7 (0T22)d4e5 (-1T22)Qe2>(1T22)g4 / (-2T22)Kc8b7 (1T22)Ra8g8 (0T22)Rh8g8 (-1T22)Qd6h2 
+30.(-2T23)Rh1d1 (-1T23)Nc5b7 (1T23)Qg4h5 (0T23)Bd3c2 / (-2T23)Nd7b6 (0T23)Nf8>(1T23)d8 (-1T23)Qh2h6 
+31.(-2T24)Qf3f7 (0T24)Bc2h7 (1T24)Bd3h7 (-1T24)Bc2b3

@@ -1,0 +1,35 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.04.13"]
+[Round "649"]
+[White "cirtus"]
+[Black "Public Match"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1f3 / (0T2)e7e6 
+3.(0T3)c2c3 / (0T3)c7c5 
+4.(0T4)Qd1a4 / (0T4)Nb8c6 
+5.(0T5)Qa4h4 / (0T5)Nc6e7 
+6.(0T6)d2d4 / (0T6)Ne7f5 
+7.(0T7)Qh4h3 / (0T7)c5d4 
+8.(0T8)Bf1d3 / (0T8)d4e3 
+9.(0T9)f2e3 / (0T9)g7g6 
+10.(0T10)Ke1g1 / (0T10)Qd8b6 
+11.(0T11)Bd3f5 / (0T11)g6f5 
+12.(0T12)Qh3h4 / (0T12)Bf8e7 
+13.(0T13)Nb1a3 / (0T13)Rh8g8 
+14.(0T14)g2g3 / (0T14)Qb6c7 
+15.(0T15)Na3b5 / (0T15)Qc7b8 
+16.(0T16)Qh4f4 / (0T16)Qb8f4 
+17.(0T17)e3f4 / (0T17)Rg8g3 
+18.(0T18)h2g3 / (0T18)Nf6g4 
+19.(0T19)Kg1h1 / (0T19)b7b6 
+20.(0T20)Nb5c7 / (0T20)Ke8d8 
+21.(0T21)Nc7a8 / (0T21)Be7f8 
+22.(0T22)Nf3h4 / (0T22)Bc8b7 
+23.(0T23)Rf1f3 / (0T23)Bb7f3 
+24.(0T24)Nh4f3 / (0T24)Ng4f2 
+25.(0T25)Kh1g1 / (0T25)Nf2h3
+{recorded:black wins}

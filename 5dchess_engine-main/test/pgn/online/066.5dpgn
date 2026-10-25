@@ -1,0 +1,17 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.15"]
+[Round "10"]
+[White "Sapphia"]
+[Black "Tones"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1. Nf3 / Nf6
+2. e3 / c6
+3. Ne5 / Qb6
+4. Bc4 / (0T4)Qb6>>x(0T0)f2~ (>L-1)
+5. (-1T1)Kxf2 / (-1T1)Nh6
+6. (-1T2)Nf3 / (-1T2)Ng4
+7. (0T5)Bc4>>(0T2)f4~ (>L1) / (1T2)e6
+8. (-1T3)Ke1 (1T3)e3 / (-1T3)Ng4>>(-1T1)f4~ (>L-2)

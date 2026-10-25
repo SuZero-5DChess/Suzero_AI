@@ -1,0 +1,29 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.04"]
+[Round "207"]
+[White "Dreamer"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1f4 / (0T4)Bc8f5 
+5.(0T5)e2e3 / (0T5)Nb8d7 
+6.(0T6)Bf1d3 / (0T6)Nf6e4 
+7.(0T7)Qd1c2 / (0T7)Nd7e5 
+8.(0T8)Bf4e5 / (0T8)e7e6 
+9.(0T9)h2h3 / (0T9)Bf5g6 
+10.(0T10)Rh1f1 / (0T10)Rh8g8 
+11.(0T11)Nb1d2 / (0T11)Ne4g5 
+12.(0T12)Bd3g6 / (0T12)h7g6 
+13.(0T13)Be5f4 / (0T13)Ng5f3 
+14.(0T14)Nd2f3 / (0T14)Bf8e7 
+15.(0T15)Nf3e5 / (0T15)f7f5 
+16.(0T16)Ne5g6 / (0T16)Be7g5 
+17.(0T17)Ng6>>(0T16)g8 / (0T17)Bg5>>(0T14)g2 
+18.(-1T15)Nf3g5 / (-1T15)Bg2f1 
+19.(-1T16)Ke1f1 / (-1T16)Qd8>>(-1T15)c7 
+20.(-2T16)Ke1e2

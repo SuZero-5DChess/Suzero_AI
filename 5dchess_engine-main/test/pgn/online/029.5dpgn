@@ -1,0 +1,22 @@
+[Event "Online Game Database"]
+[Site "games.toml"]
+[Round "30"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3/(0T1)Ng8f6
+2.(0T2)b2b4/(0T2)e7e6
+3.(0T3)Bc1b2/(0T3)g7g6
+4.(0T4)Qd1f3/(0T4)Nf6h5
+5.(0T5)Qf3xf7+/(0T5)Ke8xf7
+6.(0T6)Bb2g7+/(0T6)Kf7xg7
+7.(0T7)f2f4/(0T7)c7c6
+8.(0T8)g2g3/(0T8)Qd8b6
+9.(0T9)Bf1>>x(0T4)f6/(1T4)Nb8c6
+10.(1T5)Qd1f3+/(1T5)Qd8xf6
+11.(1T6)Qf3xf6*/(0T9)Qb6>>(0T0)b6
+12.(-1T1)e2e3/(-1T1)Qb6f6
+13.(-1T2)Qd1f3/(-1T2)Qf6xf3
+14.(-1T3)Ng1xf3/(-1T3)e7e6
+15.(-1T4)Bf1c4/(-1T4)Ng8f6
+16.(-1T5)Nf3g5/(-1T5)Nf6>x(1T6)f6
+17.(-1T6)Bc4xe6#

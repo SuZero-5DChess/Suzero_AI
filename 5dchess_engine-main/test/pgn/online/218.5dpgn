@@ -1,0 +1,45 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.10.08"]
+[Round "162"]
+[White "Tones"]
+[Black "cirtus"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+{
+t0database/game 382 records the same game with conflicting information:
+ white: Public Match
+ black: Citrus
+}
+
+1.{3:29}(0T1)e2e4 / {0:00}(0T1)Ng8f6 
+2.{3:29}(0T2)d2d4 / {0:00}(0T2)c7c5 
+3.{3:29}(0T3)b2b4 / {0:00}(0T3)Qd8b6 
+4.{3:29}(0T4)c2c3 / {0:00}(0T4)c5b4 
+5.{3:29}(0T5)Bc1g5 / {0:00}(0T5)b4c3 
+6.{3:29}(0T6)Nb1c3 / {0:00}(0T6)Qb6a5 
+7.{3:29}(0T7)Qd1b3 / {0:00}(0T7)d7d5 
+8.{3:29}(0T8)Qb3b5 / {0:00}(0T8)Qa5b5 
+9.{3:29}(0T9)Bf1b5 / {0:00}(0T9)Nb8c6 
+10.{3:29}(0T10)Bg5f6 / {0:00}(0T10)g7f6 
+11.{3:29}(0T11)Bb5c6 / {0:00}(0T11)b7c6 
+12.{3:29}(0T12)f2f3 / {0:00}(0T12)e7e6 
+13.{3:29}(0T13)Ra1c1 / {0:00}(0T13)Ra8b8 
+14.{3:29}(0T14)Nc3a4 / {0:00}(0T14)Bf8h6 
+15.{3:29}(0T15)Ng1e2 / {0:00}(0T15)Bh6c1 
+16.{3:29}(0T16)Ne2c1 / {0:00}(0T16)Rb8b1 
+17.{3:29}(0T17)Ke1g1 / {0:00}(0T17)Bc8a6 
+18.{3:29}(0T18)Rf1e1 / {0:00}(0T18)Ke8g8 
+19.{3:29}(0T19)Na4c5 / {0:00}(0T19)Ba6c4 
+20.{3:29}(0T20)Nc5d7 / {0:00}(0T20)Bc4a2 
+21.{3:29}(0T21)Nd7f6 / {0:00}(0T21)Kg8g7 
+22.{3:29}(0T22)Nf6h5 / {0:00}(0T22)Kg7h8 
+23.{3:29}(0T23)Nh5>>(0T21)h6 / {0:00}(0T23)Ba2>>(0T17)g2 
+24.{3:29}(-1T18)Kg1g2 / {0:00}(-1T18)Bc8a6 
+25.{3:29}(-1T19)Rf1e1 / {0:00}(-1T19)Rb1c1 
+26.{3:29}(-1T20)Kg2f2 / {0:00}(-1T20)Rc1e1 
+27.{3:29}(-1T21)Kf2e1 / {0:00}(-1T21)Ba6d3 (1T21)Kg8g7 
+28.{3:29}(-1T22)Na4c3 (1T22)Nd7f6 / {0:00}(1T22)Kg7h6 (-1T22)Bd3c2 
+29.{3:29}(1T23)Nc1>(-1T23)c2
+{recorded:white wins}

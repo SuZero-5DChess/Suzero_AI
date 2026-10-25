@@ -1,0 +1,20 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.30"]
+[Round "553"]
+[White "Sapphia"]
+[Black "NoNashEquilibrium"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)Nb1a3 / {19:08}(0T2)a7a5 
+3.{19:33}(0T3)Na3c4 / {18:42}(0T3)b7b5 
+4.{19:33}(0T4)Nc4e5 / {18:32}(0T4)Bc8b7 
+5.{19:33}(0T5)Ne5f7 / {18:33}(0T5)Ke8f7 
+6.{19:43}(0T6)Nf3>>(0T5)f5 / {17:02}(0T6)Nf6>>(0T4)f5 
+7.{19:43}(-1T5)Ne5f7 / {17:02}(-1T5)Nf6>(1T5)f5 
+8.{19:28}(1T6)Ne5>(-1T6)f5 / {16:59}(1T6)Nf6>(-1T6)f5 
+9.{19:27}(-1T7)Nf7d8 (1T7)Nf3>(0T7)f5 / {16:03}(1T7)Nf5>>(1T5)e5 
+10.{19:21}(-2T6)Nf3e5 / {15:21}(-2T6)Ra8a6 
+11.{19:20}(-2T7)Nf5g7

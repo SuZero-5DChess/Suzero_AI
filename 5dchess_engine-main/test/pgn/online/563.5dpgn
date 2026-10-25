@@ -1,0 +1,26 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.07.17"]
+[Round "522"]
+[White "Mage"]
+[Black "Samet"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6
+2.(0T2)Nb1a3 / (0T2)d7d5
+3.(0T3)Na3b5 / (0T3)c7c6
+4.(0T4)Nb5d4 / (0T4)Bc8g4
+5.(0T5)e2e3 / (0T5)e7e6
+6.(0T6)h2h3 / (0T6)Bg4h5
+7.(0T7)Nd4e6 / (0T7)f7e6
+8.(0T8)Nf3e5 / (0T8)Bh5d1
+9.(0T9)Ke1d1 / (0T9)Qd8c8
+10.(0T10)Ne5>>(0T8)e6 / (0T10)Qc8>>(0T5)c8
+11.(-1T6)Nf3e5 / (-1T6)Qc8>(1T8)e6
+12.(-1T7)Qd1g4 / (-1T7)Nb8d7
+13.(-1T8)Nd4e6 / (-1T8)f7e6
+14.(-1T9)Ne5>(1T9)e6 / (-1T9)Nf6>(1T9)e6
+15.(-1T10)Qg4h5 (1T10)Nf3e5 / (1T10)Nf6>>(1T8)e6
+16.(-2T9)Nf3g5 / (-2T9)Bh5>(-1T10)h5
+17.(-2T10)Ng5e6

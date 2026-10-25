@@ -1,0 +1,38 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.11.14"]
+[Round "703"]
+[White "Pluto"]
+[Black "Los Bro SPQR"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "league season 5"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1g5 / (0T4)Bc8f5 
+5.(0T5)e2e3 / (0T5)e7e6 
+6.(0T6)Nf3e5 / (0T6)Qd8c7 
+7.(0T7)Bg5f6 / (0T7)g7f6 
+8.(0T8)Ne5>>(0T6)e6 / (1T6)f7e6 
+9.(1T7)Nf3e5 / (1T7)g7g6 
+10.(1T8)h2h4 / (1T8)Bf8e7 (0T8)Bf8h6 
+11.(1T9)g2g4 (0T9)Qd1h5 / (0T9)Bh6f4 (1T9)Qd8d6 
+12.(1T10)g4f5 (0T10)Nb1d2 / (1T10)Nb8d7 (0T10)Bf5g6 
+13.(1T11)h4h5 (0T11)Qh5g4 / (0T11)Bf4>>(0T9)f2 
+14.(-1T10)Ke1d2 / (-1T10)Bh6e3 
+15.(0T12)Qg4>>(0T1)g4 / (2T1)Ng8f6 
+16.(2T2)e2e3 / (2T2)e7e6 
+17.(2T3)Nb1c3 / (2T3)Nf6g4 
+18.(2T4)Qd1g4 / (2T4)Qd8f6 
+19.(2T5)Nc3e4 / (2T5)Qf6g6 
+20.(2T6)Qg4h4 / (2T6)Nb8c6 
+21.(2T7)Ng1f3 / (2T7)Ke8>>(1T6)d7 
+22.(-2T7)Nf3e5 / (-2T7)Kd7e6 
+23.(-2T8)Qd1f3 (2T8)Nf3e5 / (2T8)Qg6>>(2T6)e4 
+24.(-3T7)Ng1f3 / (-3T7)Qe4>(-2T8)e5 
+25.(-3T8)Qh4>>(-2T7)g3 / (3T7)Bf5e6 
+26.(3T8)Nf3e5 / (3T8)Kd7c8 (-3T8)Qg6c2 
+27.(-2T9)d4e5 (-3T9)Nf3e5 (2T9)Ne5c6 (3T9)Ne5f7 / (-3T9)Qc2>(-2T9)c1 (2T9)Bf8d6 (3T9)Kc8d7
+{recorded:black wins}

@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "games.toml"]
+[Round "7"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3/(0T1)Ng8f6
+2.(0T2)d2d4/(0T2)d7d5
+3.(0T3)c2c3/(0T3)c7c6
+4.(0T4)Bc1g5/(0T4)Bc8f5
+5.(0T5)e2e3/(0T5)Nb8d7
+6.(0T6)Nb1d2/(0T6)e7e6
+7.(0T7)Bg5f6/(0T7)Nd7f6
+8.(0T8)Nf3e5/(0T8)Nf6g4
+9.(0T9)Ne5g4/(0T9)Qd8h4
+10.(0T10)Nd2f3/(0T10)Qh4>>(0T8)f2
+11.(0T11)Qd1>>(0T8)a4/(1T8)Nf6e4
+12.(-1T9)Ke1f2 (1T9)Nd2e4/(-1T9)Nf6e4 (1T9)Bf5e4
+13.(-1T10)Nd2e4 (1T10)Nf3e5/(1T10)Qd8h4 (-1T10)Qd8h4

@@ -1,0 +1,21 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.04"]
+[Round "121"]
+[White "Mage"]
+[Black "Sapphia"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:04}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:02}(0T2)b2b4 / {20:00}(0T2)g7g6 
+3.{20:01}(0T3)Bc1b2 / {20:00}(0T3)Bf8g7 
+4.{19:42}(0T4)Nb1c3 / {19:50}(0T4)Rh8g8 
+5.{19:35}(0T5)Nc3b5 / {19:47}(0T5)c7c6 
+6.{19:21}(0T6)Nb5c7 / {19:47}(0T6)Qd8c7 
+7.{19:01}(0T7)Bb2e5 / {19:47}(0T7)Qc7b6 
+8.{18:46}(0T8)e2e3 / {19:16}(0T8)Nf6e4 
+9.{18:54}(0T9)Be5>>(0T7)e7 / {19:10}(0T9)Qb6>>(0T5)f2 
+10.{18:54}(-1T6)Ke1f2 / {19:08}(-1T6)c7c6 
+11.{18:59}(-1T7)Bb2e5 / {19:18}(-1T7)Nf6>>(-1T6)f4 
+12.{18:55}(-1T8)Nf3>>(-1T6)f2 / {18:03}(2T6)c7c6

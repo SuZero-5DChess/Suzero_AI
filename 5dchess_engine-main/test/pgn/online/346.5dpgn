@@ -1,0 +1,23 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.14"]
+[Round "295"]
+[White "Drepic"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Defended Pawn"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)d2d4 / {19:50}(0T2)c7c6 
+3.{20:05}(0T3)c2c3 / {19:21}(0T3)d7d5 
+4.{20:05}(0T4)Bc1g5 / {18:02}(0T4)Nd8e6 
+5.{20:05}(0T5)Bg5f6 / {18:02}(0T5)g7f6 
+6.{19:59}(0T6)Qb1f5 / {17:24}(0T6)Ne6g7 
+7.{19:50}(0T7)Qf5f4 / {17:20}(0T7)Qb8f4 
+8.{19:41}(0T8)Nd1e3 / {16:00}(0T8)Ng7f5 
+9.{19:18}(0T9)Ne3f5 / {16:00}(0T9)Qf4f5 
+10.{19:14}(0T10)Nf3h4 / {15:13}(0T10)Qf5f4 
+11.{19:14}(0T11)g2g3 / {14:32}(0T11)Qf4h6 
+12.{19:12}(0T12)Nh4f5 / {14:25}(0T12)Qh6g5 
+13.{19:01}(0T13)Nf5h4 / {14:06}(0T13)Bc8h3 
+14.{19:02}(0T14)Bf1h3 / {13:56}(0T14)Qg5>>(0T11)d2

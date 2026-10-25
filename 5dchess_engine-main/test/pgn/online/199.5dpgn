@@ -1,0 +1,35 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.22"]
+[Round "143"]
+[White "Sapphia"]
+[Black "Romad"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1. Nf3 / Nf6
+2. c4 / c6
+3. Qb3 / e6
+4. e3 / d5
+5. g3 / Be7
+6. Bh3 / Na6
+7. Qc3 / Rg8
+8. b3 / Ne4
+9. Qc2 / Nb4
+10. Qb2 / Nd3
+11. Kf1 / Nxb2
+12. Bxb2 / Bf6
+13. (0T13)Bh3>>x(0T9)h7~ (>L1) / (1T9)Rf8
+14. (1T10)Qxg7 / (1T10)Bf6
+15. (1T11)Qxf7 / (1T11)Rxf7
+16. (1T12)Bg8 / (0T13)Bf6>>x(0T10)f3~ (>L-1)
+17. (-1T11)Bf1 / (-1T11)Ke8>>(0T10)f8~ (>L-2)
+18. (-2T11)Qxg7 / (-2T11)Rxg7
+19. (-1T12)Qxg7 (-2T12)Bxe6 / (-1T12)Rxg7 (-2T12)Qd8>x(1T12)g8
+20. (-2T13)Ne5 (1T13)Nd4 (-1T13)Nc3 / (-1T13)Nc2 (-2T13)Nc2 (1T13)Bxd4
+21. (1T14)Bh3>>(1T11)h6~ (>L2) / (2T11)Bxg7
+22. (2T12)Bxg7 / (2T12)Nxf2
+23. (2T13)Kxf2 / (1T14)Qg8>x(2T13)g7
+24. (2T14)Bh3>>(2T12)h5~ (>L3) / (3T12)Bxh6
+25. (3T13)Bxf7 / (2T14)Qg7>x(3T13)f7
+{recorded:black wins}

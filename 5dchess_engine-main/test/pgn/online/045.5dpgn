@@ -1,0 +1,31 @@
+[Event "Online Game Database"]
+[Site "games.toml"]
+[Round "46"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3/(0T1)Ng8f6
+2.(0T2)b2b4/(0T2)e7e6
+3.(0T3)Qd1f3/(0T3)Bf8d6
+4.(0T4)Bf1d3/(0T4)Qd8e7
+5.(0T5)b4b5/(0T5)Bd6e5
+6.(0T6)c2c3/(0T6)c7c6
+7.(0T7)Bc1a3/(0T7)Be5d6
+8.(0T8)Ba3b2/(0T8)c6b5
+9.(0T9)Bd3b5/(0T9)Nb8c6
+10.(0T10)Ng1e2/(0T10)Nc6e5
+11.(0T11)Qf3h3/(0T11)a7a6
+12.(0T12)Bb5a4/(0T12)Ne5d3
+13.(0T13)Ke1f1/(0T13)Nd3f2
+14.(0T14)Kf1f2/(0T14)Nf6e4
+15.(0T15)Kf2e1/(0T15)Qe7f6
+16.(0T16)Qh3f3/(0T16)Bd6g3
+17.(0T17)h2g3/(0T17)Qf6>>(0T13)f2
+18.(0T18)Ba4>>(0T11)h4/(1T11)Ne5f3
+19.(1T12)g2f3/(1T12)a7a6
+20.(1T13)Bb5d7/(1T13)Bc8d7
+21.(1T14)Ne2>(-1T14)f2/(-1T14)Nd3f2 (1T14)Ra8c8
+22.(-1T15)Kf1f2 (1T15)Rh1g1/(-1T15)Nf6e4 (1T15)Bd6h2
+23.(-1T16)Kf2e1 (1T16)Rg1g2/(-1T16)Qe7f6 (1T16)Bh2e5
+24.(1T17)Bh4>(-1T17)f4/(-1T17)Bd6f4 (1T17)Nf6d5
+25.(-1T18)Ba4d7 (1T18)Rg2g4/(-1T18)Bc8d7 (1T18)Nd5>(0T18)d3
+26.(-1T19)Ne2f4 (0T19)Ke1f1 (1T19)Bb2a3/(1T19)Qe7>>(1T16)h4

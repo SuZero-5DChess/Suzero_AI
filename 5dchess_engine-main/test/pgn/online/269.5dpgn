@@ -1,0 +1,50 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.11"]
+[Round "216"]
+[White "Shad Amethyst"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League Season 2"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)Nb1c3 / (0T3)c7c6 
+4.(0T4)Qd1d3 / (0T4)g7g6 
+5.(0T5)Bc1d2 / (0T5)Bc8e6 
+6.(0T6)Bd2g5 / (0T6)Nb8d7 
+7.(0T7)e2e3 / (0T7)Qd8b6 
+8.(0T8)Bg5f6 / (0T8)Nd7f6 
+9.(0T9)b2b3 / (0T9)Be6f5 
+10.(0T10)Qd3d2 / (0T10)Bf8g7 
+11.(0T11)Nc3a4 / (0T11)Qb6d8 
+12.(0T12)Bf1d3 / (0T12)Bf5d3 
+13.(0T13)c2d3 / (0T13)Nf6g4 
+14.(0T14)Na4c3 / (0T14)Bg7h6 
+15.(0T15)g2g3 / (0T15)Qd8a5 
+16.(0T16)Ra1c1 / (0T16)Ra8c8 
+17.(0T17)Nf3e5 / (0T17)Ng4e5 
+18.(0T18)d4e5 / (0T18)e7e6 
+19.(0T19)f2f4 / (0T19)Qa5c5 
+20.(0T20)d3d4 / (0T20)Qc5a3 
+21.(0T21)Nc3>>(0T20)c5 / (1T20)Rc8c7 
+22.(1T21)Rh1f1 / (0T21)Qa3a6 (1T21)Ke8g8 
+23.(1T22)Nc5>(0T22)c7 / (0T22)Rc8c7 (1T22)a7a6 
+24.(1T23)Nc3>(0T23)c5 / (0T23)Qa6b5 (1T23)Rc7c8 
+25.(0T24)a2a4 (1T24)Qd2c3 / (0T24)Qb5>>(0T0)b5 {After this point, we didn't have much time}
+26.(-1T1)e2e3 / (-1T1)Qb5f5 
+27.(-1T2)Qd1f3 / (-1T2)Qf5f3 
+28.(-1T3)Ng1f3 / (-1T3)e7e6 
+29.(-1T4)Nb1c3 / (-1T4)Bf8c5 
+30.(-1T5)d2d3 / (-1T5)Qd8f6 
+31.(-1T6)Bc1d2 / (-1T6)b7b6 
+32.(-1T7)Nc3e4 / (-1T7)Qf6e5 
+33.(-1T8)Ne4c5 / (-1T8)Qe5c5 
+34.(-1T9)b2b4 / (-1T9)Qc5h5 
+35.(-1T10)Bf1e2 / (-1T10)Bc8b7 
+36.(-1T11)Ra1c1 / (-1T11)Bb7f3 
+37.(-1T12)Be2f3 / (-1T12)Qh5h4 
+38.(-1T13)g2g3 / (-1T13)Qh4f6 
+39.(-1T14)c2c4 / (-1T14)Qf6f3 
+40.(-1T15)c4c5 / (-1T15)Qf3h1

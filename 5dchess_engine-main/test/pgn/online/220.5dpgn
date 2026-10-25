@@ -1,0 +1,15 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.11"]
+[Round "166"]
+[White "Los Bro SPQR"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+{
+t0database/game 243 records the same game with conflicting information:
+ date: 2021.05.12
+}
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 2.(0T2)c2c4 / (0T2)e7e6 3.(0T3)Nb1c3 / (0T3)Bf8c5 4.(0T4)e2e3 / (0T4)Nb8c6 5.(0T5)g2g3 / (0T5)Nf6g4 6.(0T6)Bf1g2 / (0T6)Qd8f6 7.(0T7)Nc3e4 / (0T7)Qf6f5 8.(0T8)Ne4c5 / (0T8)Qf5c5 9.(0T9)Ke1g1 / (0T9)Nc6d4 10.(0T10)e3d4 / (0T10)Qc5e7 11.(0T11)d2d3 / (0T11)Ng4f2 12.(0T12)Rf1f2 / (0T12)e6e5 13.(0T13)Qd1e2 / (0T13)d7d6

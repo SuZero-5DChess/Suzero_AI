@@ -1,0 +1,33 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.04.12"]
+[Round "220"]
+[White "Graven"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)a2a4 / (0T2)c7c6 
+3.(0T3)a4a5 / (0T3)e7e6 
+4.(0T4)c2c3 / (0T4)Bf8c5 
+5.(0T5)e2e3 / (0T5)b7b6 
+6.(0T6)b2b4 / (0T6)Bc5d6 
+7.(0T7)a5a6 / (0T7)b6b5 
+8.(0T8)c3c4 / (0T8)Nb8a6 
+9.(0T9)c4b5 / (0T9)Na6b4 
+10.(0T10)Bc1a3 / (0T10)Qd8a5 
+11.(0T11)b5c6 / (0T11)Nb4c6 
+12.(0T12)Ba3d6 / (0T12)Qa5a1 
+13.(0T13)Nb1c3 / (0T13)Qa1b2 
+14.(0T14)Nc3a4 / (0T14)Qb2a2 
+15.(0T15)Na4c3 / (0T15)Qa2a5 
+16.(0T16)Nc3b5 / (0T16)Nf6d5 
+17.(0T17)Bd6c5 / (0T17)Nc6e7 
+18.(0T18)Nb5d6 / (0T18)Ke8f8 
+19.(0T19)Nf3e5 / (0T19)Nd5e3 
+20.(0T20)f2e3 / (0T20)Qa5>>(0T16)a1 
+21.(-1T17)Nb5c7 / (-1T17)Ke8d8 
+22.(-1T18)Bf1e2 / (-1T18)Nc6e5 
+23.(-1T19)Nc7e6 / (-1T19)f7e6 
+24.(-1T20)Bd6f8

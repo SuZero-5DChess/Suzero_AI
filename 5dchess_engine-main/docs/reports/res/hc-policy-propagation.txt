@@ -1,0 +1,15 @@
+Production policy benchmark (11 isolated trials per policy):
+balanced min_ms=32.04 median_ms=32.386 max_ms=33.386
+stable min_ms=32.081 median_ms=32.285 max_ms=34.232
+mate=1 classification_ms=4904.33
+
+Endpoint policy comparison (3 trials per case):
+test/pgn/standard.5dpgn policy=old-local-adaptive median_ms=0.01 found=0
+test/pgn/standard.5dpgn policy=global-adaptive median_ms=0.011 found=0
+test/pgn/standard.5dpgn policy=global-full median_ms=0.009 found=0
+test/pgn/100timelines.5dpgn policy=old-local-adaptive median_ms=10.588 found=0
+test/pgn/100timelines.5dpgn policy=global-adaptive median_ms=10.485 found=0
+test/pgn/100timelines.5dpgn policy=global-full median_ms=10.46 found=0
+test/pgn/niceAndrey.5dpgn policy=old-local-adaptive median_ms=4.993 found=1
+test/pgn/niceAndrey.5dpgn policy=global-adaptive median_ms=4.987 found=1
+test/pgn/niceAndrey.5dpgn policy=global-full median_ms=8.46 found=1

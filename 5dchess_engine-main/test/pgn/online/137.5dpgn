@@ -1,0 +1,31 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.10"]
+[Round "81"]
+[White "Public Match"]
+[Black "Neathp"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1h3 / (0T2)d7d5 
+3.(0T3)Qd1f3 / (0T3)c7c6 
+4.(0T4)Nb1c3 / (0T4)Bc8g4 
+5.(0T5)Qf3g3 / (0T5)Nb8d7 
+6.(0T6)b2b3 / (0T6)e7e6 
+7.(0T7)Bc1b2 / (0T7)Bg4h3 
+8.(0T8)Qg3h3 / (0T8)Nd7e5 
+9.(0T9)Nc3d1 / (0T9)Ne5g4 
+10.(0T10)Bb2f6 / (0T10)Ng4f6 
+11.(0T11)Bf1d3 / (0T11)d5d4 
+12.(0T12)Qh3h4 / (0T12)d4e3 
+13.(0T13)f2e3 / (0T13)Qd8a5 
+14.(0T14)Nd1c3 / (0T14)Qa5>>(0T11)d2 
+15.(-1T12)Ke1d2 / (-1T12)Nf6e4 
+16.(-1T13)Kd2e2 / (-1T13)Qd8a5 
+17.(-1T14)Bd3e4 / (-1T14)d5e4 
+18.(0T15)Bd3>>(0T10)d8 / (1T10)Ra8d8 
+19.(1T11)c2c3 / (1T11)a7a5 
+20.(1T12)a2a3 / (1T12)Bf8c5 
+21.(1T13)b3b4 / (1T13)Ng4>>(1T12)e4
+{recorded:black wins}

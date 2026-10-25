@@ -1,0 +1,20 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.06"]
+[Round "55"]
+[White "Sapphia"]
+[Black "DrEpic"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1. Nf3 / Nf6
+2. d4 / c6
+3. c3 / d5
+4. Qb3 / Bg4
+5. (0T5)Qb3>>x(0T1)f7~ (>L1) / (1T1)Kxf7
+6. (1T2)e3 / (1T2)Ke8
+7. (1T3)Qh5 / (0T5)Qd8>>(0T0)d3~ (>L-1)
+8. (-1T1)cxd3 / (-1T1)Nf6
+9. (-1T2)Nf3 / (-1T2)c6
+10. (-1T3)Qc2 / (-1T3)Nf6>>(-1T2)f4~ (>L-2)
+11. (-2T3)e3

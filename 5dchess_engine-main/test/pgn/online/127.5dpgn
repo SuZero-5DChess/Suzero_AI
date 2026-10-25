@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.16"]
+[Round "71"]
+[White "Public Match"]
+[Black "Neathp"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)d2d4 / (0T1)e7e6 
+2.(0T2)c2c3 / (0T2)Qd8f6 
+3.(0T3)Ng1f3 / (0T3)h7h6 
+4.(0T4)e2e3 / (0T4)Qf6>>(0T0)f2 
+5.(-1T1)Ke1f2 / (-1T1)Ng8h6 
+6.(-1T2)Ng1f3 / (-1T2)Nh6g4 
+7.(-1T3)Kf2g1 / (-1T3)c7c6 
+8.(-1T4)Nb1c3 / (-1T4)Qd8b6
+{recorded:black wins}

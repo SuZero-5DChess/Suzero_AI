@@ -1,0 +1,35 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.10"]
+[Round "596"]
+[White "茫然的小学妹"]
+[Black "RHD"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Pogchamps"]
+
+{
+t0database/game 392 records the same game with conflicting information:
+ white: XXM
+ black: RHD
+ date: 2021.01.10
+}
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c4 / (0T3)c7c6 
+4.(0T4)Bc1d2 / (0T4)g7g6 
+5.(0T5)e2e3 / (0T5)Bf8h6 
+6.(0T6)Nb1c3 / (0T6)Ke8g8 
+7.(0T7)c4d5 / (0T7)Nf6d5 
+8.(0T8)e3e4 / (0T8)Bh6d2 
+9.(0T9)Qd1d2 / (0T9)Nd5c3 
+10.(0T10)Qd2c3 / (0T10)Bc8g4 
+11.(0T11)Bf1c4 / (0T11)e7e6 
+12.(0T12)h2h3 / (0T12)Bg4f3 
+13.(0T13)g2f3 / (0T13)Qd8h4 
+14.(0T14)Ke1g1 / (0T14)Qh4>>(0T12)f2 
+15.(-1T13)Ke1f2 / (-1T13)Bg4f3 
+16.(-1T14)Qc3f3 / (-1T14)Qd8h4 
+17.(0T15)Qc3>>(0T13)e3 / (1T13)Bf3g2
+{original data: white wins; verification: black wins}

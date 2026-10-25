@@ -1,0 +1,79 @@
+{
+  "collection_date": "2026-10-08",
+  "revision": "95751dc70be957e7dbc1b76e497ef6f9deea81f9",
+  "database": "test/pgn/online",
+  "total_games": 795,
+  "variants": {
+    "Standard - Turn Zero": 775,
+    "Standard - Two Timelines": 3,
+    "Standard - Defended Pawn": 15,
+    "Custom": 2
+  },
+  "turn_zero_games": 775,
+  "included_terminal_games": 649,
+  "excluded_nonterminal_games": 126,
+  "load_errors": 0,
+  "verification_timeouts": 0,
+  "verification_timeout_seconds": 30.0,
+  "endpoint_status_counts": {
+    "BLACK_WINS": 300,
+    "PLAYING": 126,
+    "STALEMATE": 1,
+    "WHITE_WINS": 348
+  },
+  "length_statistics": {
+    "turns": {
+      "n": 649,
+      "mean": 20.4884437596302,
+      "sample_std": 9.170551645445645,
+      "min": 3,
+      "p10": 11,
+      "p25": 14,
+      "median": 19,
+      "p75": 25,
+      "p90": 32,
+      "p95": 38,
+      "p99": 50,
+      "max": 66
+    },
+    "actions": {
+      "n": 649,
+      "mean": 40.440677966101696,
+      "sample_std": 18.382340479790958,
+      "min": 6,
+      "p10": 21,
+      "p25": 27,
+      "median": 37,
+      "p75": 49,
+      "p90": 64,
+      "p95": 76,
+      "p99": 99,
+      "max": 132
+    }
+  },
+  "quantile_method": "inverse empirical CDF (nearest-rank quantiles)",
+  "numbered_turn_definition": "ceil(submitted_actions / 2); a final White-only turn counts as one",
+  "endpoint_verification": "Fresh engine.game.from_pgn followed by game.get_match_status; independent of PGN Result headers",
+  "python": "/opt/anaconda3/bin/python",
+  "module": "build/engine.cpython-312-darwin.so",
+  "build_type": "Debug",
+  "history_variation_nodes": 0,
+  "included_source_counts": {
+    "games.toml": 41,
+    "https://github.com/MageOfficial/t0database": 608
+  },
+  "dataset_digest_definition": "SHA-256 of sorted UTF-8 lines: filename + space + PGN SHA-256 + newline, covering all 795 fixtures",
+  "dataset_sha256": "2488e4f045508aeb549d93bc98408d082fd95c843344fd1f883a3016fc745f9d",
+  "measurement_csv_sha256": "cf3350a25ca831d0b21afc0b448212804f352a0afd55676b7233b73f45897e89",
+  "histogram": {
+    "unit": "submitted player actions",
+    "bin_width": 10,
+    "inclusive_range": [
+      1,
+      300
+    ],
+    "denominator": 649,
+    "bins_csv_sha256": "ceb931bbeec8a322dbe71f930306841f03bda2eda8f0abdf9bd58d6d13d6f869",
+    "shared_bins_csv": "game-length-turn-zero-bins.csv"
+  }
+}

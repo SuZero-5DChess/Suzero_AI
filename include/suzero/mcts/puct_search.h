@@ -61,8 +61,9 @@ struct SearchResult {
   /// Every legal, positively-weighted root action, in ascending action order.
   std::vector<ActionStats> actions;
 
-  /// Highest-visit action (ties: higher prior, then lower action id).
-  /// kInvalidAction when the root is terminal or has no legal action.
+  /// Action with the largest final play-selection weight (KataGo's
+  /// getChosenMoveLoc semantics, without LCB). kInvalidAction when the root is
+  /// terminal or has no legal action.
   ActionId bestAction = kInvalidAction;
 
   /// Root value from the root player's perspective.
@@ -91,10 +92,10 @@ struct SearchResult {
 /// of owning it, and the root is deliberately kept out of the node table so it
 /// can never be reached through a cycle. It keeps the algorithmic core of
 /// KataGo's search (PUCT with child weight, FPU, virtual-loss-free playouts,
-/// edge-visit catch-up, weighted value aggregation, root Dirichlet noise,
-/// temperature sampling) but deliberately omits evaluation caching,
-/// multithreading, Go's score utilities, and symmetry/pass handling.
-/// See docs/katago-mapping.md.
+/// edge-visit catch-up, Student-t weighted value aggregation, root Dirichlet
+/// noise, retrospective root play-selection weighting, temperature sampling)
+/// but deliberately omits evaluation caching, multithreading, Go's score
+/// utilities, and symmetry/pass handling. See docs/katago-mapping.md.
 ///
 /// All methods are single-threaded and must not be called concurrently on the
 /// same instance.
@@ -119,6 +120,13 @@ class PuctSearch {
   SearchResult run();
   SearchResult run(IStopCriterion* criterion);
   SearchResult run(const std::function<bool(const SearchProgress&)>& criterion);
+
+  /// Overrides the root Dirichlet-noise parameters of `params()`.
+  ///
+  /// Takes effect the next time a root prior is prepared (a fresh root or one
+  /// promoted by `advanceRoot`); an already prepared root keeps its priors.
+  /// Self-play uses this to apply noise only to full-search moves.
+  void setRootNoise(bool enabled, double totalConcentration, double weight);
 
   /// Samples a move from root child weights using the given temperature.
   /// Falls back to the root prior when no child has been expanded.
@@ -188,6 +196,10 @@ class PuctSearch {
   void applyRootPolicyTemperature(std::vector<Prior>& priors) const;
   void addRootDirichletNoise(std::vector<Prior>& priors);
   const std::vector<Prior>& activePriors(const SearchNode& node) const;
+  bool computeRootPlaySelectionValues(std::vector<ActionId>& actions,
+                                      std::vector<double>& values) const;
+  double interpolateEarly(double halflife, double early_value,
+                          double value) const;
   ActionId sampleWithTemperature(const std::vector<ActionId>& actions,
                                  const std::vector<double>& values,
                                  double temperature,

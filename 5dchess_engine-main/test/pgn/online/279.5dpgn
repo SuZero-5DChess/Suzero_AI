@@ -1,0 +1,28 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.05"]
+[Round "226"]
+[White "Robiederks"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League Season 2"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c6 
+4.(0T4)Bc1g5 / (0T4)h7h6 
+5.(0T5)Bg5f6 / (0T5)g7f6 
+6.(0T6)e2e3 / (0T6)Bc8f5 
+7.(0T7)Bf1d3 / (0T7)Qd8d7 
+8.(0T8)Bd3f5 / (0T8)Qd7f5 
+9.(0T9)Nb1d2 / (0T9)Nb8d7 
+10.(0T10)Qd1b3 / (0T10)b7b6 
+11.(0T11)Qb3a4 / (0T11)b6b5 
+12.(0T12)Qa4a6 / (0T12)Qf5d3 
+13.(0T13)Qa6c6 / (0T13)Ra8d8 
+14.(0T14)Ra1d1 / (0T14)Qd3>>(0T13)e2 
+15.(0T15)Qc6>>(0T13)a8 / (1T13)Nd7b8 
+16.(1T14)Nd2>(-1T14)e2 / (-1T14)Qd3>>(0T13)e2 
+17.(-1T15)Ne2>>(0T13)e2 / (2T13)Qd3e2
+{original data: white wins; verification: black wins}

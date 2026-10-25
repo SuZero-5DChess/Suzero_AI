@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.06.22"]
+[Round "279"]
+[White "tesseract"]
+[Black "gjorbajarb"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{15:53}(0T1)e2e3 / {15:45}(0T1)Ng8f6 
+2.{15:53}(0T2)Ng1f3 / {15:45}(0T2)c7c6 
+3.{15:53}(0T3)c2c3 / {15:45}(0T3)d7d5 
+4.{15:53}(0T4)Qd1b3 / {15:45}(0T4)Qd8b6 
+5.{15:53}(0T5)Qb3>>(0T1)f7 / {15:45}(1T1)Ke8f7 
+6.{15:53}(1T2)Ng1f3 / {15:45}(1T2)Ng8f6 
+7.{15:53}(1T3)Nf3g5 / {15:45}(1T3)Kf7e8 
+8.{15:53}(1T4)c2c3 / {15:45}(0T5)Qb6>(1T4)b5 
+9.{15:53}(1T5)e2e3 / {15:45}(1T5)Qb5d5 
+10.{15:53}(1T6)h2h4 (0T6)Nf3h4 / {15:45}(0T6)Nf6g4 (1T6)b7b5 
+11.{15:53}(0T7)Nh4>(1T7)f4 / {15:13}(0T7)Bc8f5 (1T7)Qd5c6 
+12.{14:47}(0T8)f2f4 (1T8)Bf1b5 / {13:28}(0T8)Bf5>(1T8)f4 
+13.{14:28}(1T9)e3f4 (0T9)g2g3 / {12:39}(1T9)Qc6b5 (0T9)Nb8d7 
+14.{13:26}(0T10)Bf1e2 (1T10)Qd1f3 / {12:9}(1T10)Bc8b7 (0T10)h7h5 
+15.{11:21}(1T11)Qf3e3 (0T11)d2d4 / {10:24}(1T11)Bb7g2 (0T11)Nd7f6 
+16.{10:30}(1T12)Rh1g1 (0T12)Nb1d2 / {9:37}(0T12)Ng4e3 (1T12)Qb5f1

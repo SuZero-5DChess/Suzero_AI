@@ -1,0 +1,688 @@
+{
+  "trials": 10000,
+  "censored": 4,
+  "terminal_trials": 9996,
+  "restricted_lengths_at_2000": {
+    "mean": 82.7444,
+    "sample_std": 60.58914071875672,
+    "min": 4.0,
+    "p10": 28.0,
+    "p25": 47.0,
+    "median": 75.0,
+    "p75": 110.0,
+    "p90": 145.0,
+    "p95": 167.0,
+    "p99": 210.0,
+    "max": 2000.0
+  },
+  "terminal_lengths": {
+    "mean": 81.97719087635053,
+    "sample_std": 46.91312503556208,
+    "min": 4.0,
+    "p10": 28.0,
+    "p25": 47.0,
+    "median": 75.0,
+    "p75": 110.0,
+    "p90": 145.0,
+    "p95": 167.0,
+    "p99": 209.0,
+    "max": 1085.0
+  },
+  "numbered_turns": {
+    "mean": 41.6195,
+    "sample_std": 30.29286855909413,
+    "min": 2.0,
+    "p10": 14.0,
+    "p25": 24.0,
+    "median": 38.0,
+    "p75": 55.0,
+    "p90": 73.0,
+    "p95": 84.0,
+    "p99": 105.0,
+    "max": 1000.0
+  },
+  "runtime_ms": {
+    "mean": 0.7076963002000001,
+    "sample_std": 0.4762947005187974,
+    "min": 0.037792,
+    "p10": 0.252458,
+    "p25": 0.415667,
+    "median": 0.659125,
+    "p75": 0.933666,
+    "p90": 1.199375,
+    "p95": 1.360167,
+    "p99": 1.686625,
+    "max": 14.787166
+  },
+  "terminal_runtime_ms": {
+    "mean": 0.7022628136254502,
+    "sample_std": 0.39125430238136394,
+    "min": 0.037792,
+    "p10": 0.252458,
+    "p25": 0.415583,
+    "median": 0.659125,
+    "p75": 0.93325,
+    "p90": 1.198417,
+    "p95": 1.359084,
+    "p99": 1.678292,
+    "max": 9.145041
+  },
+  "statuses": {
+    "ACTION_LIMIT": 4,
+    "BLACK_WINS": 5049,
+    "STALEMATE": 3,
+    "WHITE_WINS": 4944
+  },
+  "actions_gt_200": 148,
+  "actions_ge_200": 151,
+  "quantile_method": "inverted_cdf",
+  "model_length_representation": "K=ceil(X), X>0; censored K>2000",
+  "models": {
+    "lognormal": {
+      "theta": [
+        -0.4073651951134847,
+        4.21523008714886
+      ],
+      "negative_log_likelihood": 52243.990548131376,
+      "aic": 104491.98109626275,
+      "ks": 0.0601079707010832,
+      "predicted_censored_probability": 1.8077014418894533e-07,
+      "training_theta": [
+        -0.4073432833417477,
+        4.217159874514792
+      ],
+      "held_out_nll_per_trial": 5.2159699647870035,
+      "predicted_quantiles": {
+        "0.5": 68,
+        "0.9": 159,
+        "0.95": 203,
+        "0.99": 319
+      },
+      "parameters": {
+        "shape": 0.6654011446781418,
+        "scale": 67.7097432205568,
+        "loc": 0,
+        "mu": 4.21523008714886,
+        "sigma": 0.6654011446781418
+      },
+      "bootstrap_exceedances": 0,
+      "bootstrap_p": 0.001
+    },
+    "gamma": {
+      "theta": [
+        1.001658658504319,
+        3.4081898283393848
+      ],
+      "negative_log_likelihood": 51921.86587682144,
+      "aic": 103847.73175364287,
+      "ks": 0.019963140723813444,
+      "predicted_censored_probability": 1.585867932601005e-26,
+      "training_theta": [
+        1.0043809266337942,
+        3.4068425072260906
+      ],
+      "held_out_nll_per_trial": 5.190123215850237,
+      "predicted_quantiles": {
+        "0.5": 73,
+        "0.9": 150,
+        "0.95": 178,
+        "0.99": 240
+      },
+      "parameters": {
+        "shape": 2.722794270997017,
+        "scale": 30.210508527421688,
+        "loc": 0
+      },
+      "bootstrap_exceedances": 0,
+      "bootstrap_p": 0.001
+    },
+    "weibull": {
+      "theta": [
+        0.4506661241594296,
+        4.518108083596788
+      ],
+      "negative_log_likelihood": 52386.62333446923,
+      "aic": 104777.24666893846,
+      "ks": 0.04273897299396451,
+      "predicted_censored_probability": 1.529291284301312e-55,
+      "training_theta": [
+        0.45563486615703347,
+        4.51977680331953
+      ],
+      "held_out_nll_per_trial": 5.242787424415723,
+      "predicted_quantiles": {
+        "0.5": 73,
+        "0.9": 156,
+        "0.95": 185,
+        "0.99": 243
+      },
+      "parameters": {
+        "shape": 1.5693572241505591,
+        "scale": 91.66201695611014,
+        "loc": 0
+      },
+      "bootstrap_exceedances": 0,
+      "bootstrap_p": 0.001
+    },
+    "geometric": {
+      "theta": [
+        -4.404002279212901
+      ],
+      "negative_log_likelihood": 54079.27622306843,
+      "aic": 108160.55244613686,
+      "ks": 0.19109697865818828,
+      "predicted_censored_probability": 2.7736326961837343e-11,
+      "training_theta": [
+        -4.405370271304628
+      ],
+      "held_out_nll_per_trial": 5.401954466073794,
+      "predicted_quantiles": {
+        "0.5": 58,
+        "0.9": 190,
+        "0.95": 247,
+        "0.99": 379
+      },
+      "parameters": {
+        "p": 0.01208057584561614
+      },
+      "bootstrap_exceedances": 0,
+      "bootstrap_p": 0.001
+    }
+  },
+  "bootstrap_replicates": 999,
+  "bootstrap_seed": 2026100801,
+  "held_out_ids": [
+    8001,
+    10000
+  ],
+  "training_ids": [
+    1,
+    8000
+  ],
+  "bootstrap_95_intervals": {
+    "restricted_mean_actions": [
+      81.53918,
+      83.98213
+    ],
+    "median_actions": [
+      74.0,
+      76.0
+    ],
+    "p95_actions": [
+      165.0,
+      169.0
+    ],
+    "p99_actions": [
+      205.0,
+      215.0
+    ],
+    "mean_runtime_ms": [
+      0.6982895870649999,
+      0.7175891095549999
+    ],
+    "median_runtime_ms": [
+      0.650458,
+      0.6675922999999999
+    ],
+    "p95_runtime_ms": [
+      1.343417,
+      1.374
+    ],
+    "p99_runtime_ms": [
+      1.647459,
+      1.7235
+    ]
+  },
+  "uncertainty_bootstrap_replicates": 1999,
+  "uncertainty_bootstrap_seed": 2026100802,
+  "wilson_95_intervals": {
+    "white_win_probability": [
+      0.4846048265162442,
+      0.5041994742655073
+    ],
+    "censored_probability": [
+      0.00015556283662307484,
+      0.0010281283353569795
+    ]
+  },
+  "bounded_evaluation_score": {
+    "scale": "White win=1, Black win=0, stalemate=.5; unresolved assigned midpoint .5 only for this estimate",
+    "mean": 0.49475,
+    "sample_variance": 0.24982241974197414,
+    "unresolved_outcome_bounds": [
+      0.49455000000000005,
+      0.49495
+    ]
+  },
+  "optimizer": "Nelder-Mead in log parameters; xatol=1e-8, fatol=1e-7, maxiter=750",
+  "environment": {
+    "date": "2026-10-08",
+    "revision": "95751dc70be957e7dbc1b76e497ef6f9deea81f9",
+    "source_digest": "3f174e43e2bebc0fb7b1ae729aa5b96aae6b0c0c3ea7fc95e9c5c0a156bc86bb",
+    "source_file_hashes": {
+      "src/core/.DS_Store": "d65165279105ca6773180500688df4bdc69a2c7b771752f0a46ef120b7fd8ec3",
+      "src/core/action.cpp": "90be8c1ebe5037ebe55906f692a2e71658a149cc1e6363629156e4eddbdb24ff",
+      "src/core/action.h": "fc02709315648ff40c0d4754087911cd43b73080af60f5da4bd22a80a70a8f53",
+      "src/core/ast.cpp": "ef58a2f30c91a38f196eb16dfcbc9b8b41fda93338e482ae97f1463b94841213",
+      "src/core/ast.h": "2fdb9da961f29127174d78a0ad8b316d698d8e016ed26921460bdd461a8eb62a",
+      "src/core/bitboard.cpp": "a061761d8f63d55570401276569ec2b7f5a4c85af9745073fee95f456f07091c",
+      "src/core/bitboard.h": "08f5e178055b713909400bee640c5931c09f2ed1244b4fd6e27bb675f742e475",
+      "src/core/bitboard.inl": "f0dc52ee460028cb81f228ac6aa19c0d587c2626ba1e243569c5bafc2a689d4c",
+      "src/core/board.cpp": "45a39d6f8fe6dbd50f4d24900f598bb35853f9e777237c235450f51c611a435e",
+      "src/core/board.h": "971b98183b5556ec1e57db8fd8cc20d660b49dabe3a197ae2e41cedc1c1f19cc",
+      "src/core/check_position.cpp": "a0537bdfad2db6318e237cbe676f3a88fc4ea13046a9befd26c95bf8e1d6d423",
+      "src/core/check_position.h": "2b8d1c435f9f99f492d68ac5bf7883d6c5d252ae6a92b151aa46f78a6a55560b",
+      "src/core/finetree.h": "6c9f8da0508280781fc1e10b5f3f73cc999ce1c77f9792c0137e29cf15fae4a8",
+      "src/core/finetree.inl": "817654fd3cfd405759b78d32627fce205e5e3f4a9741c7a0a14414e8c0f48d63",
+      "src/core/gametree.h": "b6cb3360e4f3b183f9c5e5d4a3f9b8b8926045bbedcb885c057a81dd53d5aaf3",
+      "src/core/gametree.inl": "279e9cebc298da842800a1a04e75d925ad914645c94fe2e99a35ff30a1b68ec0",
+      "src/core/hash.cpp": "69b8ae9af4e44c9f951fde63fbcc55eb7b980c3290bf980190c6891bde6aa16c",
+      "src/core/hash.h": "f4fab63675b415324741756fa2435c28a8dbde37f6807f99d1cc61e5ecccd841",
+      "src/core/hypercuboid.cpp": "9d900b1849d2415beead05f3081282674cffee8b0caf826f82a68135a383d8fc",
+      "src/core/hypercuboid.h": "7ce5b82362eb0530722592b39d4c0efb5d1eabf86c13ed3356fab86493ad23ae",
+      "src/core/hypercuboid.inl": "26aafa1305660917a5d82cc5d85c15bfa3b506315b9f99625ba1c4e1a0da4d68",
+      "src/core/magic.cpp": "ee188b785b752ed9eaa57c40c1243c4982102f13d953d16d269e8a6938e92491",
+      "src/core/magic.h": "0fb0d5b44872792155475e27c93fccd4f28a4364d5503cd6c5b3735272810d80",
+      "src/core/move_feature.cpp": "7ea6a9a3e3978a26257872c14d52904ea06e81bc7412e12fed1c993deeee6eb0",
+      "src/core/move_feature.h": "a2ba1ad57d7e75c1b4867f415b2263002b595b368c2c367376ba21b5a49c771a",
+      "src/core/move_geometry.h": "361c3a0c817652103b04bb3efd8a7eb3140291a27b161669ebe5bcaa18d238bc",
+      "src/core/multiverse.h": "3f7b7b14e0fe482dde9f09930acdd5435affa99eed364f5e401b9652d8ff88f9",
+      "src/core/multiverse_base.cpp": "0024750b9e2ab7fa8a00faa4a8a624030ddc96a6e06714e8712fd3519214d9f9",
+      "src/core/multiverse_base.h": "accb34e66bdae6479f6a3ffbf1a9a5dca2cb9af5fb3af88784e25fe1a1e31b41",
+      "src/core/multiverse_variants.cpp": "d7cc674619d26e679274dce87ecac5a6b103f7d43ddf2b089161fc31025f46b4",
+      "src/core/multiverse_variants.h": "f86c980a5298d86687531ee9d02291ea583dd9f601f7808412545dfd9b86fb18",
+      "src/core/pgnparser.cpp": "dd5ca233bd2d39609d1c9cfdd540cf42e0982fdc90c75c660e609fb69a1ced0f",
+      "src/core/pgnparser.h": "778910d31282d213d9708125138c1243e28634b3d614dac9b266205618741051",
+      "src/core/piece.h": "af1686027968439686ade6fd1cf220bbdd7ce6173394811a4f7209c8094a6d5f",
+      "src/core/promotion_header.cpp": "7714ce963e19bddf4126e61635e905cf5a9ec19c1173ad4e346fd18e5cf9cefa",
+      "src/core/promotion_header.h": "aa34774e2cff9aa3445421fd28988f643933dbc342b2f6c23bc7bd973c41b9f3",
+      "src/core/semimove.cpp": "0d3f888f6fa27734bd71b00e9fd4d74c387a60d89502d914b01a2d1fb94992f1",
+      "src/core/semimove.h": "045c507804548f0182fd6d7c275863a7b794f4cad616423f0556cdceb8a79610",
+      "src/core/state.cpp": "46b3c3de0fe8e0feb80f1b4dec9fffb252c348db7e13324f47d46000354b7c0b",
+      "src/core/state.h": "10ea5b9a3751d153ece9469fa3205df6c524f4a05ed9d1b04d4a55cee7ce8ee3",
+      "src/core/statistics.cpp": "4ce2dd71a2bc24c1cdbd0d4e4d5b57fc392aa2a457530e3752689d70af53f179",
+      "src/core/statistics.h": "d512457dbe597639a908536e7d01825f24b9393c2b3a00c2468fb45d34288307",
+      "src/core/turn.h": "683cd90dcdc9e8aa5243310960a7dfb4e5a6e511d0b7a64092da42ce446f1187",
+      "src/core/variants.cpp": "a53d64566b77e36e6dc7c817959636487cd476df1686801e24a014191b524890",
+      "src/core/variants.h": "f02dab6e2da44efd7d02bf98f775f6cba2dda0005921a44ff79f536924ed928b",
+      "src/engine/backpropagation.h": "6d49f123db5f7c9848453f04471281cb0be34ee804c15d7e4ef09b76350bb4ef",
+      "src/engine/default_policy.h": "bedf2c366b0112e3c9cae43516499b6a2901f5f8f1494136074d20f9cc62a301",
+      "src/engine/flat_ucb.cpp": "c643d4b2d4effba0071fa4f01ecec312a0c001e0be2ddd7922a1c3dfc70b6d95",
+      "src/engine/flat_ucb.h": "419126fe0e7943f7c1658941b8303ea01e6f8ba01bc7bcfc2ff24653dddc39a5",
+      "src/engine/io_handler.cpp": "9de14b8c794beecadcfd94420903bbef556ad340f7fea74f08c188d1ab659d9f",
+      "src/engine/io_handler.h": "02edf011d50da8b2ed01a0dcc239efe8605b2c26827727fc2cef32418dd6b69e",
+      "src/engine/linear.cpp": "4358b7fee958f678c18722e6610bc04329e11d75decacb8eba2fb263b9055700",
+      "src/engine/linear.h": "f23e06bae9a330ccecb99cdbe868af1a51793c53a5dc04bb93c3269179869714",
+      "src/engine/mcts.h": "5201e3473e6d3e07c77175d2206c7f8d47556e4b15bd5e068197c7d723454981",
+      "src/engine/mcts.inl": "5d1deade4b8fca71ec155fec567382e47f17981fdd00ce9f7d89db342311fb30",
+      "src/engine/mcts_engines.h": "a0d9a6297584690bf90eb49e9474c8d3bc1da824d514866841fbf6eb3bc1ce4e",
+      "src/engine/monkey.cpp": "0b346defa70a75e09e989b0e1a9944352d40c41c314ce7437357fe839a82b6f5",
+      "src/engine/monkey.h": "1b8bf04a923bfbb83fbe6d8de7e6360b83721f0280287a6d90d1ba6d77fd74f6",
+      "src/engine/move_evaluation.cpp": "38dbba74c3fe9713dd26e44b358d84d7f24fca7f27799876a5be77620e60229b",
+      "src/engine/move_evaluation.h": "818821462ceb97c408b427ffcd4d559700bccfabdcd26f8ac976c0ad1be9e464",
+      "src/engine/move_evaluation_weights.h": "02958e9584246aab54e636f61b531265d7786dfb4c20fb30c21304b901e11a32",
+      "src/engine/progressive_widening.h": "4f071b9d178c592a1d6a57c249c067dc58d107fe9a0d84ab1a7355091378807d",
+      "src/engine/rollout_policy.cpp": "d5ea7a951249b0b8c196d86ff246a0457addc91d0ac5938af5742337f3d3985b",
+      "src/engine/rollout_policy.h": "9941a58317b429204ea78c3e793df3863bf61209c4e46143e3dbe7eb26e26ebd",
+      "src/engine/selection_policy.h": "5721edbf67d6554ac0c7707875463e9819e8b6fc0e7cf9ab1c77f5008e2fefda",
+      "src/engine/uci.cpp": "87a46be63eabe7a3df3c6fea97ebf691f951156d51ab2c2246c53b0cec8455a4",
+      "src/engine/uci.h": "0dfdf5721e7bff4c677b6ec9f9f8b13b96ef206fdf75c741442212ab6e179244",
+      "src/engine/uct.cpp": "cb6999a146437b21b1028d85f955b2a2a204b4b984a867aa68d3d1cec66d575f",
+      "src/engine/uct.h": "2110a28445b9f71df490f3e511fdbd51d2612e553455af80ec41c0dde9f2d54f",
+      "src/misc/.DS_Store": "d65165279105ca6773180500688df4bdc69a2c7b771752f0a46ef120b7fd8ec3",
+      "src/misc/debug.h": "9515680cb4d44fd599a8abc2e31f37c1b680e78a803caad162a91bdb11fb26ac",
+      "src/misc/generator.h": "a5f5c91b18a4f13942b9018198fa6e2e77d93410a503eb3ee7953bde371a0a05",
+      "src/misc/geometry.cpp": "3f818d994b438397eb2c2153acacc5123b22536c7454e252505b6e1c0276bcda",
+      "src/misc/geometry.h": "29d93b0fea09ef516d9028fd5bf99ab85e54589c2fe3927e101b802cfa9e6142",
+      "src/misc/graph.cpp": "3e155cb0ecbd5ecbac8db9cf9a51889f7b425d008673f6dc440eb775f0bbf3ff",
+      "src/misc/graph.h": "9220fa164f8e9d271185d3be2af3f0a46740880d075c39f872757aa8ef20154b",
+      "src/misc/integer_set.cpp": "6b751db93f7f37bd9f468d2a193317f9e367107013edc377f3a81b1f989550cf",
+      "src/misc/integer_set.h": "dd6762242c782c03b87d85437e589ee5bbd0025790e90fda0c3d1e993d09035a",
+      "src/misc/ordering.cpp": "1cba590c19db8844ac21a2c9828ad95cb9cff666c17081163229784ad049b4f5",
+      "src/misc/ordering.h": "29e540341c8d082c17c5212ddaa8d2d362bfca0a4d61ad194f7a7599a2624568",
+      "src/misc/scope.h": "aa6a78c8fc79130e30645771f9a6bdd80f843d0e3bbcd76c67ab398d606c5224",
+      "src/misc/utils.h": "ea1b91d7cfe27c32dbd695ac52d152f28d01db479bcf3716eac08787a6c6f29b",
+      "src/misc/vec4.h": "31d13e241bd19cf2e364c065c44f112ffb94ad56e8dcf62def038cc678f5510b"
+    },
+    "hardware": "Apple M1 Pro, 8 CPU cores (6 performance + 2 efficiency), 16 GB RAM",
+    "system": "macOS 15.8.1 arm64",
+    "compiler": "Apple Clang 17.0.0 (clang-1700.6.3.2)",
+    "build": "Release (-O3 -DNDEBUG), LTO enabled",
+    "python": "/opt/anaconda3/bin/python",
+    "instrumentation_sha256": "a85901e05c631ea95c257797b9c155f6008c687c3aece33fe8221bac9c9647df",
+    "temporary_driver_path": "/private/tmp/5dchess-rollout-20261008/measure.cpp",
+    "pilot_seed_range": [
+      2500000,
+      2500199
+    ],
+    "main_seed_range": [
+      5000000,
+      5009999
+    ],
+    "pilot_excluded_from_main": true
+  },
+  "fixed_main_design": {
+    "pilot_trials": 200,
+    "pilot_statuses": {
+      "BLACK_WINS": 108,
+      "WHITE_WINS": 92
+    },
+    "pilot_actions_min": 10,
+    "pilot_actions_max": 238,
+    "pilot_mean_actions": 78.29,
+    "main_trials": 10000,
+    "main_first_seed": 5000000,
+    "main_action_limit": 2000,
+    "main_trial_timeout_seconds": 30,
+    "train_trial_ids": [
+      1,
+      8000
+    ],
+    "held_out_trial_ids": [
+      8001,
+      10000
+    ],
+    "discretization": "Positive integer K=ceil(X) for continuous X>0; lognormal/gamma/Weibull loc fixed at zero",
+    "goodness_of_fit": "discrete KS with parametric bootstrap, refitting each simulated sample",
+    "significance_level": 0.05,
+    "bootstrap_replicates": 999,
+    "bootstrap_rng_seed": 2026100801,
+    "uncertainty_bootstrap_replicates": 1999,
+    "uncertainty_rng_seed": 2026100802,
+    "main_not_started_when_written": true
+  },
+  "pilot": {
+    "phase": "pilot",
+    "first_seed": 2500000,
+    "trials": 200,
+    "action_limit": 2000,
+    "trial_timeout_seconds": 30.0,
+    "wall_seconds": 0.9927282089920482,
+    "statuses": {
+      "BLACK_WINS": 108,
+      "WHITE_WINS": 92
+    },
+    "sum_reported_time_ms": 139.582251,
+    "native_driver": "rollout_measurement",
+    "independent_rng_per_trial": true
+  },
+  "main_collection": {
+    "phase": "main",
+    "first_seed": 5000000,
+    "trials": 10000,
+    "action_limit": 2000,
+    "trial_timeout_seconds": 30.0,
+    "wall_seconds": 7.146109249995789,
+    "statuses": {
+      "ACTION_LIMIT": 4,
+      "BLACK_WINS": 5049,
+      "STALEMATE": 3,
+      "WHITE_WINS": 4944
+    },
+    "sum_reported_time_ms": 7076.963002,
+    "native_driver": "rollout_measurement",
+    "independent_rng_per_trial": true
+  },
+  "initial_extension_design": {
+    "extension_action_limits": [
+      20000,
+      200000
+    ],
+    "per_run_timeout_seconds": 30,
+    "trials": [
+      724,
+      5820,
+      6836,
+      9535
+    ],
+    "rerun_from_same_seed": true,
+    "stop_extending_when_terminal": true,
+    "reason": "Resolve four main trials capped at 2000; retain any censoring after the final extension"
+  },
+  "extension_revision": {
+    "original_limits": [
+      20000,
+      200000
+    ],
+    "revised_limit": 4000,
+    "reason": "Long-run reproduction found time-coordinate overflow: vec4::T_MAX is 2047. Avoid further invalid-state measurements; retain the four right-censored trials.",
+    "original_protocol_file": "extension-design.json",
+    "representation_issue_reproduction_seed": 5000723,
+    "asan_log": "asan.stderr.log"
+  },
+  "validation": {
+    "deterministic_replay_seeds": [
+      5000000,
+      5000001,
+      5000099,
+      5000499,
+      5001999,
+      5005999,
+      5008999,
+      5009999
+    ],
+    "production_cli_outcomes_agree": true,
+    "boundary_seed": 5000099,
+    "boundary_classification": {
+      "108": "ACTION_LIMIT",
+      "109": "WHITE_WINS",
+      "110": "WHITE_WINS"
+    },
+    "opening_hash": "108895e6542b2533",
+    "opening_matches_human_dataset": true,
+    "numerical_fit_checks": {
+      "lognormal": {
+        "alternative_start_nll_difference": -7.275957614183426e-12,
+        "observation_probability_sum": 1.0
+      },
+      "gamma": {
+        "alternative_start_nll_difference": -7.275957614183426e-12,
+        "observation_probability_sum": 0.9999999999999999
+      },
+      "weibull": {
+        "alternative_start_nll_difference": -7.275957614183426e-12,
+        "observation_probability_sum": 1.0
+      }
+    },
+    "all_bootstrap_refits_converged": true,
+    "existing_test_mcts_policies": "Passed"
+  },
+  "budgets": [
+    {
+      "budget_seconds": "1.000000",
+      "elapsed_seconds": "1.000481",
+      "completed": "1472",
+      "white": "721",
+      "black": "750",
+      "stalemate": "1",
+      "capped": "0",
+      "seed_base": "10000000",
+      "peak_child_resident_bytes_so_far": "5095424"
+    },
+    {
+      "budget_seconds": "10.000000",
+      "elapsed_seconds": "10.000432",
+      "completed": "14342",
+      "white": "7240",
+      "black": "7100",
+      "stalemate": "0",
+      "capped": "2",
+      "seed_base": "20000000",
+      "peak_child_resident_bytes_so_far": "5996544"
+    },
+    {
+      "budget_seconds": "60.000000",
+      "elapsed_seconds": "60.000698",
+      "completed": "86699",
+      "white": "42968",
+      "black": "43683",
+      "stalemate": "22",
+      "capped": "26",
+      "seed_base": "30000000",
+      "peak_child_resident_bytes_so_far": "7929856"
+    }
+  ],
+  "capped_endpoint_boards": {
+    "724": "endpoint=0:2001:0 8/8/1k6/8/8/8/2K5/8",
+    "5820": "endpoint=0:2001:0 8/8/8/8/4K3/8/8/k7",
+    "6836": "endpoint=0:2001:0 8/8/8/6K1/8/8/8/4k3",
+    "9535": "endpoint=0:2001:0 4k3/8/8/8/8/K7/8/8"
+  },
+  "human_baseline": {
+    "verified_games": 649,
+    "mean_actions": 40.440677966101696,
+    "median_actions": 37,
+    "max_actions": 132,
+    "selection": "verified terminal Standard - Turn Zero human games only"
+  },
+  "completion_at_action_cap": {
+    "120": 8013,
+    "200": 9852,
+    "500": 9994,
+    "2000": 9996
+  },
+  "artifact_sha256": {
+    "rollout-turn-zero-budgets.csv": "2117e7b3431ad261a8ad27fcf1de4b299927f769c5094608b5fe61c4bcfecaa7",
+    "rollout-turn-zero-extensions.csv": "551264745211631723a141a845f964e9d661b9db41fdcf71981498a6de440dd6",
+    "rollout-turn-zero-model-bootstrap.csv": "f39771c8d45144e69604b31d56382e0686ef66e018484dff9ad99f346f14359a",
+    "rollout-turn-zero-models.csv": "046058a1cf0e935a27d48adf7371d803e0e23bed04e0fe4d0c8f51424af68c22",
+    "rollout-turn-zero-pilot.csv": "26178e449d4cdf8503a6db4c32c1bcb7a0e8e12bfb19247614fc09b3f0000bfe",
+    "rollout-turn-zero-stopping-probability.csv": "9d9801e23d11def065d48811c5b13a37f89cca9e179143546075abf1dc224f92",
+    "rollout-turn-zero.csv": "c544e19787be73107556b5c40f1df54606b1b25980e5b4f5683b7d9300081a56"
+  },
+  "statistical_software": {
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "matplotlib": "3.9.2"
+  },
+  "histogram": {
+    "unit": "submitted player actions",
+    "bin_width": 10,
+    "comparison_range": [
+      1,
+      300
+    ],
+    "complete_terminal_range": [
+      1,
+      1100
+    ],
+    "denominator": 10000,
+    "terminal_bar_total": 9996,
+    "censored_outside_bars": 4,
+    "shared_bins_csv": "game-length-turn-zero-bins.csv"
+  },
+  "model_cdf_diagnostics": {
+    "lognormal": {
+      "max_discrepancy_at_actions": 73,
+      "observed_cdf": 0.4849,
+      "fitted_cdf": 0.5450079707010832,
+      "bootstrap_ks_95th_percentile": 0.008510365300789701,
+      "bootstrap_ks_max": 0.015728021514030466
+    },
+    "gamma": {
+      "max_discrepancy_at_actions": 75,
+      "observed_cdf": 0.5019,
+      "fitted_cdf": 0.5218631407238135,
+      "bootstrap_ks_95th_percentile": 0.008788044529287147,
+      "bootstrap_ks_max": 0.013127918522829796
+    }
+  },
+  "stopping_probability_diagnostic": {
+    "collection": "saved main trials; post hoc descriptive analysis",
+    "interval_width_actions": 25,
+    "intervals": [
+      {
+        "min_actions": 1,
+        "max_actions": 25,
+        "trials_entering_interval": 10000,
+        "terminal_in_interval": 823,
+        "conditional_probability": 0.0823,
+        "wilson_95_lower": 0.0770726451510133,
+        "wilson_95_upper": 0.08784814708784992
+      },
+      {
+        "min_actions": 26,
+        "max_actions": 50,
+        "trials_entering_interval": 9177,
+        "terminal_in_interval": 2001,
+        "conditional_probability": 0.21804511278195488,
+        "wilson_95_lower": 0.20971587977981435,
+        "wilson_95_upper": 0.22661029759600712
+      },
+      {
+        "min_actions": 51,
+        "max_actions": 75,
+        "trials_entering_interval": 7176,
+        "terminal_in_interval": 2195,
+        "conditional_probability": 0.30588071348940915,
+        "wilson_95_lower": 0.2953258702846798,
+        "wilson_95_upper": 0.31664327750516474
+      },
+      {
+        "min_actions": 76,
+        "max_actions": 100,
+        "trials_entering_interval": 4981,
+        "terminal_in_interval": 1919,
+        "conditional_probability": 0.3852640032122064,
+        "wilson_95_lower": 0.37184242488835717,
+        "wilson_95_upper": 0.39886241909871534
+      },
+      {
+        "min_actions": 101,
+        "max_actions": 125,
+        "trials_entering_interval": 3062,
+        "terminal_in_interval": 1319,
+        "conditional_probability": 0.43076420640104507,
+        "wilson_95_lower": 0.4133224694157135,
+        "wilson_95_upper": 0.4483794464546865
+      },
+      {
+        "min_actions": 126,
+        "max_actions": 150,
+        "trials_entering_interval": 1743,
+        "terminal_in_interval": 877,
+        "conditional_probability": 0.5031554790590935,
+        "wilson_95_lower": 0.479701786240734,
+        "wilson_95_upper": 0.5265952935225471
+      },
+      {
+        "min_actions": 151,
+        "max_actions": 175,
+        "trials_entering_interval": 866,
+        "terminal_in_interval": 497,
+        "conditional_probability": 0.5739030023094688,
+        "wilson_95_lower": 0.5407124356403423,
+        "wilson_95_upper": 0.6064408170610622
+      },
+      {
+        "min_actions": 176,
+        "max_actions": 200,
+        "trials_entering_interval": 369,
+        "terminal_in_interval": 221,
+        "conditional_probability": 0.5989159891598916,
+        "wilson_95_lower": 0.5481371409247242,
+        "wilson_95_upper": 0.6476565356446697
+      },
+      {
+        "min_actions": 201,
+        "max_actions": 225,
+        "trials_entering_interval": 148,
+        "terminal_in_interval": 97,
+        "conditional_probability": 0.6554054054054054,
+        "wilson_95_lower": 0.5757819862019191,
+        "wilson_95_upper": 0.7271655773770127
+      },
+      {
+        "min_actions": 226,
+        "max_actions": 250,
+        "trials_entering_interval": 51,
+        "terminal_in_interval": 30,
+        "conditional_probability": 0.5882352941176471,
+        "wilson_95_lower": 0.4516533720637157,
+        "wilson_95_upper": 0.7124560479541906
+      }
+    ],
+    "interval_definition": "P(a <= L <= b | L >= a)",
+    "confidence_intervals": "pointwise Wilson 95%; not a test for a selected tail threshold"
+  }
+}

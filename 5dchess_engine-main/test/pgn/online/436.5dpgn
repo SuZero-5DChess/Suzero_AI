@@ -1,0 +1,28 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.10"]
+[Round "597"]
+[White "RHD"]
+[Black "茫然的小学妹"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Pogchamps"]
+
+{
+t0database/game 391 records the same game with conflicting information:
+ white: Citrus
+ black: Public Match
+ date: 2021.01.10
+ result: 1-0
+}
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)d2d4 / (0T2)d7d5 
+3.(0T3)c2c3 / (0T3)c7c5 
+4.(0T4)g2g3 / (0T4)Bc8d7 
+5.(0T5)Nf3e5 / (0T5)Nf6e4 
+6.(0T6)Ne5f7 / (0T6)Ne4f2 
+7.(0T7)Nf7d8 / (0T7)Ke8d8 
+8.(0T8)Qd1c2 / (0T8)Bd7f5 
+9.(0T9)Qc2f5
+{recorded:black wins}

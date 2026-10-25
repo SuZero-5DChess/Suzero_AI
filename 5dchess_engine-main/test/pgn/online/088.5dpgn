@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.11"]
+[Round "32"]
+[White "Neathp"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)e7e6 
+2.(0T2)Qd1f3 / (0T2)Nb8c6 
+3.(0T3)h2h4 / (0T3)Nc6e5 
+4.(0T4)Qf3h5 / (0T4)g7g6 
+5.(0T5)Qh5e5 / (0T5)Ng8f6 
+6.(0T6)Qe5f4 / (0T6)Bf8d6 
+7.(0T7)Qf4f3 / (0T7)Ke8g8 
+8.(0T8)Ng1h3 / (0T8)c7c6 
+9.(0T9)Nh3g5 / (0T9)Bd6>>(0T5)d2 
+10.(-1T6)Bc1d2 / (-1T6)Qd8f6 
+11.(-1T7)Bd2c3 / (-1T7)Qf6e5 
+12.(-1T8)Bc3e5 / (-1T8)f7f6 
+13.(-1T9)Be5c3 / (-1T9)Bf8g7 
+14.(-1T10)Ng1>>(-1T9)g3 (0T10)Ng5>>(0T9)g7 / (2T9)Kg8g7 (1T9)g6g5 
+15.(2T10)Nh3g5 (1T10)Be5f6 / (1T10)Bf8>>(1T9)f7 
+16.(-2T10)Be5f6 / (0T10)Qd8>>(0T7)a5 
+17.(-3T8)Nb1a3 / (-3T8)Rh8g8 
+18.(-3T9)Na3c4 / (-3T9)g6g5 19.(-3T10)Nc4a5

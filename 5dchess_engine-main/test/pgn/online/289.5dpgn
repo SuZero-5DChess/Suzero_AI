@@ -1,0 +1,42 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.08"]
+[Round "236"]
+[White "Sarperen"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League Season 2"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)c2c4 / (0T2)c7c5 
+3.(0T3)Nb1c3 / (0T3)Nb8c6 
+4.(0T4)e2e3 / (0T4)e7e6 
+5.(0T5)b2b3 / (0T5)g7g6 
+6.(0T6)Bc1b2 / (0T6)Bf8g7 
+7.(0T7)Nc3e4 / (0T7)Nf6e4 
+8.(0T8)Bb2g7 / (0T8)Rh8g8 
+9.(0T9)Bg7b2 / (0T9)f7f5 
+10.(0T10)h2h4 / (0T10)Nc6b4 
+11.(0T11)a2a3 / (0T11)Nb4c6 
+12.(0T12)Bf1d3 / (0T12)b7b6 
+13.(0T13)Qd1c2 / (0T13)d7d5 
+14.(0T14)c4d5 / (0T14)e6d5 
+15.(0T15)Nf3e5 / (0T15)Qd8e7 
+16.(0T16)Ne5c6 / (0T16)Qe7e6 
+17.(0T17)Bd3b5 / (0T17)Bc8d7 
+18.(0T18)Nc6>>(0T17)e6 / (1T17)Bc8e6 
+19.(1T18)Bd3e4 / (0T18)Qe6e7 (1T18)f5e4 
+20.(0T19)Bb5d7 (1T19)Nc6>>(1T18)e6 / (0T19)Ke8d7 (1T19)Ra8b8 
+21.(1T20)Bb2e5 (0T20)Ke1>>(0T19)d1 / (0T20)Qe7d6 (1T20)Rg8f8 
+22.(1T21)Be5b8 (0T21)Ra1e1 / (0T21)Qd6>>(0T0)d6 
+23.(-1T1)e2e3 / (-1T1)e7e6 
+24.(-1T2)Ng1f3 / (-1T2)Qd8f6 
+25.(-1T3)Ke1>>(-1T2)e2 / (-1T3)Qf6h6 
+26.(-1T4)Bf1d3 / (-1T4)Qh6>>(-1T1)h6 
+27.(-2T2)Ke1>>(-1T2)e2 / (-2T2)e7e6 
+28.(-2T3)Ng1f3 / (-2T3)Qh6>>(0T1)f4 
+29.(-3T2)Ke1>>(-2T2)e2 / (4T2)Qd8h4 (-3T2)e7e6 
+30.(-3T3)e2e3 (4T3)Ng1f3 / (4T3)Qh4f2 (-3T3)Qf4f6 
+31.(4T4)Ke1f2 (-3T4)Bf1d3 (-2T4)Nf3d4 / (4T4)Qd6a6 (-3T4)Nb8c6 (-2T4)Qd8f6 
+32.(4T5)Ke2e1 (-1T5)Nf3g5 (-2T5)Bf1d3 (-3T5)Nb1c3 / (4T5)b7b5 (-3T5)Nc6e5 (-2T5)Nb8c6 (-1T5)Ng8h6

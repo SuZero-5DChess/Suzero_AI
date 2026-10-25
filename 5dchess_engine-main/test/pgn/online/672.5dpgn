@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.05.23"]
+[Round "636"]
+[White "tesseract"]
+[Black "Mauer"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)Ng1f3 / {20:05}(0T1)Ng8f6 
+2.{20:05}(0T2)d2d4 / {20:05}(0T2)a7a5 
+3.{20:04}(0T3)c2c3 / {20:05}(0T3)a5a4 
+4.{20:05}(0T4)Bc1f4 / {20:05}(0T4)b7b6 
+5.{19:05}(0T5)b2b4 / {17:27}(0T5)d7d5 
+6.{17:49}(0T6)Nf3e5 / {16:46}(0T6)Qd8d6 
+7.{17:38}(0T7)e2e3 / {16:01}(0T7)Qd6e6 
+8.{16:24}(0T8)Bf1b5 / {15:56}(0T8)c7c6 
+9.{16:22}(0T9)Qd1e2 / {13:43}(0T9)Bc8b7 
+10.{15:57}(0T10)Nb1d2 / {12:28}(0T10)Nf6d7 
+11.{13:59}(0T11)Bb5d3 / {12:01}(0T11)Bb7a6 
+12.{12:54}(0T12)Bd3a6 / {11:31}(0T12)Ra8a6 
+13.{12:24}(0T13)Ne5d7 / {11:24}(0T13)Nb8d7 
+14.{12:19}(0T14)Qe2a6 / {9:14}(0T14)Ke8d8 
+15.{12:06}(0T15)Qa6a8

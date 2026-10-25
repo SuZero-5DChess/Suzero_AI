@@ -1,0 +1,33 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.09.19"]
+[Round "506"]
+[White "Mage"]
+[Black "RyanFourPM"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6
+2.(0T2)Nb1a3 / (0T2)d7d5
+3.(0T3)Na3b5 / (0T3)c7c5
+4.(0T4)c2c4 / (0T4)Bc8d7
+5.(0T5)e2e3 / (0T5)d5d4
+6.(0T6)b2b4 / (0T6)a7a6
+7.(0T7)Nb5d6 / (0T7)e7d6
+8.(0T8)Nf3g5 / (0T8)Qd8e7
+9.(0T9)Qd1f3 / (0T9)Bd7g4
+10.(0T10)Bf1e2 / (0T10)Bg4f3
+11.(0T11)g2f3 / (0T11)h7h6
+12.(0T12)e3e4 / (0T12)h6g5
+13.(0T13)Rh1f1 / (0T13)Rh8h2
+14.(0T14)Be2>>(0T9)e7 / (1T9)Bf8e7
+15.(1T10)Qd1f3 / (1T10)Bd7c6
+16.(1T11)Qf3h3 / (1T11)Bc6d7
+17.(1T12)Qh3f3 / (1T12)Bd7c6
+18.(1T13)Qf3f5 / (1T13)Bc6d7
+19.(1T14)Qf5f3 / (1T14)Nb8c6 (0T14)Nb8c6
+20.(1T15)Bf1e2 (0T15)d2d3 / (0T15)Nc6b4 (1T15)Ke8c8
+21.(1T16)Ng5f7 (0T16)Bc1d2 / (0T16)Bf8>(1T16)f7
+22.(0T17)Bd2b4 (1T17)b4b5 / (0T17)c5b4 (1T17)Nc6b4
+23.(1T18)Be2d1 (0T18)Ra1c1
+{recorded:black wins}

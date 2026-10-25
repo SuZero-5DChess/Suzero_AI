@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.30"]
+[Round "552"]
+[White "NoNashEquilibrium"]
+[Black "Sapphia"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)d2d4 / {20:05}(0T1)Ng8f6 
+2.{19:40}(0T2)c2c3 / {19:58}(0T2)c7c5 
+3.{19:14}(0T3)Bc1g5 / {19:44}(0T3)Nf6e4 
+4.{18:20}(0T4)Bg5>>(0T1)d5 / {19:44}(1T1)e7e6 
+5.{18:09}(1T2)e2e4 / {19:44}(1T2)Qd8g5 
+6.{17:53}(1T3)Ng1f3 / {19:44}(1T3)Qg5d5 
+7.{17:39}(1T4)e4d5 / {19:24}(0T4)f7f5 (1T4)Bf8e7 
+8.{16:35}(0T5)e2e3 (1T5)Bf1e2 / {19:15}(0T5)Ne4>(1T5)e2 
+9.{16:17}(1T6)Qd1e2 (0T6)Qd1h5 / {18:37}(1T6)Ng8>>(0T4)g8 
+10.{16:01}(-1T5)e2e3 / {17:39}(-1T5)Ne4g5 
+11.{15:00}(-1T6)Bf1b5 / {17:44}(-1T6)Ng5>>(0T4)g5 
+12.{14:29}(-2T5)Qd1b3 / {17:44}(-2T5)c5c4 
+13.{12:47}(-2T6)Qb3c4 / {17:44}(-2T6)Ng5>(0T6)h5 
+14.{11:42}(-2T7)Qc4f7 (-1T7)Ng1f3 (0T7)Ng1h3 (1T7)d5e6 / {17:26}(-1T7)Bf8>(-2T7)f7 (0T7)g7g6 (1T7)d7e6 
+15.{10:04}(-1T8)Nf3e5 (-2T8)Nb1d2 (1T8)Nf3>(0T8)f5 / {16:45}(1T8)Bc8d7 (0T8)c5d4 (-1T8)c5d4 (-2T8)Qd8b6 
+16.{9:00}(-1T9)Bb5d7 (-2T9)Nd2e4 (1T9)Qe2h5 (0T9)Nh3g5 / {16:45}(1T9)g7g6 (-1T9)Bc8d7 (-2T9)Qb6b2 (0T9)d4c3 
+17.{7:36}(0T10)Nf5e7 (1T10)Qh5e5 (-2T10)Ra1d1 (-1T10)Qd1d4 / {15:00}(0T10)Bf8e7 (1T10)Bd7c6 (-2T10)Qb2a2 (-1T10)Ng8h6 
+18.{5:20}(0T11)Ng5e6 (1T11)Qe5h8 (-2T11)Rd1>(-1T11)d1

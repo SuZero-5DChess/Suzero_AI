@@ -1,0 +1,31 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.03.14"]
+[Round "599"]
+[White "Mage"]
+[Black "Los Bro SPQR"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Pro league season 4"]
+
+1.{0:47}(0T1)e2e3 / {7:06}(0T1)Ng8f6
+2.{0:47}(0T2)Ng1f3 / {7:06}(0T2)d7d5
+3.{0:47}(0T3)c2c4 / {7:06}(0T3)c7c6
+4.{0:47}(0T4)c4d5 / {7:06}(0T4)Qd8d5
+5.{0:47}(0T5)Nb1c3 / {7:06}(0T5)Qd5a5
+6.{0:47}(0T6)Qd1b3 / {7:06}(0T6)e7e6
+7.{0:47}(0T7)Bf1c4 / {7:06}(0T7)Nb8a6
+8.{0:47}(0T8)a2a3 / {7:06}(0T8)Na6c5
+9.{0:47}(0T9)Qb3c2 / {7:06}(0T9)Qa5c7
+10.{0:47}(0T10)b2b4 / {7:06}(0T10)Nc5d7
+11.{0:47}(0T11)Bc4e6 / {7:06}(0T11)f7e6
+12.{0:47}(0T12)Nc3b5 / {7:06}(0T12)Qc7d8
+13.{0:47}(0T13)Nf3g5 / {7:06}(0T13)Nd7e5
+14.{0:47}(0T14)Nb5c7 / {7:06}(0T14)Qd8c7
+15.{0:47}(0T15)Ng5e6 / {7:06}(0T15)Bc8e6
+16.{0:47}(0T16)Qc2>>(0T12)g6 / {7:06}(1T12)Ke8e7
+17.{0:47}(1T13)Nf3g5 / {7:06}(1T13)Nd7e5
+18.{0:47}(1T14)Nc3d5 / {7:06}(1T14)e6d5
+19.{0:47}(1T15)Qc2c5 / {7:06}(0T16)Qc7>>(0T13)f7
+20.{0:47}(-1T14)Ng5f7 / {7:06}(-1T14)Ke8f7
+21.{0:47}(-1T15)Qc2g6

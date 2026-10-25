@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.04.14"]
+[Round "651"]
+[White "Public Match"]
+[Black "cirtus"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{4:36}(0T1)Ng1f3 / {11:45}(0T1)Ng8f6 
+2.{4:36}(0T2)d2d4 / {11:45}(0T2)d7d5 
+3.{4:36}(0T3)Bc1d2 / {11:45}(0T3)c7c6 
+4.{4:36}(0T4)c2c4 / {11:45}(0T4)Bc8g4 
+5.{4:36}(0T5)Nb1c3 / {11:45}(0T5)e7e6 
+6.{4:36}(0T6)e2e3 / {11:45}(0T6)Nf6e4 
+7.{4:36}(0T7)h2h3 / {11:45}(0T7)Bg4f3 
+8.{4:36}(0T8)Qd1f3 / {11:45}(0T8)Qd8h4 
+9.{4:36}(0T9)g2g3 / {11:45}(0T9)Qh4>>(0T7)f2 
+10.{4:36}(0T10)Qf3>>(0T6)f7 / {11:45}(1T6)Ke8f7 
+11.{4:36}(1T7)Nf3e5 / {11:45}(1T7)Kf7e8 
+12.{4:36}(1T8)Bd2>(-1T8)f2 / {11:45}(1T8)Nf6e4 (-1T8)Ne4f2 
+13.{4:36}(-1T9)h3g4 (1T9)g2g3 / {11:45}(1T9)Qd8f6 (-1T9)Nf2d1 
+14.{4:36}(-1T10)Ra1d1 (1T10)Ne5g4 / {11:45}(1T10)Qf6f5 (0T10)Ne4>(-1T10)e2 
+15.{4:36}(-1T11)Bf1e2 (1T11)Qd1b3 (0T11)Nc3b5 / {11:45}(1T11)Qf5f2 (-1T11)Qd8d6 (0T11)c6b5 
+16.{4:36}(1T12)Ng4f2 (-1T12)Nf3e5 (0T12)c4d5 / {11:45}(-1T12)Qd6>>(-1T9)g3

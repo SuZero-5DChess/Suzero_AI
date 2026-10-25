@@ -1,0 +1,43 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.08"]
+[Round "234"]
+[White "Write and Wrong"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)b2b3 / (0T2)e7e6 
+3.(0T3)Bc1b2 / (0T3)h7h5 
+4.(0T4)Qd1f3 / (0T4)Bf8d6 
+5.(0T5)Bb2f6 / (0T5)g7f6 
+6.(0T6)Nb1c3 / (0T6)Nb8c6 
+7.(0T7)Nc3e4 / (0T7)Rh8h6 
+8.(0T8)Ne4d6 / (0T8)c7d6 
+9.(0T9)Qf3g3 / (0T9)Rh6g6 
+10.(0T10)Qg3d6 / (0T10)Qd8e7 
+11.(0T11)Qd6f4 / (0T11)Nc6e5 
+12.(0T12)Ng1f3 / (0T12)Ne5f3 
+13.(0T13)Qf4f3 / (0T13)Rg6g5 
+14.(0T14)h2h4 / (0T14)Rg5f5 
+15.(0T15)Qf3g3 / (0T15)Qe7f8 
+16.(0T16)Qg3c7 / (0T16)Rf5f2 
+17.(0T17)Ke1f2 / (0T17)Qf8b4 
+18.(0T18)Qc7c3 / (0T18)Qb4c3 
+19.(0T19)d2c3 / (0T19)a7a6 
+20.(0T20)Bf1d3 / (0T20)f6f5 
+21.(0T21)Rh1h3 / (0T21)d7d5 
+22.(0T22)Rh3g3 / (0T22)Ke8f8 
+23.(0T23)Kf2e2 / (0T23)e6e5 
+24.(0T24)Ke2e1 / (0T24)Bc8e6 
+25.(0T25)Rg3g5 / (0T25)Ra8c8 
+26.(0T26)Bd3f5 / (0T26)Be6f5 
+27.(0T27)Rg5f5 / (0T27)Rc8c3 
+28.(0T28)Ke1d2 / (0T28)d5d4 
+29.(0T29)e3d4 / (0T29)e5d4 
+30.(0T30)Ra1f1 / (0T30)Rc3c7 
+31.(0T31)Rf5h5 / (0T31)Rc7>>(0T17)c7 
+32.(-1T18)Bf1d3 / (-1T18)b7b6 
+33.(-1T19)Bd3h7 {timeout}
+{recorded:white wins}

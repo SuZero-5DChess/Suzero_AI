@@ -1,0 +1,39 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.11"]
+[Round "242"]
+[White "Samet The Turk"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)c2c4 / (0T2)c7c5 
+3.(0T3)Nb1c3 / (0T3)e7e6 
+4.(0T4)Nc3d5 / (0T4)b7b6 
+5.(0T5)Nd5f6 / (0T5)Qd8f6 
+6.(0T6)e2e3 / (0T6)Bc8b7 
+7.(0T7)Ra1b1 / (0T7)Nb8c6 
+8.(0T8)Qd1e2 / (0T8)Nc6d4 
+9.(0T9)e3d4 / (0T9)c5d4 
+10.(0T10)Ke1d1 / (0T10)Bb7c6 
+11.(0T11)b2b3 / (0T11)a7a5 
+12.(0T12)Bc1b2 / (0T12)Qf6f5 
+13.(0T13)Rb1c1 / (0T13)Bf8c5 
+14.(0T14)Qe2d3 / (0T14)Qf5h5 
+15.(0T15)Bf1e2 / (0T15)a5a4 
+16.(0T16)Rh1e1 / (0T16)Qh5g6 
+17.(0T17)Qd3g6 / (0T17)h7g6 
+18.(0T18)Bb2d4 / (0T18)a4b3 
+19.(0T19)Bd4c5 / (0T19)b6c5 
+20.(0T20)a2b3 / (0T20)Ra8a2 
+21.(0T21)Be2d3 / (0T21)Ra2b2 
+22.(0T22)Nf3e5 / (0T22)Bc6b7 
+23.(0T23)f2f3 / (0T23)Rb2b3 
+24.(0T24)h2h3 / (0T24)d7d5 
+25.(0T25)c4d5 / (0T25)Rb3d3 
+26.(0T26)Ne5d3 / (0T26)Bb7d5 
+27.(0T27)Nd3c5 / (0T27)Bd5b3 
+28.(0T28)Nc5b3 / (0T28)Ke8g8 
+29.(0T29)Rc1c7
+{recorded:white wins}

@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.05"]
+[Round "224"]
+[White "Romad"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)e2e3 / (0T2)c7c6 
+3.(0T3)Bf1c4 / (0T3)e7e6 
+4.(0T4)Nb1c3 / (0T4)b7b5 
+5.(0T5)Bc4b3 / (0T5)Nb8a6 
+6.(0T6)d2d4 / (0T6)Nf6e4 
+7.(0T7)Qd1d3 / (0T7)Ne4f2 
+8.(0T8)Ke1f2 / (0T8)Na6b4 
+9.(0T9)Qd3e4 / (0T9)Qd8f6 
+10.(0T10)Nc3b5 / (0T10)c6b5 
+11.(0T11)Qe4a8 / (0T11)Qf6>>(0T8)f3 
+12.(-1T9)Kf2f3 / (-1T9)Qd8f6 
+13.(-1T10)Kf3e2 / (-1T10)Ke8d8 
+14.(0T12)Qa8>>(0T10)c8 / (1T10)Ra8c8 
+{unfinished final turn: 15.(1T11)Qe4f4 {timeout}}
+{recorded:white wins}

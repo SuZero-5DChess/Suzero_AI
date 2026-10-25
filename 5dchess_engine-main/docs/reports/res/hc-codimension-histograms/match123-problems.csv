@@ -1,0 +1,5 @@
+problem,attempt,fixed_axes,universe_codim,selected_codim,hcs_before,hcs_after,intersecting_targets,disjoint_targets
+1,1,14,14,1,58,721,58,0
+2,2,1,1,0,721,663,58,663
+3,3,1,1,1,663,663,663,0
+4,4,1,1,1,663,663,663,0

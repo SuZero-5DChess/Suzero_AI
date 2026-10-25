@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.14"]
+[Round "369"]
+[White "Public Match"]
+[Black "cirtus"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.{17:06}(0T1)e2e3 / {8:00}(0T1)Ng8f6 
+2.{17:06}(0T2)Ng1f3 / {8:00}(0T2)e7e6 
+3.{17:06}(0T3)c2c3 / {8:00}(0T3)c7c6 
+4.{17:06}(0T4)Qd1b3 / {8:00}(0T4)Qd8a5 
+5.{17:06}(0T5)Qb3>>(0T1)f7 / {8:00}(1T1)Ke8f7 
+6.{17:06}(1T2)Ng1h3 / {8:00}(1T2)Ng8f6 
+7.{17:06}(1T3)Nh3g5 / {8:00}(1T3)Kf7e8 
+8.{17:06}(1T4)Ng5>>(1T2)f5 / {8:00}(1T4)d7d5 
+9.{17:06}(1T5)Ke1>>(0T5)d1 / {8:00}(1T5)c7c6 (0T5)Nf6g4 
+10.{17:06}(1T6)Qd1e1 (0T6)Ke1>>(1T6)e1 / {8:00}(0T6)Qa5a4 (1T6)Qd8a5 
+11.{17:06}(0T7)Nf3e1 (1T7)f2f3 / {8:00}(0T7)Qa4>>(0T0)h4 
+12.{17:06}(-1T1)g2g3 / {8:00}(-1T1)Qh4>>(0T0)h4 
+13.{17:06}(-2T1)d2d3 / {8:00}(-2T1)Qh4g4 
+14.{17:06}(-1T2)e2e3 (-2T2)e2e3 / {8:00}(-2T2)Qg4>>(0T0)e6 
+15.{17:29}(-3T1)c2c3
+{recorded:white wins}

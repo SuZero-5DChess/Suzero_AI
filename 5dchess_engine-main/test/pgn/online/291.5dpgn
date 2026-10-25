@@ -1,0 +1,30 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.08"]
+[Round "238"]
+[White "Mage"]
+[Black "tesseract"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Advanced League Season 2"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1f3 / (0T2)d7d5 
+3.(0T3)c2c4 / (0T3)c7c6 
+4.(0T4)c4d5 / (0T4)Qd8d5 
+5.(0T5)Nb1c3 / (0T5)Qd5c5 
+6.(0T6)a2a3 / (0T6)Bc8g4 
+7.(0T7)b2b4 / (0T7)Bg4f3 
+8.(0T8)Qd1f3 / (0T8)Qc5e5 
+9.(0T9)Bf1c4 / (0T9)e7e6 
+10.(0T10)Bc1b2 / (0T10)Nb8d7 
+11.(0T11)Nc3d1 / (0T11)Qe5d6 
+12.(0T12)Bb2c3 / (0T12)Ra8d8 
+13.(0T13)Nd1b2 / (0T13)Nd7e5 
+14.(0T14)Qf3g3 / (0T14)Nf6e4 
+15.(0T15)Qg3e5 / (0T15)Qd6e5 
+16.(0T16)Bc3e5 / (0T16)Bf8d6 
+17.(0T17)Be5d6 / (0T17)Ne4>>(0T15)e5 
+18.(-1T16)Ra1d1 / (-1T16)Qd6c7 
+19.(-1T17)Bc4e6 / (-1T17)f7e6 
+20.(0T18)Bd6>(-1T18)e6

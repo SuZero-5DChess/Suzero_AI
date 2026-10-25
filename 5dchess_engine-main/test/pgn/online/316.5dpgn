@@ -1,0 +1,41 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.30"]
+[Round "265"]
+[White "tesseract"]
+[Black "Public Match"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1f3 / (0T2)c7c5 
+3.(0T3)c2c3 / (0T3)e7e6 
+4.(0T4)Qd1b3 / (0T4)Qd8b6 
+5.(0T5)Qb3>>(0T1)f7 / (1T1)Ke8f7 
+6.(1T2)Ng1h3 / (1T2)Ng8f6 
+7.(1T3)Nh3g5 / (1T3)Kf7e8 
+8.(1T4)Ng5>>(1T2)f5 / (1T4)c7c5 
+9.(1T5)e2e3 / (1T5)Qd8b6 (0T5)Nb8c6 
+10.(1T6)Ke1>>(0T5)d1 (0T6)Bf1d3 / (0T6)Bf8d6 (1T6)Nb8c6 
+11.(1T7)Bf1e2 (0T7)Ke1>>(1T7)e1 / (0T7)Nc6e5 (1T7)Nc6e5 
+12.(1T8)Be2h5 (0T8)Nf3e5 / (0T8)Bd6e5 (1T8)g7g6 
+13.(1T9)Bh5g6 (0T9)f2f4 / (0T9)Be5d6 (1T9)h7g6 
+14.(1T10)f2f4 (0T10)f4f5 / (0T10)Qb6d8 (1T10)Ne5g4 
+15.(1T11)Qd1f3 (0T11)f5e6 / (0T11)d7e6 (1T11)Qb6c6 
+16.(1T12)e3e4 (0T12)Bd3f5 / (1T12)Qc6e4 (0T12)Bd6e7 
+17.(1T13)Qf3a3 (0T13)Bf5d3 / (1T13)Qe4b4 (0T13)Qd8d3 
+18.(1T14)Qa3g3 (0T14)Nb1a3 / (0T14)Bc8d7 (1T14)Qb4e4 
+19.(1T15)d2d3 (0T15)b2b4 / (1T15)Qe4e2 (0T15)Qd3f5 
+20.(0T16)b4c5 (1T16)Rh1e1 / (1T16)Qe2f2 (0T16)Qf5g5 
+21.(1T17)Re1e7 (0T17)Bc1b2 / (1T17)Bf8e7 (0T17)Ra8c8 
+22.(1T18)Qg3>(0T18)h3 / (1T18)Qf2c2 (0T18)Rc8c5 
+23.(0T19)Bb2>(1T19)c2 / (1T19)Rh8h2 (0T19)Nf6e4 
+24.(0T20)Ra1f1 (1T20)Nb1c3 / (0T20)Rc5f5 (1T20)Rh2g2 
+25.(0T21)Qh3>(1T21)g2 / (0T21)Qg5h4 (1T21)d7d6 
+26.(1T22)Nc3d5 (0T22)Rf1f5 / (0T22)Qh4>>(0T0)h4 
+27.(-1T1)e2e3 / (-1T1)Qh4>>(0T0)g5 
+28.(-2T1)e2e3 / (-2T1)Qg5f6 
+29.(-1T2)Qd1h5 (-2T2)Qd1h5 / (-2T2)Qf6>>(0T0)h4 
+30.(-3T1)e2e3 / (-3T1)Qh4>>(-1T1)f2 
+31.(-3T2)Bf1>(-4T2)f2
+{recorded:white wins}

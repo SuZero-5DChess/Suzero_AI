@@ -1,0 +1,32 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.20"]
+[Round "252"]
+[White "tesseract"]
+[Black "Neathp"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Ng1f3 / (0T2)e7e6 
+3.(0T3)c2c3 / (0T3)c7c5 
+4.(0T4)Qd1b3 / (0T4)Qd8a5 
+5.(0T5)Qb3>>(0T1)f7 / (0T5)Qa5>>(0T0)f5 
+6.(-1T1)Ng1h3 / (-1T1)Qf5>(1T1)f7 
+7.(-1T2)e2e3 (1T2)Ng1f3 / (-1T2)Ng8f6 (1T2)e7e6 
+8.(-1T3)Nh3g5 (1T3)e2e3 / (1T3)Ng8f6 (-1T3)e7e6 
+9.(-1T4)c2c3 (1T4)Nf3e5 / (-1T4)c7c5 (1T4)Qf7h5 
+10.(1T5)Qd1h5 (-1T5)Qd1b3 / (-1T5)Qd8a5 (1T5)Nf6h5 
+11.(-1T6)Qb3>>(-1T2)f7 / (2T2)Ke8f7 
+12.(2T3)e2e3 / (2T3)Ng8f6 
+13.(2T4)Nh3g5 / (2T4)Kf7e8 
+14.(2T5)c2c3 / (2T5)d7d5 
+15.(2T6)Qd1b3 (1T6)Ne5>(0T6)e7 / (-1T6)Qa5>>(-1T1)a5 
+16.(-2T2)e2e3 / (-2T2)Qa5d2 
+17.(-2T3)Qd1d2 / (-2T3)e7e6 
+18.(-2T4)Qd2c3 / (-2T4)Bf8b4 
+19.(-2T5)Qc3b4 / (-2T5)Qf5>>(-2T2)f2 
+20.(-3T3)Nh3f2 / (-3T3)Qf5f2 
+21.(-3T4)Ke1f2 / (-3T4)e7e6 
+22.(-3T5)g2g3 / (-3T5)Qd8f6 
+23.(-3T6)Qd1f3 (-2T6)Qb4f8

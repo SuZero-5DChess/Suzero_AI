@@ -1,0 +1,18 @@
+[Event "Online Game Database"]
+[Site "games.toml"]
+[Round "41"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3/(0T1)Ng8f6
+2.(0T2)b2b4/(0T2)e7e6
+3.(0T3)Qd1f3/(0T3)Bf8b4
+4.(0T4)Qf3g3/(0T4)Bb4f8
+5.(0T5)Ng1f3/(0T5)Qd8e7
+6.(0T6)Bf1d3/(0T6)Nb8c6
+7.(0T7)Bc1a3/(0T7)Nc6b4
+8.(0T8)Ba3b4/(0T8)Qe7b4
+9.(0T9)Qg3c7/(0T9)Qb4b2
+10.(0T10)Ke1g1/(0T10)Qb2>>(0T9)c1
+11.(-1T10)Ke1e2/(-1T10)Nf6e4
+12.(0T11)Qc7>>(0T10)d8/(0T11)Nf6>>(0T9)f5
+13.(-2T10)Qc7d8

@@ -1,0 +1,20 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.24"]
+[Round "394"]
+[White "5D Voyage"]
+[Black "RyanFourPM"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{20:05}(0T1)e2e3 / {20:05}(0T1)Ng8f6 
+2.{19:54}(0T2)Ng1f3 / {20:05}(0T2)Nf6g4 
+3.{19:50}(0T3)c2c4 / {18:59}(0T3)f7f5 
+4.{19:48}(0T4)Qd1c2 / {18:16}(0T4)e7e6 
+5.{19:28}(0T5)h2h4 / {17:59}(0T5)Ng4e3 
+6.{19:23}(0T6)f2e3 / {17:46}(0T6)Bf8>>(0T0)f2 
+7.{19:07}(-1T1)Ke1f2 / {17:46}(-1T1)Ng8h6 
+8.{19:07}(-1T2)Ng1f3 / {17:46}(-1T2)Nh6g4 
+9.{19:07}(-1T3)Kf2e1 / {17:46}(-1T3)c7c6 
+10.{18:05}(-1T4)c2c4 / {17:46}(-1T4)Qd8b6
+{recorded:black wins}

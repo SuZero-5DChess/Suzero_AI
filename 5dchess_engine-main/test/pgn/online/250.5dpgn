@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.03.23"]
+[Round "197"]
+[White "tesseract"]
+[Black "Narik"]
+[Result "1-0"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)e7e6 
+2.(0T2)d2d4 / (0T2)Qd8f6 
+3.(0T3)c2c3 / (0T3)h7h6 
+4.(0T4)Nf3e5 / (0T4)Qf6h4 
+5.(0T5)g2g3 / (0T5)Qh4e4 
+6.(0T6)f2f4 / (0T6)Qe4h1 
+7.(0T7)e2e3 / (0T7)Qh1g1 
+8.(0T8)Qd1h5 / (0T8)Qg1>>(0T0)g1 
+9.(-1T1)Rh1g1 / (-1T1)Ng8h6 
+10.(-1T2)e2e3 / (-1T2)e7e6 
+11.(-1T3)f2f4 / (-1T3)Qd8h4 
+12.(-1T4)g2g3 / (-1T4)Qh4h2 
+13.(-1T5)Qd1e2 / (-1T5)Qh2g1 
+14.(-1T6)Qe2f2 / (-1T6)Qg1>>(-1T5)g1 
+15.(0T9)Qh5>>(0T7)f7 (-2T6)Qe2h2 / (-2T6)Qg1h2 
+16.(-2T7)a2a4 (-1T7)a2a4

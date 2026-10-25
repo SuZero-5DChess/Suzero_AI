@@ -1,0 +1,816 @@
+/* Shared desktop anchors; the canvas remains usable between floating panels. */
+.top-panels {
+    --panel-margin: 24px;
+    --panel-gap: 24px;
+    --metadata-expanded-width: 380px;
+    position: fixed;
+    inset: var(--panel-margin) var(--panel-margin) auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--panel-gap);
+    pointer-events: none;
+    z-index: 100;
+}
+.top-panels > * { pointer-events: auto; }
+.top-panels .game-metadata { grid-column: 1; grid-row: 1; justify-self: start; }
+.top-panels .hud-wrapper {
+    grid-column: 2;
+    grid-row: 1;
+    /* Keep the same centered width for every metadata visibility/expansion state. */
+    width: min(440px, calc(100vw - 2 * (var(--panel-margin) + var(--metadata-expanded-width) + var(--panel-gap))));
+}
+.top-panels .control-panel { grid-column: 3; grid-row: 1; justify-self: end; }
+.game-metadata[hidden] { display: none; }
+
+/* ================= HUD Wrapper ================= */
+.hud-wrapper {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    max-width: 440px;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    z-index: 100;
+}
+
+/* ================= HUD ================= */
+.hud {
+    color: var(--ui-text);
+    position: relative;
+    width: 100%;
+    min-width: 200px;
+    background: var(--ui-panel-floating);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.hud.collapsed { height: 65px; }
+.hud.expanded  { height: 230px; }
+
+/* ================= Header ================= */
+.hud-header {
+    height: 56px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.top-panels .hud-header { padding: 0 36px; }
+.top-panels .hud-title {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hud-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+/* ================= Glowing Light ================= */
+.hud-light {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff2b2b;
+    box-shadow:
+        0 0 6px rgba(255,0,0,0.8),
+        0 0 14px rgba(255,0,0,0.6);
+    transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+#light{
+    position: absolute;
+    right: 16px;
+    cursor: pointer;
+}
+
+.hud-light.off {
+    opacity: 0.25;
+    box-shadow: none;
+}
+
+.hud-light.blink {
+    animation: blink 0.7s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background: #ff2b2b;
+        opacity: 1;
+        box-shadow:
+            0 0 10px rgba(255,0,0,0.9),
+            0 0 20px rgba(255,0,0,0.7);
+    }
+    50% {
+        background: #ff4510;
+        opacity: 0.6;
+        box-shadow:
+            0 0 4px rgba(255,31,0,0.5),
+            0 0 8px rgba(255,63,16,0.3);
+    }
+}
+
+/* ================= Content ================= */
+.hud-content {
+    position: relative;
+    padding: 12px 14px 34px;
+    height: calc(100% - 56px);
+    box-sizing: border-box;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.hud.collapsed .hud-content {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+}
+
+.hud.expanded .hud-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hud-text {
+    height: 100%;
+    padding-bottom: 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.45;
+    outline: none;
+    cursor: text;
+}
+
+/* Focus belongs to the editor, not the other controls in this panel. */
+.hud:has(.hud-text:focus) {
+    background: var(--ui-panel-editing);
+}
+.hud-text:not(:focus) { caret-color: transparent; }
+.hud-text:focus {
+    caret-color: var(--ui-text);
+}
+
+.hud-comment-actions {
+    visibility: hidden;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.hud-comment-actions.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hud-comment-btn {
+    background: linear-gradient(135deg, var(--ui-panel), var(--ui-soft));
+    border: 1px solid var(--ui-border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ui-text);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    min-width: 130px;
+}
+
+.hud-comment-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--ui-soft), var(--ui-border));
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+#hudUpdateComment {
+    width: max-content;
+    max-width: 190px;
+}
+
+@media (max-width: 600px) {
+    #hudUpdateComment {
+        width: max-content;
+    }
+}
+
+.hud-comment-btn.delete {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border-color: #ef9a9a;
+    color: #c62828;
+}
+
+.hud-comment-btn.delete:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ffcdd2, #ef9a9a);
+    box-shadow: 0 2px 6px rgba(198, 40, 40, 0.2);
+}
+
+.hud-comment-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.hud-comment-btn.secondary {
+    background: linear-gradient(135deg, var(--ui-panel), var(--ui-soft));
+    color: var(--ui-muted);
+}
+
+/* ================= Toggle ================= */
+.hud-toggle, .panel-toggle {
+    appearance: none;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    font: inherit;
+}
+.hud-toggle:focus-visible, .panel-toggle:focus-visible {
+    outline: 2px solid var(--ui-primary);
+    outline-offset: -2px;
+}
+
+.hud-toggle {
+    --toggle-shadow-width: 480px;
+    --toggle-shadow-height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--ui-text);
+    cursor: pointer;
+    user-select: none;
+    z-index: 2;
+}
+
+.hud-toggle::before,
+.panel-toggle::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--toggle-shadow-width, 320px);
+    height: var(--toggle-shadow-height, 48px);
+    background: radial-gradient(ellipse calc(var(--toggle-shadow-width, 320px) / 2) var(--toggle-shadow-height, 48px) at bottom center, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.09) 40%, rgba(0,0,0,0) 100%);
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    pointer-events: none;
+}
+
+.hud-toggle svg {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.hud-toggle:hover::before,
+.hud-toggle:focus-visible::before,
+.panel-toggle:hover::before,
+.panel-toggle:focus-visible::before { opacity: 1; }
+
+/* ================= Control Panel ================= */
+.control-panel {
+    color: var(--ui-text);
+    position: relative;
+    width: 200px;
+    background: var(--ui-panel-floating);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    overflow: hidden;
+    transition: height 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ================= Remote Control ================= */
+.remote-control {
+    padding: 14px;
+    display: flex;
+    justify-content: center;
+}
+
+.remote-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(3, 50px);
+    gap: 4px;
+}
+
+.remote-btn {
+    background: linear-gradient(135deg, var(--ui-panel), var(--ui-soft));
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ui-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.remote-btn.active:hover {
+    background: linear-gradient(135deg, var(--ui-soft), var(--ui-border));
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.remote-btn.active:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.remote-btn.pressed {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.remote-btn.ok.pressed {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.remote-btn.up { grid-column: 2; grid-row: 1; }
+.remote-btn.left { grid-column: 1; grid-row: 2; }
+.remote-btn.ok { grid-column: 2; grid-row: 2; background: var(--ui-primary); color: var(--ui-on-primary); border-color: var(--ui-primary); }
+.remote-btn.right { grid-column: 3; grid-row: 2; }
+.remote-btn.down { grid-column: 2; grid-row: 3; }
+
+.remote-btn.ok.active:hover {
+    background: var(--ui-primary-hover);
+}
+
+.remote-btn.inactive{
+    opacity: 50%;
+}
+
+/* ================= Select Box ================= */
+.select-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 28px;
+}
+
+.control-panel.collapsed .select-container {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.control-panel.expanded .select-container {
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+.select-option {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--ui-text);
+    cursor: pointer;
+    word-wrap: break-word;
+    line-height: 1.4;
+    transition: background 0.15s;
+}
+
+.select-option:hover {
+    background: var(--ui-soft);
+}
+
+.select-option.selected {
+    background: var(--ui-primary-soft);
+    color: var(--ui-on-primary-soft);
+    font-weight: 500;
+}
+
+.select-option.illegal-history {
+    color: var(--ui-illegal);
+    background: color-mix(in srgb, var(--ui-illegal) 12%, var(--ui-panel));
+}
+
+.select-option.illegal-history:hover {
+    background: color-mix(in srgb, var(--ui-illegal) 20%, var(--ui-panel));
+}
+
+.select-option.illegal-history.selected {
+    background: color-mix(in srgb, var(--ui-illegal) 28%, var(--ui-panel));
+    box-shadow: inset 3px 0 var(--ui-illegal);
+}
+
+.hint-btn {
+    border: 0;
+    font-family: inherit;
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ui-text);
+    background: var(--ui-soft);
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+}
+
+.hint-btn:disabled { opacity: 0.5; cursor: default; }
+
+body:not(.compact-layout) .hint-btn:not(:disabled):hover,
+body:not(.compact-layout) .hint-btn:not(:disabled):focus-visible {
+    background: color-mix(in srgb, var(--ui-soft) 90%, var(--ui-text));
+}
+
+body:not(.compact-layout) .hint-btn:focus-visible {
+    outline: 2px solid var(--ui-primary);
+    outline-offset: -2px;
+}
+
+.selected-display {
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--ui-text);
+    word-wrap: break-word;
+    line-height: 1.4;
+    min-height: 40px;
+    box-sizing: border-box;
+}
+
+.control-panel.expanded .selected-display {
+    display: none;
+}
+
+/* ================= Panel Toggle ================= */
+.panel-toggle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        var(--ui-panel-floating) 70%,
+        var(--ui-panel) 100%
+    );
+    color: var(--ui-text);
+    cursor: pointer;
+    user-select: none;
+    z-index: 2;
+}
+
+.panel-toggle svg {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* ================= Buttons Panel ================= */
+.buttons-panel {
+    color: var(--ui-text);
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ui-panel-floating);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    padding: 8px;
+    display: flex;
+    gap: 0;
+}
+
+.btn-icon {
+    width: 42px;
+    height: 42px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+    padding: 9px;
+    border-radius: 6px;
+}
+
+.btn-icon svg {
+    width: 100%;
+    height: 100%;
+    color: var(--ui-muted);
+    transition: color 0.15s ease;
+}
+
+.btn-icon:hover {
+    background: var(--ui-hover);
+}
+
+.btn-icon:hover svg {
+    color: var(--ui-text);
+}
+
+.btn-icon:active {
+    background: var(--ui-pressed);
+}
+
+.btn-icon.active {
+    background: var(--ui-primary-soft);
+}
+
+.btn-icon.active svg {
+    color: var(--ui-primary);
+}
+
+/* ================= Game Metadata ================= */
+.game-metadata {
+    position: relative;
+    z-index: 90;
+    box-sizing: border-box;
+    width: 290px;
+    max-width: 100%;
+    max-height: calc(100dvh - 2 * var(--panel-margin));
+    color: var(--ui-text);
+    background: var(--ui-panel-floating);
+    border: 1px solid var(--ui-border);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width 0.25s ease;
+}
+.game-metadata.expanded { width: var(--metadata-expanded-width, 380px); }
+.game-metadata [hidden] { display: none; }
+.game-metadata-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 26px 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.game-metadata-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.game-metadata-separator, .game-metadata-label, .game-metadata-facts dt {
+    color: var(--ui-muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+.game-metadata-result {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 8px;
+    background: var(--ui-primary-soft);
+    color: var(--ui-on-primary-soft);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    overflow-wrap: anywhere;
+    max-width: 65px;
+}
+.game-metadata-details {
+    padding: 20px 20px 40px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    min-height: 0;
+    overflow-wrap: anywhere;
+    animation: metadata-reveal 0.2s ease;
+}
+.game-metadata-event {
+    color: var(--ui-muted);
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+.game-metadata-players {
+    display: grid;
+    grid-template-columns: minmax(0, max-content) auto minmax(0, max-content);
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+}
+.game-metadata-players > :last-child { grid-column: 3; }
+.game-metadata-result-empty {
+    padding: 0 6px;
+    background: transparent;
+    color: var(--ui-muted);
+    font-size: 24px;
+    font-weight: 300;
+}
+.game-metadata-player { font-size: 17px; font-weight: 600; line-height: 1.35; margin-bottom: 4px; }
+.game-metadata-facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--ui-border);
+}
+.game-metadata-unknown { color: var(--ui-muted); font-weight: 400; }
+.game-metadata-site { grid-column: 1 / -1; }
+.game-metadata-facts dd { margin: 4px 0 0; font-size: 14px; }
+.game-metadata-toggle {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    color: var(--ui-muted);
+    background: transparent;
+    cursor: pointer;
+}
+.game-metadata:not(.expanded) .game-metadata-toggle { width: 24px; }
+.game-metadata-toggle::before {
+    content: '';
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 112px;
+    height: 96px;
+    /* Darken the translucent panel instead of washing it out with near-white. */
+    background: radial-gradient(ellipse 112px 96px at bottom right, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.09) 40%, rgba(0,0,0,0) 100%);
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    pointer-events: none;
+}
+.game-metadata-toggle svg { position: absolute; right: 4px; bottom: 4px; width: 12px; height: 12px; }
+.game-metadata-toggle:hover::before,
+.game-metadata-toggle:focus-visible::before { opacity: 1; }
+.game-metadata-toggle:focus-visible { outline: 2px solid var(--ui-muted); outline-offset: -2px; }
+@keyframes metadata-reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+    .game-metadata { transition: none; }
+    .game-metadata-details { animation: none; }
+    .game-metadata-toggle::before, .hud-toggle::before, .panel-toggle::before { transition: none; }
+}
+
+/* Continuation editing shares the navigation anchor and never reserves text space. */
+.top-panels .navigation-stack {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: calc(100dvh - 48px);
+}
+.navigation-stack .control-panel { width: 100%; flex-shrink: 1; min-height: 0; }
+.remote-control { flex-shrink: 0; }
+body:not(.compact-layout) .remote-control { padding: 12px; }
+body:not(.compact-layout) .remote-grid {
+    position: relative;
+    --navigation-tone: color-mix(in srgb, var(--ui-primary) 85%, var(--ui-panel));
+    --navigation-disabled: color-mix(in srgb, #808080 50%, var(--ui-panel));
+    grid-template-columns: 48px 72px 48px;
+    grid-template-rows: repeat(3, 48px);
+    gap: 4px;
+    padding: 8px;
+    /* 50% over the 88% panel gives 94% combined opacity. */
+    background: color-mix(in srgb, var(--ui-panel) 50%, transparent);
+    border: 1px solid var(--ui-border);
+    border-radius: 999px;
+}
+body:not(.compact-layout) .remote-btn {
+    padding: 0;
+    border: 0;
+    border-radius: 28px;
+    font-size: 14px;
+    font-weight: 500;
+    background: transparent;
+}
+body:not(.compact-layout) .remote-btn.ok { background: var(--ui-primary); }
+body:not(.compact-layout) .remote-btn.active:hover { background: transparent; box-shadow: none; transform: none; }
+body:not(.compact-layout) .remote-btn.ok.active:hover { background: var(--ui-primary-hover); }
+.desktop-remote-label svg { display: block; width: 24px; height: 24px; }
+.continuation-row { position: relative; flex-shrink: 0; }
+.select-option { box-sizing: border-box; min-height: 48px; padding-inline: 8px; overflow-wrap: anywhere; }
+.select-option.selected { font-weight: normal; }
+.pending-deletion .select-option { color: var(--ui-text-muted, var(--ui-text)); opacity: .6; cursor: default; }
+.pending-deletion .continuation-notation { text-decoration: line-through; }
+.branch-action {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ui-text);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+}
+.continuation-notation { display: block; }
+/* Fade only the glyphs beneath the 40px action area; do not paint a surface.
+   The notation's right edge is 8px inside the row, so the action centre is
+   16px from that edge. A 66% occlusion leaves 34% of the text visible. */
+.continuation-row:hover .continuation-notation,
+.continuation-row:has(:focus-visible) .continuation-notation,
+.compact-layout .editing-continuations .continuation-notation {
+    mask-image: radial-gradient(circle at calc(100% - 16px) 50%, #00000057 14px, #000 20px);
+}
+.branch-action svg { width: 22px; height: 22px; vertical-align: middle; }
+.continuation-row:hover .branch-action,
+.continuation-row:has(:focus-visible) .branch-action { opacity: 1; pointer-events: auto; }
+.compact-layout .editing-continuations .branch-action { opacity: 1; pointer-events: auto; }
+.pending-branches { align-self: flex-end; width: max-content; color: var(--ui-text); flex-shrink: 0; }
+.pending-branches { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.25s ease, visibility 0.25s ease; }
+.pending-branches.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+.pending-branches[hidden] { display: none; }
+.pending-branch-actions { display: flex; gap: 8px; }
+.pending-branch-actions .hud-comment-btn { min-width: 0; }
+@media (prefers-reduced-motion: reduce) { .pending-branches { transition: none; } }
+.branch-buttons { display: flex; gap: 8px; }
+.branch-buttons button { flex: 1; min-height: 48px; padding: 8px; border-radius: 24px; border: 1px solid var(--ui-border); background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.branch-buttons button:last-child { background: var(--ui-primary); color: var(--ui-on-primary); border-color: transparent; }
+.deletion-dialog { box-sizing: border-box; width: min(480px, calc(100vw - 48px)); max-height: calc(100dvh - 48px); padding: 24px; border: 0; border-radius: 28px; background: var(--ui-panel); color: var(--ui-text); }
+.deletion-dialog::backdrop { background: #0006; }
+.deletion-dialog h2 { margin: 0 0 16px; font-size: 24px; font-weight: 500; }
+.deletion-dialog p, .deletion-dialog li { font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.deletion-dialog ul { max-height: 35dvh; overflow: auto; padding-left: 24px; }
+.branch-action:focus-visible, .branch-buttons button:focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 2px; }
+
+/* Availability accents follow each enabled control around the enclosing pill. */
+.navigation-arcs { display: none; }
+body:not(.compact-layout) .navigation-arcs { display: block; position: absolute; top: -1px; left: -1px; width: calc(100% + 2px); height: calc(100% + 2px); overflow: visible; pointer-events: none; color: var(--navigation-tone); }
+.navigation-arc { fill: currentColor; stroke: none; opacity: 0; transition: opacity 0.15s ease; }
+.remote-grid:has(.up.active) .arc-prev,
+.remote-grid:has(.down.active) .arc-next,
+.remote-grid:has(.left.active) .arc-undo,
+.remote-grid:has(.right.active) .arc-redo { opacity: 1; }
+body:not(.compact-layout) .remote-btn:not(.ok) { color: var(--navigation-tone); }
+body:not(.compact-layout) .remote-btn:not(.ok).active:hover { color: var(--ui-primary); }
+body:not(.compact-layout) .remote-btn:not(.ok).pressed { box-shadow: none; }
+body:not(.compact-layout) .remote-btn.inactive { opacity: 1; color: var(--navigation-disabled); cursor: default; }
+body:not(.compact-layout) .remote-btn.ok.inactive { background: color-mix(in srgb, #808080 15%, var(--ui-panel)); }
+@media (prefers-reduced-motion: reduce) { .navigation-arc { transition: none; } }
+
+.navigation-connector { fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: butt; vector-effect: non-scaling-stroke; }
+.remote-grid:has(.up.active):has(.left.active) .connector-prev-undo,
+.remote-grid:has(.up.active):has(.right.active) .connector-prev-redo,
+.remote-grid:has(.down.active):has(.right.active) .connector-next-redo,
+.remote-grid:has(.down.active):has(.left.active) .connector-next-undo { opacity: 1; }

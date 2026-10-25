@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.01.16"]
+[Round "7"]
+[White "CrazyPenguin"]
+[Black "MaSK78"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)Ng1f3 / (0T1)Ng8f6 
+2.(0T2)a2a4 / (0T2)d7d5 
+3.(0T3)a4a5 / (0T3)c7c6 
+4.(0T4)e2e3 / (0T4)Bc8g4 
+5.(0T5)h2h3 / (0T5)Bg4h5 
+6.(0T6)c2c4 / (0T6)e7e6 
+7.(0T7)Qd1b3 / (0T7)b7b6 
+8.(0T8)a5b6 / (0T8)d5c4 
+9.(0T9)Qb3c4 / (0T9)Qd8b6 
+10.(0T10)b2b3 / (0T10)Bf8d6 
+11.(0T11)Bc1b2 / (0T11)Nb8d7 
+12.(0T12)Qc4>>(0T10)e6 / (1T10)f7e6 
+13.(1T11)Nf3g5 / (1T11)Bh5f7 
+14.(1T12)Ng5f7 / (0T12)Nd7>(1T12)f7 
+15.(0T13)Nf3g5 (1T13)Bf1d3 / (1T13)Nf6d5 (0T13)Qb6c5 
+16.(1T14)Qc4g4 (0T14)Nb1c3 / (0T14)Qc5g5 (1T14)Nd5e3 
+17.(0T15)Nc3d5 (1T15)f2e3 / (0T15)Qg5>(1T15)g4 
+18.(1T16)Bd3c4 (0T16)Nd5c7 / (0T16)Bd6c7 (1T16)Qg4g3

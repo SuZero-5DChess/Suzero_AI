@@ -1,0 +1,287 @@
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+#include <pybind11/operators.h>
+#include <ostream>
+#include "game.h"
+#include "core/hash.h"
+
+namespace py = pybind11;
+
+using metadata_t = std::map<std::string, std::string>;
+PYBIND11_MAKE_OPAQUE(metadata_t);
+
+namespace {
+int checked_coordinate(const py::int_ &value, int lower, int upper, const char *name)
+{
+    int overflow = 0;
+    const auto coordinate = PyLong_AsLongLongAndOverflow(value.ptr(), &overflow);
+    if(PyErr_Occurred())
+        throw py::error_already_set();
+    if(overflow || coordinate < lower || coordinate > upper)
+        throw py::value_error(std::string(name) + " must be between "
+            + std::to_string(lower) + " and " + std::to_string(upper) + ".");
+    return static_cast<int>(coordinate);
+}
+
+metadata_t metadata_from_dict(const py::dict &headers)
+{
+    metadata_t result;
+    for(const auto &item : headers)
+    {
+        if(!py::isinstance<py::str>(item.first) || !py::isinstance<py::str>(item.second))
+            throw py::type_error("Metadata keys and values must be strings.");
+        result.emplace(py::cast<std::string>(item.first), py::cast<std::string>(item.second));
+    }
+    return result;
+}
+} /* anonymous namespace */
+
+PYBIND11_MODULE(engine, m) {
+    m.doc() = "5d chess engine"; // optional module docstring
+    py::bind_map<metadata_t>(m, "Metadata")
+        .def(py::init(&metadata_from_dict))
+        .def("get", [](const metadata_t &headers, const std::string &key, py::object fallback) {
+            auto it = headers.find(key);
+            return it == headers.end() ? fallback : py::cast(it->second);
+        }, py::arg("key"), py::arg("default") = py::none())
+        .def("update", [](metadata_t &headers, const py::dict &updates) {
+            for(const auto &[key, value] : metadata_from_dict(updates))
+                headers[key] = value;
+        }, py::arg("updates"))
+        .def("clear", &metadata_t::clear)
+        .def("copy", [](metadata_t &headers) {
+            return py::dict(py::cast(&headers, py::return_value_policy::reference));
+        });
+    py::enum_<piece_t>(m, "Piece")
+        .value("NO_PIECE", NO_PIECE)
+        .value("WALL_PIECE", WALL_PIECE)
+        .value("KING_UW", KING_UW)
+        .value("ROOK_UW", ROOK_UW)
+        .value("PAWN_UW", PAWN_UW)
+        .value("KING_UB", KING_UB)
+        .value("ROOK_UB", ROOK_UB)
+        .value("PAWN_UB", PAWN_UB)
+        .value("KING_W", KING_W)
+        .value("QUEEN_W", QUEEN_W)
+        .value("BISHOP_W", BISHOP_W)
+        .value("KNIGHT_W", KNIGHT_W)
+        .value("ROOK_W", ROOK_W)
+        .value("PAWN_W", PAWN_W)
+        .value("UNICORN_W", UNICORN_W)
+        .value("DRAGON_W", DRAGON_W)
+        .value("BRAWN_W", BRAWN_W)
+        .value("PRINCESS_W", PRINCESS_W)
+        .value("ROYAL_QUEEN_W", ROYAL_QUEEN_W)
+        .value("COMMON_KING_W", COMMON_KING_W)
+        .value("KING_B", KING_B)
+        .value("QUEEN_B", QUEEN_B)
+        .value("BISHOP_B", BISHOP_B)
+        .value("KNIGHT_B", KNIGHT_B)
+        .value("ROOK_B", ROOK_B)
+        .value("PAWN_B", PAWN_B)
+        .value("UNICORN_B", UNICORN_B)
+        .value("DRAGON_B", DRAGON_B)
+        .value("BRAWN_B", BRAWN_B)
+        .value("PRINCESS_B", PRINCESS_B)
+        .value("ROYAL_QUEEN_B", ROYAL_QUEEN_B)
+        .value("COMMON_KING_B", COMMON_KING_B)
+        .export_values();  // Exports the values for easy access
+    py::enum_<game::match_status_t>(m, "match_status_t")
+        .value("PLAYING", game::match_status_t::PLAYING)
+        .value("WHITE_WINS", game::match_status_t::WHITE_WINS)
+        .value("BLACK_WINS", game::match_status_t::BLACK_WINS)
+        .value("STALEMATE", game::match_status_t::STALEMATE)
+        .value("ILLEGAL_HISTORY", game::match_status_t::ILLEGAL_HISTORY)
+        .def("__str__", [](game::match_status_t status) {
+            std::ostringstream oss;
+            oss << status;
+            return oss.str();
+        });
+    /*
+    py::class_<board>(m, "board")
+        .def(py::init<std::string, int, int>(), 
+             py::arg("fen"), 
+             py::arg("x_size") = BOARD_LENGTH, 
+             py::arg("y_size") = BOARD_LENGTH) // Constructor with parameters
+        .def("get_piece", &board::get_piece)
+        .def("set_piece", &board::set_piece)
+        .def("__str__", &board::to_string);
+    */
+   /*
+    py::class_<multiverse>(m, "multiverse")
+        .def(py::init<const std::string&>(), py::arg("input")) // Constructor
+        .def("get_board", &multiverse::get_board, py::arg("l"), py::arg("t"), py::arg("c"),
+             py::return_value_policy::reference) // Return shared_ptr to board
+        .def("__str__", &multiverse::to_string) // String representation of the board
+        .def("get_boards", &multiverse::get_boards)
+        .def("get_piece", &multiverse::get_piece)
+        .def("gen_piece_move", &multiverse::gen_piece_move)
+        .def_readwrite("metadata", &multiverse::metadata); // Expose `metadata` map directly
+    py::class_<multiverse, std::shared_ptr<multiverse>>(m, "multiverse")
+        // Bind the constructor
+        .def(py::init<const std::string &>(), py::arg("input"))
+        // Bind public methods
+        .def("get_board", &multiverse::get_board, py::arg("l"), py::arg("t"), py::arg("c"))
+        .def("get_boards", &multiverse::get_boards)
+        .def("to_string", &multiverse::to_string)
+        .def("inbound", &multiverse::inbound, py::arg("a"), py::arg("color"))
+        .def("get_piece", &multiverse::get_piece, py::arg("a"), py::arg("color"))
+        .def("gen_piece_move", &multiverse::gen_piece_move, py::arg("p"), py::arg("board_color"));
+        // // Bind public member variables
+        // .def_readwrite("metadata", &multiverse::metadata);
+    py::class_<vec4>(m, "vec4")
+        .def(py::init<int, int, int, int>(), py::arg("x"), py::arg("y"), py::arg("t"), py::arg("l"))
+        .def("__repr__", &vec4::to_string);
+        //.def("__add__", &vec4::operator+); 
+    */
+    py::class_<vec4>(m, "vec4")
+        // Bind the constructor
+        .def(py::init([](const py::int_ &x, const py::int_ &y, const py::int_ &t, const py::int_ &l) {
+            constexpr int x_limit = 1 << (vec4::X_BITS - 1);
+            constexpr int y_limit = 1 << (vec4::Y_BITS - 1);
+            return vec4(
+                checked_coordinate(x, -x_limit, x_limit - 1, "x"),
+                checked_coordinate(y, -y_limit, y_limit - 1, "y"),
+                checked_coordinate(t, vec4::T_MIN, vec4::T_MAX, "t"),
+                checked_coordinate(l, vec4::L_MIN, vec4::L_MAX, "l"));
+        }), py::arg("x"), py::arg("y"), py::arg("t"), py::arg("l"))
+        // Bind member functions
+        .def("l", &vec4::l)
+        .def("t", &vec4::t)
+        .def("y", &vec4::y)
+        .def("x", &vec4::x)
+        .def(py::self == py::self)
+        .def(py::self != py::self)
+        .def(py::self >= py::self)
+        .def(py::self <= py::self)
+        .def(py::self > py::self)
+        .def(py::self < py::self)
+        .def(py::self + py::self)
+        .def(py::self - py::self)
+        .def(-py::self)
+        .def(py::self * int())
+        //.def(int() * py::self) //this should be a bug
+        .def("to_string", &vec4::to_string)
+        // Bind the stream operator for string representation
+        .def("__repr__", [](const vec4 &v) { return v.to_string(); });
+    py::class_<ext_move>(m, "ext_move")
+        .def(py::init<vec4, vec4, piece_t>(),
+             py::arg("from"),
+             py::arg("to"),
+             py::arg("promote_to"))
+        .def("get_from", &ext_move::get_from)
+        .def("get_to", &ext_move::get_to)
+        .def("get_promote", &ext_move::get_promote)
+        .def("to_string", &ext_move::to_string)
+        .def("__repr__", [](const ext_move &m){
+            return "<ext_move " + m.to_string() + ">";
+        })
+        .def(py::self == py::self);
+    py::class_<action>(m, "action")
+        .def("__lt__", &action::operator<)
+        .def("get_moves", &action::get_moves)
+        .def(py::self == py::self)
+        // optional: nice repr
+        .def("__repr__", [](const action &a){
+            return "<action with " + std::to_string(a.get_length()) + " moves>";
+        })
+    ;
+    /*
+    py::class_<state>(m, "state")
+        .def_readwrite("m", &state::m)
+        .def(py::init<multiverse>())
+        .def("apply_move", &state::apply_move<false>);
+    */
+    py::class_<game::action_summary>(m, "action_summary")
+        .def_readonly("act", &game::action_summary::act)
+        .def_readonly("pgn", &game::action_summary::pgn)
+        .def_readonly("is_illegal", &game::action_summary::is_illegal);
+    py::class_<game>(m, "game")
+        // metadata
+        .def_property("metadata",
+            [](game &g) -> metadata_t & { return g.metadata; },
+            [](game &g, const py::dict &metadata) { g.metadata = metadata_from_dict(metadata); },
+            py::return_value_policy::reference_internal,
+            "Live metadata mapping. Assignment replaces all headers; edits do not change the loaded position.")
+        // factory
+        .def_static("from_pgn", [](std::string pgn, bool allow_illegal_history) {
+            return game::from_pgn(std::move(pgn), {allow_illegal_history});
+        }, py::arg("pgn"), py::arg("allow_illegal_history") = false)
+        .def("has_illegal_history", &game::has_illegal_history)
+        // core functions
+        .def("get_current_fen", [](const game &g) {
+            return g.get_current_state().show_fen();
+        })
+        .def("get_current_hash", [](const game &g) {
+            return hash_state(g.get_current_state());
+        })
+        .def("get_current_present", &game::get_current_present)
+        .def("get_current_boards", &game::get_current_boards)
+        .def("get_current_timeline_status", &game::get_current_timeline_status)
+        .def("gen_move_if_playable", &game::gen_move_if_playable)
+        .def("get_match_status", &game::get_match_status)
+        .def("get_movable_pieces", &game::get_movable_pieces)
+        .def("is_playable", &game::is_playable)
+        .def("can_undo", &game::can_undo)
+        .def("can_redo", &game::can_redo)
+        .def("can_submit", &game::can_submit, py::arg("allow_submit_with_checks") = false)
+        .def("undo", &game::undo)
+        .def("redo", &game::redo)
+        .def("apply_move", &game::apply_move)
+        .def("submit", &game::submit, py::arg("allow_submit_with_checks") = false)
+        .def("currently_check", &game::currently_check)
+        .def("get_current_checks", &game::get_current_checks)
+        .def("get_board_size", &game::get_board_size)
+        .def("get_promotion_options", [](const game &g) {
+            return static_cast<uint8_t>(g.get_promotion_options());
+        })
+        .def("suggest_action", &game::suggest_action)
+        .def("has_child", &game::has_child)
+        .def("add_child", &game::add_child)
+        .def("delete_child", &game::delete_child)
+        .def("get_comments", &game::get_comments)
+        .def("set_comments", &game::set_comments)
+        .def("has_parent", &game::has_parent)
+        .def("visit_parent", &game::visit_parent)
+        .def("get_child_actions", [](const game &g, uint16_t show_flags) {
+            return g.get_child_actions(static_cast<pgn_options>(show_flags));
+        }, py::arg("show_flags") = static_cast<uint16_t>(pgn_options::SHOW_CAPTURE | pgn_options::SHOW_PROMOTION))
+        .def("visit_child", &game::visit_child, py::arg("action"))
+        .def("show_pgn", [](game &g, uint16_t options, bool complete_game_tree, bool standard_metadata_only) {
+            return g.show_pgn(
+                static_cast<pgn_options>(options),
+                complete_game_tree,
+                standard_metadata_only);
+        },
+            py::arg("options"),
+            py::arg("complete_game_tree") = true,
+            py::arg("standard_metadata_only") = false);
+
+    m.attr("SHOW_NOTHING") = static_cast<uint16_t>(pgn_options::SHOW_NOTHING);
+    m.attr("SHOW_RELATIVE") = static_cast<uint16_t>(pgn_options::SHOW_RELATIVE);
+    m.attr("SHOW_PAWN") = static_cast<uint16_t>(pgn_options::SHOW_PAWN);
+    m.attr("SHOW_CAPTURE") = static_cast<uint16_t>(pgn_options::SHOW_CAPTURE);
+    m.attr("SHOW_PROMOTION") = static_cast<uint16_t>(pgn_options::SHOW_PROMOTION);
+    m.attr("SHOW_MATE") = static_cast<uint16_t>(pgn_options::SHOW_MATE);
+    m.attr("SHOW_LCOMMENT") = static_cast<uint16_t>(pgn_options::SHOW_LCOMMENT);
+    m.attr("SHOW_ALL") = static_cast<uint16_t>(pgn_options::SHOW_ALL);
+    m.attr("SHOW_SHORT") = static_cast<uint16_t>(pgn_options::SHOW_SHORT);
+    m.attr("SHOW_OUTCOME") = static_cast<uint16_t>(pgn_options::SHOW_OUTCOME);
+    
+    // Add version information
+    m.def("get_version", []() {
+#ifdef PROJECT_VERSION_STRING
+        return std::string(PROJECT_VERSION_STRING);
+#else
+        return std::string("unknown");
+#endif
+    });
+    
+    // Add __version__ attribute
+#ifdef PROJECT_VERSION_STRING
+    m.attr("__version__") = std::string(PROJECT_VERSION_STRING);
+#else
+    m.attr("__version__") = std::string("unknown");
+#endif
+}

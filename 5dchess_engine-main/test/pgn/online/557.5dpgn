@@ -1,0 +1,27 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.23"]
+[Round "515"]
+[White "Tones"]
+[Black "Mage"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+[OriginalEvent "Blitz Tournament"]
+
+1.(0T1)e2e4 / (0T1)Ng8f6
+2.(0T2)d2d4 / (0T2)e7e6
+3.(0T3)Bc1g5 / (0T3)c7c5
+4.(0T4)b2b4 / (0T4)c5b4
+5.(0T5)Bg5f6 / (0T5)Qd8f6
+6.(0T6)Qd1h5 / (0T6)Qf6g6
+7.(0T7)Qh5g6 / (0T7)h7g6
+8.(0T8)f2f3 / (0T8)Nb8c6
+9.(0T9)Ng1e2 / (0T9)b7b6
+10.(0T10)c2c3 / (0T10)Bc8a6
+11.(0T11)d4d5 / (0T11)Nc6e5
+12.(0T12)Ne2f4 / (0T12)g6g5
+13.(0T13)Bf1a6 / (0T13)g5f4
+14.(0T14)d5e6 / (0T14)Ne5>>(0T13)e3
+15.(0T15)Ba6>>(0T12)a3 / (1T12)Ne5d3
+16.(1T13)Ke1>>(0T14)f1 / (1T13)Nd3e1
+{original data: white wins; verification: black wins}

@@ -1,0 +1,367 @@
+diff --git a/src/core/finetree.h b/src/core/finetree.h
+index c6483b0..436a778 100644
+--- a/src/core/finetree.h
++++ b/src/core/finetree.h
+@@ -88,9 +88,9 @@ class fine_node
+     fine_node<T> *expand(const Order &order);
+     template<HCOrdering Order>
+     std::optional<std::tuple<point, fine_cell<T> *, HC *>> explore(const Order &order);
+-    void remove_problem(const slice &, fine_cell<T> *origin_cell);
+-    void remove_from_cell(const slice &, fine_cell<T> *, bool force_back_removal);
+-    void remove_from_node(const slice &, fine_node<T> *, fine_cell<T> *critical_cell, bool force_critical_removal);
++    void remove_problem(const slice &);
++    void remove_from_cell(const slice &, fine_cell<T> *);
++    void remove_from_node(const slice &, fine_node<T> *);
+     fine_node<T> *isolate(const point &, fine_cell<T> *, HC *);
+     fine_node<T> *normalize(const point &, fine_cell<T> *, fine_node<T> *);
+ 
+diff --git a/src/core/finetree.inl b/src/core/finetree.inl
+index 655d252..f3b0056 100644
+--- a/src/core/finetree.inl
++++ b/src/core/finetree.inl
+@@ -251,10 +251,10 @@ inline std::optional<std::tuple<point, fine_cell<T> *, HC *>> fine_node<T>::expl
+             continue;
+         }
+ 
+-        auto problem = hc_info.find_problem(*pt_opt, hc);
++        auto problem = hc_info.find_problem(*pt_opt, hc_info.get_universe());
+         if(problem)
+         {
+-            remove_problem(*problem, cell);
++            remove_problem(*problem);
+             continue;
+         }
+ 
+@@ -266,78 +266,36 @@ inline std::optional<std::tuple<point, fine_cell<T> *, HC *>> fine_node<T>::expl
+ 
+ template<typename T>
+     requires std::default_initializable<T>
+-inline void fine_node<T>::remove_from_cell(
+-    const slice &s,
+-    fine_cell<T> *cell,
+-    bool force_back_removal
+-)
++inline void fine_node<T>::remove_from_cell(const slice &s, fine_cell<T> *cell)
+ {
+-    if(cell->space.intersects(s))
+-    {
+-        cell->subspace.remove_slice_backwards(s, force_back_removal);
+-    }
++    if(!cell->space.intersects(s)) return;
++    search_space remaining;
++    for(const HC &hc : cell->subspace)
++        remaining.concat(hc.remove_slice_carefully(s));
++    cell->subspace = std::move(remaining);
+ }
+ 
+ template<typename T>
+     requires std::default_initializable<T>
+-inline void fine_node<T>::remove_from_node(
+-    const slice &s,
+-    fine_node<T> *node,
+-    fine_cell<T> *critical_cell,
+-    bool force_critical_removal
+-)
++inline void fine_node<T>::remove_from_node(const slice &s, fine_node<T> *node)
+ {
+-    remove_from_cell(s, critical_cell, force_critical_removal);
+-    for(fine_cell<T> *cell : node->cells)
+-    {
+-        if(cell != critical_cell)
+-        {
+-            remove_from_cell(s, cell, false);
+-        }
+-    }
++    for(fine_cell<T> *cell : node->cells) remove_from_cell(s, cell);
+ }
+ 
+ template<typename T>
+     requires std::default_initializable<T>
+-inline void fine_node<T>::remove_problem(const slice &s, fine_cell<T> *origin_cell)
++inline void fine_node<T>::remove_problem(const slice &s)
+ {
+     nodal_pocession *problem_context = get_context();
+-    // Process only the cells owned by the current node and its ancestors.
+-    // Do not enter either the current node's descendants or off-path child
+-    // subtrees of an ancestor. The originating HC is always cut to guarantee
+-    // progress; secondary HCs are subject to the quality filter.
+-    remove_from_node(s, this, origin_cell, true);
+-    if(is_nodal())
+-    {
+-        return;
+-    }
+-
+-    // Cells grow monotonically along the parent chain. If cutting the problem
+-    // slice from the current path cell already exceeds the quality limit, the
+-    // corresponding parent cells cannot improve.
+-    if(!origin_cell->space.is_slice_good(s))
++    // Propagate the whole conflict through every remaining HC on the current
++    // node/ancestor path. Stay within this position's context; do not visit
++    // descendants or off-path sibling subtrees.
++    for(fine_node<T> *node = this;
++        node && node->get_context() == problem_context;
++        node = node->parent)
+     {
+-        return;
+-    }
+-
+-    fine_node<T> *ancestor = parent;
+-    fine_cell<T> *path_cell = origin_cell->parent;
+-    while(ancestor != nullptr
+-          && ancestor->get_context() == problem_context
+-          && path_cell != nullptr)
+-    {
+-        if(!path_cell->space.is_slice_good(s))
+-        {
+-            break;
+-        }
+-
+-        remove_from_node(s, ancestor, path_cell, false);
+-        if(ancestor->is_nodal())
+-        {
+-            break;
+-        }
+-        ancestor = ancestor->parent;
+-        path_cell = path_cell->parent;
++        remove_from_node(s, node);
++        if(node->is_nodal()) break;
+     }
+ }
+ 
+diff --git a/src/core/hypercuboid.cpp b/src/core/hypercuboid.cpp
+index 1ddd777..6a34a6b 100644
+--- a/src/core/hypercuboid.cpp
++++ b/src/core/hypercuboid.cpp
+@@ -1068,24 +1068,13 @@ generator<moveseq> HC_info::stable_search(search_space ss) const &
+         {
+             const point &pt = *pt_opt;
+             dprint("got point: ", range_to_string(pt));
+-            auto problem = find_problem(pt, hc);
++            auto problem = find_problem(pt, universe);
+             if(problem)
+             {
+                 const slice &problem_slice = problem.value();
+                 dprint("found problem:", problem.value().to_string());
+-                // Remove this slice from every remaining hypercuboid and re-join all pieces.
+-                search_space adjoined;
+-                for(const HC &other_hc : ss)
+-                {
+-                    search_space sstemp = other_hc.remove_slice_carefully(problem_slice);
+-                    adjoined.concat(std::move(sstemp));
+-                }
+-                // Keep the selected HC's pieces at the back, where search
+-                // will consume them before the earlier HCs.
+-                adjoined.concat(hc.remove_slice(problem_slice));
+-                // make sure when a leave is removed, so is the corresponding arrive
+-                dprint("removed problem from all hcs, continue search:", adjoined.to_string());
+-                ss = std::move(adjoined);
++                hc_detail::propagate_globally(ss, hc, problem_slice);
++                dprint("removed problem from all hcs, continue search:", ss.to_string());
+             }
+             else
+             {
+diff --git a/src/core/hypercuboid.inl b/src/core/hypercuboid.inl
+index ba97619..56e904e 100644
+--- a/src/core/hypercuboid.inl
++++ b/src/core/hypercuboid.inl
+@@ -3,6 +3,21 @@
+ #include <limits>
+ #include "graph.h"
+ 
++namespace hc_detail
++{
++// Preserve HC and piece order, including the selected HC's remaining pieces
++// at the back. Global problems need intersection-aware removal on every HC.
++inline void propagate_globally(search_space &space, const HC &selected,
++                               const slice &problem)
++{
++    search_space remaining;
++    for(const HC &hc : space)
++        remaining.concat(hc.remove_slice_carefully(problem));
++    remaining.concat(selected.remove_slice_carefully(problem));
++    space = std::move(remaining);
++}
++} // namespace hc_detail
++
+ template<HCOrdering Order>
+ std::optional<point> HC_info::take_point(HC &hc, const Order &order) const
+ {
+@@ -135,7 +150,8 @@ generator<moveseq> HC_info::search(search_space ss, Order order) const &
+         }
+ 
+         const point &pt = *pt_opt;
+-        auto problem = find_problem(pt, hc);
++        // Retain the whole conflict when propagating into other HCs.
++        auto problem = find_problem(pt, universe);
+         if(!problem)
+         {
+             co_yield to_action(pt);
+@@ -143,9 +159,8 @@ generator<moveseq> HC_info::search(search_space ss, Order order) const &
+             continue;
+         }
+ 
+-        // Propagation prunes earlier HCs without moving them ahead of the
+-        // current HC's remaining pieces.
+-        ss.push_back(std::move(hc));
+-        ss.remove_slice_backwards(*problem, true, 10);
++        // Apply the complete reason to every region, using careful removal
++        // because its coordinate sets may extend beyond the selected HC.
++        hc_detail::propagate_globally(ss, hc, *problem);
+     }
+ }
+diff --git a/src/engine/default_policy.h b/src/engine/default_policy.h
+index a82a7b4..f8249b6 100644
+--- a/src/engine/default_policy.h
++++ b/src/engine/default_policy.h
+@@ -148,10 +148,12 @@ public:
+             {
+                 bool player = s.get_present().c();
+                 std::optional<bool> winner = std::nullopt;
+-                if(s.get_mate_type() == mate_type::CHECKMATE)
++                // The action search has already proved there is no legal action.
++                if(s.has_phantom_check())
+                 {
+                     winner = !player;
+                 }
++                if(stop_token.stop_requested()) return std::nullopt;
+                 return cutoff_evaluation.mate_reward(winner, num_actions);
+             }
+             for(full_move mv : *action)
+diff --git a/src/engine/rollout_policy.cpp b/src/engine/rollout_policy.cpp
+index 7f9e6ee..ab0c24c 100644
+--- a/src/engine/rollout_policy.cpp
++++ b/src/engine/rollout_policy.cpp
+@@ -8,67 +8,43 @@
+ namespace
+ {
+ template<HCOrdering Order>
+-generator<moveseq> mixed_search(
++generator<moveseq> cancellable_search(
+     const HC_info &hc_info,
+     search_space space,
+     Order order,
+     std::stop_token stop_token
+ )
+ {
+-    constexpr std::size_t iterative_problem_limit = 100;
+-    std::size_t num_problems = 0;
+-    while(!space.empty() && num_problems < iterative_problem_limit)
++    while(!space.empty())
+     {
+-        if(stop_token.stop_requested())
+-        {
+-            co_return;
+-        }
++        if(stop_token.stop_requested()) co_return;
+ 
+         HC hc = std::move(space.back());
+         space.pop_back();
+         auto point = hc_info.take_point(hc, order);
+-        if(!point)
+-        {
+-            continue;
+-        }
++        if(!point) continue;
++        if(stop_token.stop_requested()) co_return;
+ 
+-        if(auto problem = hc_info.find_problem(*point, hc))
+-        {
+-            ++num_problems;
+-            space.concat(hc.remove_slice(*problem));
+-        }
+-        else
++        auto problem = hc_info.find_problem(*point, hc_info.get_universe());
++        if(stop_token.stop_requested()) co_return;
++        if(!problem)
+         {
+             co_yield hc_info.to_action(*point);
+             space.concat(hc.remove_point(*point));
+-        }
+-    }
+-
+-    while(!space.empty())
+-    {
+-        if(stop_token.stop_requested())
+-        {
+-            co_return;
+-        }
+-
+-        HC hc = std::move(space.back());
+-        space.pop_back();
+-        auto point = hc_info.take_point(hc, order);
+-        if(!point)
+-        {
+             continue;
+         }
+ 
+-        if(auto problem = hc_info.find_problem(*point, hc))
++        // Match the core search's global propagation, retaining cancellation
++        // opportunities between HCs as well as between candidate attempts.
++        search_space remaining;
++        for(const HC &other : space)
+         {
+-            space.push_back(std::move(hc));
+-            space.remove_slice_backwards(*problem, true, 10);
+-        }
+-        else
+-        {
+-            co_yield hc_info.to_action(*point);
+-            space.concat(hc.remove_point(*point));
++            if(stop_token.stop_requested()) co_return;
++            remaining.concat(other.remove_slice_carefully(*problem));
+         }
++        if(stop_token.stop_requested()) co_return;
++        remaining.concat(hc.remove_slice_carefully(*problem));
++        space = std::move(remaining);
+     }
+ }
+ } /* anonymous namespace */
+@@ -78,9 +54,10 @@ std::optional<moveseq> random_action_selection::operator()(
+ {
+     if(stop.stop_requested()) return std::nullopt;
+     auto [info, space] = HC_info::build_HC(s);
++    if(stop.stop_requested()) return std::nullopt;
+     auto order = rng ? random_HC_ordering(info.get_universe(), *rng)
+                      : random_HC_ordering(info.get_universe());
+-    return mixed_search(info, std::move(space), std::move(order), stop).first();
++    return cancellable_search(info, std::move(space), std::move(order), stop).first();
+ }
+ 
+ std::optional<reward_t<rollout_details>> evaluate_zero_position(
+@@ -88,7 +65,7 @@ std::optional<reward_t<rollout_details>> evaluate_zero_position(
+ {
+     if(stop.stop_requested()) return std::nullopt;
+     auto [info, space] = HC_info::build_HC(s);
+-    auto moves = mixed_search(
++    auto moves = cancellable_search(
+         info, std::move(space), natural_HC_ordering{}, stop).first();
+     if(stop.stop_requested()) return std::nullopt;
+ 
+@@ -96,8 +73,10 @@ std::optional<reward_t<rollout_details>> evaluate_zero_position(
+     if(!moves)
+     {
+         std::optional<bool> winner;
+-        if(s.get_mate_type() == mate_type::CHECKMATE)
+-            winner = !s.get_present().c();
++        // Exhaustion already proved that no legal action exists. Only the
++        // royal-safety check is needed to distinguish checkmate and stalemate.
++        if(s.has_phantom_check()) winner = !s.get_present().c();
++        if(stop.stop_requested()) return std::nullopt;
+         return evaluation.mate_reward(winner, 0);
+     }
+     return evaluation.cutoff_reward(std::move(s), 0, stop, nullptr);
+@@ -118,6 +97,7 @@ std::optional<moveseq> weighted_action_selection::operator()(
+ {
+     if(stop.stop_requested()) return std::nullopt;
+     auto [info, space] = HC_info::build_HC(s);
++    if(stop.stop_requested()) return std::nullopt;
+     const float weight_temperature = get_temperature();
+     move_evaluator evaluator(info, weights);
+     std::vector<std::vector<float>> coordinate_weights(info.get_universe().dimension());
+@@ -137,5 +117,5 @@ std::optional<moveseq> weighted_action_selection::operator()(
+             info.get_universe(), std::move(coordinate_weights), *rng)
+         : weighted_HC_ordering(
+             info.get_universe(), std::move(coordinate_weights));
+-    return mixed_search(info, std::move(space), std::move(order), stop).first();
++    return cancellable_search(info, std::move(space), std::move(order), stop).first();
+ }

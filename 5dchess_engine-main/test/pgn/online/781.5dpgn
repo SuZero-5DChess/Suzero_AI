@@ -1,0 +1,36 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2025.07.31"]
+[Round "747"]
+[White "Sapphia"]
+[Black "SavingsNewspaper2"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1. Nf3 / Nf6
+2. Na3 / d5
+3. c4 / c6
+4. Qb3 / Nbd7
+5. e3 / Qb6
+6. cxd5 / Qxb3
+7. axb3 / Nxd5
+8. Bc4 / e6
+9. Bxd5 / cxd5
+10. Nb5 / Kd8
+11. Ng5 / Ne5
+12. d4 / h6
+13. Bd2 / b6
+14. dxe5 / hxg5
+15. Ra4 / Bd7
+16. Nd4 / Bc5
+17. Bb4 / Bxd4
+18. exd4 / a5
+19. Bd6 / Rc8
+20. Rc4 / dxc4
+21. (0T21)Bd6>>x(0T20)d7~ (>L1) / (0T21)Bd7>x(1T20)d7
+22. (1T21)Bd6>(0T22)d6 / (1T21)Rh4
+23. (1T22)Rc4 / (1T22)Bd7>x(0T22)d6
+24. (1T23)Rxc8 (0T23)g3 / (1T23)Kxc8 (0T23)Bb4
+25. (1T24)Kg1 (0T24)Ke2 / (0T24)cxb3 (1T24)Rxd4
+26. (1T25)Rc1 (0T25)Re1 / (1T25)Kd7 (0T25)Rc2
+27. (0T26)Kd1 (1T26)g3 / (0T26)Bd2 (1T26)Rd1

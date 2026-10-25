@@ -1,0 +1,207 @@
+#undef NDEBUG
+#include <tuple>
+#include <ranges>
+#include <cassert>
+#include <iostream>
+#include <chrono>
+#include "game.h"
+
+std::string str = R"(
+[Board "Standard"]
+[Mode "5D"]
+1. Nf3
+/ Nc6
+2. (0T2)Nf3>>(0T1)f5 (~T2) (>L1)
+/ (0T2)Nc6>>(0T1)c4 (~T1) (>L-1) (1T1)Nb8>>(0T1)b6 (~T3) (>L-2)
+3. (-2T2)Nf3>>(0T1)f3 (~T4) (>L2)
+/ (2T1)Ng8>>(1T1)g6 (~T5) (>L-3)
+4. (2T2)Ne5 (-3T2)Nxg7 (-1T2)e3 (1T2)e3
+/ (-3T2)Bxg7 (-2T2)e6 (-1T2)e6 (1T2)e6 (2T2)e6
+5. (1T3)Qf3 (-3T3)Nf3 (0T3)Nc3 (-1T3)Bd3 (-2T3)e3 (2T3)e3
+/ (-2T3)Qf6 (-3T3)c5 (-1T3)Qh4 (2T3)Qh4 (1T3)Bb4 (0T3)c6
+6. (1T4)Qf3>(2T4)e4 (-2T4)Qh5 (-3T4)Ng5 (0T4)e3 (-1T4)b3
+/ (1T4)e5 (-1T4)Qh4>>x(-1T2)f2 (>L-4) (-2T4)Qf6>(-3T4)e6 (2T4)Bb4 (0T4)Nf6
+7. (0T5)e4 (1T5)Be2 (-1T5)Bg6 (-3T5)e3 (-2T5)Bb5 (2T5)Qh5
+/ (-2T5)Bc5 (-1T5)Nxe3 (-3T5)Qa5 (2T5)Bxd2 (0T5)Ng4 (1T5)Qg5
+8. (-1T6)fxe3 (-3T6)Nxe6 (1T6)g3 (-2T6)Qh5>>(0T4)h5 (~T7) (>L3) (-4T3)Kxf2
+/ (-4T3)e6 (3T4)g6
+9. (-4T4)Ke1
+/ (-4T4)Qg5
+10. (3T5)Nd5 (-4T5)Nd4
+/ (3T5)Qa5 (-4T5)Bb4
+11. (2T6)Bxd2 (3T6)Qe5 (0T6)Bc4 (-4T6)Qh5
+/ (3T6)Qxd2 (-3T6)dxe6 (-4T6)Nxe3 (-2T6)Bxe3 (0T6)Ne3 (-1T6)Bb4 (1T6)Qxe3 (2T6)Qxf2
+12. (0T7)dxe3 (-1T7)c3 (3T7)Qxd2 (-2T7)dxe3 (-3T7)Qd1>>(-3T5)f3 (~T8) (>L4)
+/ (4T5)Bc3
+13. (4T6)Nxe6
+/ (4T6)dxe6
+14. (4T7)Qf3>>x(0T3)f7 (~T10) (>L5)
+/ (5T3)Kxf7
+15. (5T4)e3
+/ (5T4)Nf6
+16. (5T5)Qf3
+/ (5T5)e6
+17. (5T6)Qe4
+/ (-3T7)Qa5>>x(-3T4)d2 (~T9) (>L-5)
+18. (-5T5)Qxd2
+/ (-5T5)Bd4
+19. (-5T6)Ne6
+/ (-2T7)Nb6>>x(-2T5)b5 (~T11) (>L-6)
+20. (-6T6)Qxf7
+/ (5T6)Nxe4 (-5T6)dxe6 (-6T6)Kxf7
+21. (-6T7)Bc1>>(-6T6)d1 (~T12) (>L6)
+/ (6T6)Bb4
+22. (-2T8)Bb5>>(-2T6)d5 (~T14) (>L7)
+/ (-6T7)Nb6>>(-5T5)b6
+23. (-7T6)Qd2d5
+/ (-7T6)Nb6>>(-5T5)b6
+24. (-8T6)Qd2d5
+)";
+
+int main()
+{
+    int return_code = 0;
+
+    game metadata_game = game::from_pgn(R"(
+[Result "1-0"]
+[Black "Black Engine"]
+[Event "Autoplay"]
+[White "White Engine"]
+[Round "2"]
+[Date "2026.08.21"]
+[Site "Local/Batch 7"]
+[Matchid "42"]
+[Board "Standard"]
+)" );
+    std::string metadata_pgn = metadata_game.show_pgn(pgn_options::SHOW_NOTHING);
+    const std::vector<std::string> ordered_headers = {
+        "[Event ", "[Site ", "[Date ", "[Round ",
+        "[White ", "[Black ", "[Result ",
+    };
+    size_t previous_header = 0;
+    for(const std::string &header : ordered_headers)
+    {
+        size_t position = metadata_pgn.find(header);
+        assert(position != std::string::npos);
+        assert(position >= previous_header);
+        previous_header = position;
+    }
+    assert(metadata_pgn.contains("[Matchid \"42\"]"));
+    assert(metadata_pgn.contains("[Board \"Standard\"]"));
+    assert(!metadata_pgn.contains("[Variant \"Standard\"]"));
+
+    const std::string standard_metadata_pgn = metadata_game.show_pgn(
+        pgn_options::SHOW_NOTHING, true, true);
+    assert(standard_metadata_pgn.contains("[Variant \"Standard\"]"));
+    assert(!standard_metadata_pgn.contains("[Board "));
+    assert(!standard_metadata_pgn.contains("[Matchid "));
+
+    game variant_game = game::from_pgn("[Variant \"Standard\"]");
+    const std::string variant_pgn = variant_game.show_pgn(pgn_options::SHOW_NOTHING);
+    assert(variant_pgn.contains("[Variant \"Standard\"]"));
+    assert(!variant_pgn.contains("[Board "));
+
+    game outcome_game = game::from_pgn(R"(
+[Board "Standard"]
+(1. e4 1-0)
+(1. d4 0-1)
+1. Nf3 1/2-1/2
+)");
+    std::string outcome_pgn = outcome_game.show_pgn(pgn_options::SHOW_OUTCOME);
+    assert(!outcome_pgn.contains("1-0"));
+    assert(!outcome_pgn.contains("0-1"));
+    assert(!outcome_pgn.contains("1/2-1/2"));
+    std::string no_outcome_pgn = outcome_game.show_pgn(pgn_options::SHOW_NOTHING);
+    assert(!no_outcome_pgn.contains("1-0"));
+    assert(!no_outcome_pgn.contains("0-1"));
+    assert(!no_outcome_pgn.contains("1/2-1/2"));
+    std::string outcome_path_pgn = outcome_game.show_pgn(pgn_options::SHOW_OUTCOME, false);
+    assert(!outcome_path_pgn.contains("1/2-1/2"));
+    assert(!outcome_path_pgn.contains("1-0"));
+    assert(!outcome_path_pgn.contains("0-1"));
+    game::from_pgn(outcome_pgn);
+
+    game g = game::from_pgn(str);
+    std::cout << "Final mate state: " << static_cast<int>(g.get_current_state().get_mate_type()) << "\n";
+    std::string inferred_outcome_pgn = g.show_pgn(pgn_options::SHOW_OUTCOME);
+    assert(inferred_outcome_pgn.contains("1-0"));
+    std::string inferred_outcome_path_pgn = g.show_pgn(pgn_options::SHOW_OUTCOME, false);
+    assert(inferred_outcome_path_pgn.contains("1-0"));
+    std::string default_pgn = g.show_pgn();
+    std::cout << default_pgn << "\n\n";
+    const std::vector<pgn_options> flags_to_test = {
+        pgn_options::SHOW_NOTHING,
+        pgn_options::SHOW_RELATIVE,
+        pgn_options::SHOW_PAWN,
+        pgn_options::SHOW_CAPTURE,
+        pgn_options::SHOW_PROMOTION,
+        pgn_options::SHOW_LCOMMENT,
+        pgn_options::SHOW_SHORT,
+        pgn_options::SHOW_OUTCOME,
+        pgn_options::SHOW_CAPTURE | pgn_options::SHOW_PROMOTION | pgn_options::SHOW_MATE | pgn_options::SHOW_SHORT,
+        pgn_options::SHOW_ALL
+    };
+    for(pgn_options flags : flags_to_test)
+    {
+        std::cout << "Flags: " << static_cast<uint16_t>(flags) << " (";
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_RELATIVE))
+        {
+            std::cout << "SHOW_RELATIVE ";
+        }
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_PAWN))
+        {
+            std::cout << "SHOW_PAWN ";
+        }
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_CAPTURE))
+        {
+            std::cout << "SHOW_CAPTURE ";
+        }
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_PROMOTION))
+        {
+            std::cout << "SHOW_PROMOTION ";
+        }
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_MATE))
+        {
+            std::cout << "SHOW_MATE ";
+        }
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_LCOMMENT))
+        {
+            std::cout << "SHOW_LCOMMENT ";
+        }
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_SHORT))
+        {
+            std::cout << "SHOW_SHORT ";
+        }
+        if(static_cast<uint16_t>(flags) & static_cast<uint16_t>(pgn_options::SHOW_OUTCOME))
+        {
+            std::cout << "SHOW_OUTCOME ";
+        }
+        std::cout << ")\n";
+        auto start = std::chrono::high_resolution_clock::now();
+        std::string pgn = g.show_pgn(flags);
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << "Time to print: " << duration.count() << " ms\n";
+        std::cout << "Re-construct game from PGN:";
+        bool exception_thrown = false;
+        try {
+            game g2 = game::from_pgn(pgn);
+        }
+        catch(const std::exception &e)
+        {
+            exception_thrown = true;
+            std::cerr << "failed. " << e.what() << "\n";
+            return_code = 1;
+        }
+        if(!exception_thrown)
+        {
+            std::cout << "passed\n";
+        }
+        std::cout << "Output:\n" << pgn << "\n\n";
+    }
+    if(return_code == 0)
+    {
+        std::cout << "---= show_pgn.cpp: all tests passed =---" <<std::endl;
+    }
+    return return_code;
+}

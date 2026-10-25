@@ -1,0 +1,19 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2022.03.21"]
+[Round "642"]
+[White "Public Match"]
+[Black "cirtus"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.{17:21}(0T1)Ng1f3 / {14:04}(0T1)Ng8f6 
+2.{17:21}(0T2)d2d4 / {14:04}(0T2)c7c5 
+3.{17:21}(0T3)c2c3 / {14:04}(0T3)Qd8b6 
+4.{17:21}(0T4)Bc1e3 / {14:04}(0T4)e7e6 
+5.{17:21}(0T5)Qd1d3 / {14:04}(0T5)Qb6b2 
+6.{17:21}(0T6)Nf3e5 / {14:04}(0T6)Qb2a1 
+7.{17:21}(0T7)Ne5>>(0T5)e6 / {14:04}(1T5)d7e6 
+8.{17:21}(1T6)Nf3e5 / {14:04}(1T6)Bc8d7 
+9.{17:21}(1T7)Qd1c2 / {14:04}(0T7)Qa1a2 (1T7)Nb8c6
+{recorded:black wins}

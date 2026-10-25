@@ -25,3 +25,33 @@ CMakeCache.txt
 # OS
 Thumbs.db
 .DS_Store
+
+# Python (training subsystem)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+*.pyd
+
+# Training artifacts
+runs/
+*.pt
+*.onnx.tmp
+*.onnx.json.tmp
+
+# Generated models and game records
+models/
+*.onnx
+*.gn5d
+*.5dck
+
+# Locally installed ONNX Runtime SDK (CMake searches extern/ as a fallback)
+extern/
+
+# Internal notes
+ai.md
+
+# Claude Code machine-local settings
+.claude/settings.local.json

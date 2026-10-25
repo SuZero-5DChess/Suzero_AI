@@ -1,0 +1,24 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.05.20"]
+[Round "254"]
+[White "Aghata"]
+[Black "tesseract"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1.(0T1)e2e3 / (0T1)Ng8f6 
+2.(0T2)Nb1c3 / (0T2)e7e6 
+3.(0T3)Ng1f3 / (0T3)Nf6g4 
+4.(0T4)Qd1e2 / (0T4)f7f5 
+5.(0T5)d2d4 / (0T5)Ng4e3 
+6.(0T6)Bc1e3 / (0T6)Bf8>>(0T0)f2 
+7.(-1T1)Ke1f2 / (-1T1)Ng8h6 
+8.(-1T2)Kf2g3 / (-1T2)e7e6 
+9.(-1T3)d2d3 / (-1T3)Qd8g5 
+10.(-1T4)Bc1g5 / (-1T4)Nh6f5 
+11.(-1T5)Kg3g4 / (-1T5)f7f6 
+12.(-1T6)Ng1f3 / (-1T6)h7h5 
+13.(0T7)Qe2>>(0T3)a6 / (1T3)b7a6 
+14.(1T4)Qd1h5 / (1T4)Nf6h5
+{recorded:black wins}

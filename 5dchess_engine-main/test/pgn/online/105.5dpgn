@@ -1,0 +1,25 @@
+[Event "Online Game Database"]
+[Site "https://github.com/MageOfficial/t0database"]
+[Date "2021.08.16"]
+[Round "49"]
+[White "Sapphia"]
+[Black "Andrey"]
+[Result "0-1"]
+[Variant "Standard - Turn Zero"]
+
+1. d4 / e6
+2. Nf3 / Nf6
+3. c3 / h6
+4. Bf4 / b5
+5. e3 / a6
+6. g3 / Bb7
+7. Bg2 / g5
+8. Be5 / d6
+9. Bxf6 / Qxf6
+10. Qd3 / Bxf3
+11. O-O / g4
+12. Nd2 / Bxg2
+13. Kxg2 / (0T13)Qf6>>x(0T10)f3~ (>L-1)
+14. (-1T11)Rg1 / (-1T11)Qxf2
+15. (0T14)Qd3>>(0T10)h7~ (>L1) / (1T10)Rxh7
+16. (1T11)Qd2 / (1T11)Qxf3
