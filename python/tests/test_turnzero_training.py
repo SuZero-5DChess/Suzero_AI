@@ -198,12 +198,14 @@ def test_turnzero_training_records_export_and_resume(
     assert checkpoint["extra_state"]["variant"] == STANDARD_TURN_ZERO.name
     assert "replay" not in checkpoint["extra_state"]
     assert checkpoint["train_state"]["trainer_global_step"] == 1
-    from suzero_5dchess.pipeline import _load_replay_buffer
-    from suzero_5dchess.replay import ReplayBuffer
+    from suzero_5dchess.game_store import GameStore
 
-    replay = ReplayBuffer(config.replay_buffer_size)
-    _load_replay_buffer(replay, paths.replay)
-    for sample in replay.sample(len(replay)):
+    store = GameStore(
+        paths.replay_store, STANDARD_TURN_ZERO, config.replay_buffer_size
+    )
+    store.scan()
+    assert len(store) == summary["total_samples"]
+    for sample in store.iter_samples():
         validate_sample(sample, STANDARD_TURN_ZERO)
         assert sample.board_planes.shape[1:] == (12, 64)
 

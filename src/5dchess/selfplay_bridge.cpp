@@ -18,6 +18,7 @@
 #include "suzero/mcts/batch_evaluator.h"
 #include "suzero/mcts/puct_search.h"
 #include "suzero/mcts/random.h"
+#include "tree_positions.h"
 
 namespace suzero::chess5d {
 
@@ -32,6 +33,7 @@ using mcts::SearchProgress;
 using mcts::SearchResult;
 
 void validateConfig(const SelfPlayBridgeConfig& config) {
+  internal::validateTreePositionConfig(config);
   auto require = [](bool condition, const char* message) {
     if (!condition) {
       throw std::invalid_argument(std::string("runSelfPlay: ") + message);
@@ -124,6 +126,8 @@ BridgeGame playOneGame(const SelfPlayBridgeConfig& config, int index,
                        const std::shared_ptr<IEvaluator>& evaluator) {
   const std::uint64_t seed = seedForGame(config.seed, index);
   Rng rng(seed);
+  // Domain-separated from both game decisions and PUCT's own RNG.
+  Rng tree_rng(seed ^ 0x54524545504F5331ULL);
 
   GameConfig game_config = config.game;
   game_config.board_limit = sampleBoardLimit(config, rng);
@@ -247,6 +251,15 @@ BridgeGame playOneGame(const SelfPlayBridgeConfig& config, int index,
       throw std::runtime_error("runSelfPlay: search selected no legal action");
     }
 
+    if (full_search && config.recordTreePositions) {
+      auto tree_samples = internal::extractTreePositions(
+          config, *state, search->rootNode(), action, tree_rng);
+      game.treeSamples += static_cast<int>(tree_samples.size());
+      for (auto& sample : tree_samples) {
+        game.samples.push_back(std::move(sample));
+      }
+    }
+
     const Action chosen = candidates[static_cast<std::size_t>(action)];
     const bool is_submit = chosen.is_submit;
     if (config.recordGames) {
@@ -287,6 +300,9 @@ BridgeGame playOneGame(const SelfPlayBridgeConfig& config, int index,
   }
 
   for (BridgeSample& sample : game.samples) {
+    if (sample.source == 1) {
+      continue;  // Tree utility is already labelled in the node player's frame.
+    }
     const double value =
         sample.player == game.finalPlayer ? final_utility : -final_utility;
     sample.value = static_cast<float>(value);
@@ -299,7 +315,8 @@ BridgeGame playOneGame(const SelfPlayBridgeConfig& config, int index,
 
 std::vector<BridgeGame> runSelfPlay(const SelfPlayBridgeConfig& config,
                                     const BridgeGameCallback& onGameFinished,
-                                    SelfPlayStats* stats) {
+                                    SelfPlayStats* stats,
+                                    const BridgeStopCallback& shouldStop) {
   validateConfig(config);
 
   using Clock = std::chrono::steady_clock;
@@ -312,8 +329,13 @@ std::vector<BridgeGame> runSelfPlay(const SelfPlayBridgeConfig& config,
       makeBatchedOnnxEvaluator(config.evaluator, batch_config);
   const Clock::time_point setup_done = Clock::now();
 
-  std::vector<BridgeGame> games(static_cast<std::size_t>(config.numGames));
-  std::atomic<int> next_index{0};
+  std::vector<std::unique_ptr<BridgeGame>> slots(
+      static_cast<std::size_t>(config.numGames));
+  // Guards "check stop, take next index" so the played games stay a contiguous
+  // prefix. A signal arriving after a worker took its index lets that game
+  // finish; no later game starts.
+  std::mutex start_mutex;
+  int next_index = 0;
   std::atomic<int> completed{0};
   std::mutex error_mutex;
   std::exception_ptr first_error;
@@ -328,16 +350,24 @@ std::vector<BridgeGame> runSelfPlay(const SelfPlayBridgeConfig& config,
           break;
         }
       }
-      const int index = next_index.fetch_add(1);
-      if (index >= config.numGames) {
-        break;
+      int index = 0;
+      {
+        std::lock_guard<std::mutex> lock(start_mutex);
+        if (shouldStop && shouldStop()) {
+          break;
+        }
+        if (next_index >= config.numGames) {
+          break;
+        }
+        index = next_index++;
       }
       try {
-        BridgeGame game = playOneGame(config, index, evaluator);
-        games[static_cast<std::size_t>(index)] = std::move(game);
+        std::unique_ptr<BridgeGame> game =
+            std::make_unique<BridgeGame>(playOneGame(config, index, evaluator));
+        slots[static_cast<std::size_t>(index)] = std::move(game);
         const int done = completed.fetch_add(1) + 1;
         if (onGameFinished) {
-          onGameFinished(done, games[static_cast<std::size_t>(index)]);
+          onGameFinished(done, *slots[static_cast<std::size_t>(index)]);
         }
       } catch (...) {
         std::lock_guard<std::mutex> lock(error_mutex);
@@ -360,6 +390,14 @@ std::vector<BridgeGame> runSelfPlay(const SelfPlayBridgeConfig& config,
 
   if (first_error) {
     std::rethrow_exception(first_error);
+  }
+
+  std::vector<BridgeGame> games;
+  games.reserve(static_cast<std::size_t>(completed.load()));
+  for (std::unique_ptr<BridgeGame>& slot : slots) {
+    if (slot) {
+      games.push_back(std::move(*slot));
+    }
   }
 
   if (stats != nullptr) {

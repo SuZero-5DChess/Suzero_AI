@@ -48,15 +48,12 @@ def test_color_win_rates_exclude_draws_and_truncations():
     }
 
 
-def test_launcher_enables_two_opponents_and_preserves_debug():
+def test_launcher_does_not_configure_periodic_matches():
     text = (Path(__file__).resolve().parents[2] / "run_train.bat").read_text(encoding="utf-8")
-    for option in ("interval", "lookback", "games", "workers", "sims", "max-boards", "provider", "reference"):
-        assert f"--model-match-{option}" in text
-    assert 'set "MATCH_WORKERS=20"' in text
-    assert 'set "MATCH_MAX_BOARDS=25"' in text
-    assert '--model-match-workers %MATCH_WORKERS%' in text
-    assert 'if /I "%VARIANT%"=="very_small" if defined MATCH_REFERENCE' in text
-    assert '--model-match-reference "%MATCH_REFERENCE%"' in text
+    for knob in ("EVALUATION_INTERVAL", "MATCH_LOOKBACK", "MATCH_GAMES", "MATCH_WORKERS",
+                 "MATCH_SIMS", "MATCH_MAX_BOARDS", "MATCH_PROVIDER", "MATCH_REFERENCE"):
+        assert f"set \"{knob}=" not in text
+    assert "--model-match-interval %" not in text
     assert 'if defined DEBUG_MODE set "DEFAULT_ARGS=--record-games %CONTINUOUS_ARG%"' in text
 
 

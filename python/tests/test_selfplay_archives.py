@@ -38,7 +38,7 @@ def test_pipeline_archives_every_fast_game(
         device="cpu", checkpoint_dir=str(tmp_path / "run"),
         log_dir=str(tmp_path / "custom_logs"),
         num_iterations=1, export_interval=0, save_interval=1,
-        tensorboard=False, min_replay_size=1,
+        tensorboard=False, min_replay_size=1, gate_interval=0,
         mcts=MctsConfig(num_simulations=2),
         self_play=SelfPlayConfig(
             num_games=2, workers=2, num_server_threads=processes,
@@ -127,7 +127,7 @@ def test_disabled_recording_writes_no_game_archives(tmp_path: Path, native_recor
 
     config = TrainConfig(
         device="cpu", checkpoint_dir=str(tmp_path), num_iterations=1,
-        export_interval=0, tensorboard=False,
+        export_interval=0, tensorboard=False, gate_interval=0,
         mcts=MctsConfig(num_simulations=1),
         self_play=SelfPlayConfig(
             num_games=1,

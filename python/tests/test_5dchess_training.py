@@ -17,6 +17,7 @@ from suzero_5dchess.config import (
     TrainConfig,
     debug_train_config,
 )
+from suzero_5dchess.endgame_sampling import EndgameSamplingConfig
 from suzero_5dchess.pipeline import RunPaths, run_training
 from suzero_5dchess.protocol import VERY_SMALL
 
@@ -83,15 +84,26 @@ def test_replay_load_preserves_fifo_capacity(tmp_path: Path, legacy: bool) -> No
         sample.move_count = index
     buffer = ReplayBuffer(3)
     buffer.push(samples)
+    # A capacity shrink may only discard rows the trainer already served.
+    buffer.record_trained(range(3))
     state = {"capacity": 3, "samples": samples} if legacy else buffer.state_dict()
     path = tmp_path / "replay_buffer.pt"
     torch.save(state, path)
     restored = ReplayBuffer(2)
     _load_replay_buffer(restored, path)
     assert restored.capacity == 2
-    assert len(restored) == 2
-    assert sorted(sample.move_count for sample in restored.sample(2)) == [1, 2]
-    assert all(isinstance(sample.policy, np.ndarray) for sample in restored.sample(2))
+    if legacy:
+        # Legacy snapshots carry no counters, so nothing proves a pass and the
+        # whole history is kept instead of being silently discarded.
+        assert len(restored) == 3
+        assert sorted(sample.move_count for sample in restored.sample(3)) == [0, 1, 2]
+    else:
+        assert len(restored) == 2
+        assert sorted(sample.move_count for sample in restored.sample(2)) == [1, 2]
+    assert all(
+        isinstance(sample.policy, np.ndarray)
+        for sample in restored.sample(len(restored))
+    )
 
 
 def test_replay_save_failure_preserves_previous_file(tmp_path: Path, monkeypatch) -> None:
@@ -323,6 +335,49 @@ def test_cpp_self_play_uses_terminal_material_labels(tmp_path: Path, fen: str, s
         assert sample.value_target == pytest.approx(expected)
 
 
+def test_python_self_play_stops_between_games(monkeypatch: pytest.MonkeyPatch) -> None:
+    from suzero_5dchess import self_play
+    from suzero_5dchess.config import MctsConfig, SelfPlayConfig
+    from suzero_5dchess.self_play import SelfPlayResult
+
+    played: list[int] = []
+
+    def fake_play(network, spec, mcts, config, *, device="cpu", seed=0):
+        del network, spec, mcts, config, device
+        played.append(seed)
+        return SelfPlayResult(
+            samples=[], white_outcome=0.0, terminal_reason="draw",
+            semimoves=1, turns=1, board_limit=2, board_count=1,
+            final_player=0,
+        )
+
+    flags = iter([False, True])
+    monkeypatch.setattr(self_play, "play_game", fake_play)
+    monkeypatch.setattr(
+        self_play, "stop_requested", lambda: next(flags, True)
+    )
+
+    class Network:
+        training = False
+
+        def eval(self) -> None:
+            self.training = False
+
+        def train(self, mode: bool) -> None:
+            self.training = mode
+
+    results = self_play.generate_games(
+        Network(),
+        VERY_SMALL,
+        MctsConfig(num_simulations=2),
+        SelfPlayConfig(num_games=4, workers=1),
+        num_games=4,
+        seed=0,
+    )
+    assert len(results) == 1
+    assert len(played) == 1
+
+
 def test_parallel_self_play_matches_sequential() -> None:
     from suzero_5dchess.network import build_network
     from suzero_5dchess.self_play import generate_games
@@ -368,6 +423,7 @@ def test_debug_pipeline_checkpoint_and_resume(tmp_path: Path) -> None:
         save_interval=1,
         export_interval=1,
         tensorboard=False,
+        gate_interval=0,
         checkpoint_dir=str(tmp_path / "run"),
         self_play=SelfPlayConfig(
             num_games=1,
@@ -425,6 +481,7 @@ def test_pipeline_writes_tensorboard(tmp_path: Path) -> None:
         save_interval=1,
         export_interval=0,
         tensorboard=True,
+        gate_interval=0,
         checkpoint_dir=str(tmp_path / "run"),
         self_play=SelfPlayConfig(
             num_games=1,
@@ -456,6 +513,7 @@ def test_evaluation_seeds_baseline_then_plays(tmp_path: Path) -> None:
         evaluation_games=2,
         evaluation_simulations=2,
         tensorboard=False,
+        gate_interval=0,
         checkpoint_dir=str(tmp_path / "eval_run"),
         self_play=SelfPlayConfig(
             num_games=1,
@@ -516,6 +574,55 @@ def test_cli_exposes_backend_and_board_limit_knobs() -> None:
     assert config.self_play.min_board_limit == 5
     assert config.self_play.max_board_limit == 9
     assert config.evaluation_interval == 7
+
+
+def test_cli_exposes_the_repeat_rows_knob() -> None:
+    from suzero_5dchess.cli import _build_config, build_parser
+
+    parser = build_parser()
+    # Disjoint adjacent rounds stay the default.
+    assert _build_config(parser.parse_args(["train"])).no_repeat_rows is True
+    assert _build_config(
+        parser.parse_args(["train", "--repeat-rows"])
+    ).no_repeat_rows is False
+    assert _build_config(
+        parser.parse_args(["train", "--no-repeat-rows"])
+    ).no_repeat_rows is True
+    with pytest.raises(ValueError):
+        TrainConfig(no_repeat_rows="yes")
+
+
+def test_cli_exposes_the_endgame_sampling_knobs() -> None:
+    from suzero_5dchess.cli import _build_config, build_parser
+
+    parser = build_parser()
+    # The library default stays off so older checkpoints keep their replay
+    # distribution; run_train.bat passes --endgame-sampling explicitly.
+    default = _build_config(parser.parse_args(["train"]))
+    assert default.endgame.enabled is False
+    assert default.endgame.strength == 1.0
+    assert default.endgame.exponent == 2.0
+
+    config = _build_config(parser.parse_args([
+        "train", "--endgame-sampling",
+        "--endgame-weight", "2.5", "--endgame-exponent", "1.5",
+    ]))
+    assert config.endgame.enabled is True
+    assert config.endgame.strength == 2.5
+    assert config.endgame.exponent == 1.5
+
+    # Weight/exponent alone do not enable a disabled default.
+    partial = _build_config(parser.parse_args(
+        ["train", "--endgame-weight", "0"]
+    ))
+    assert partial.endgame.enabled is False
+    assert partial.endgame.strength == 0.0
+
+    assert _build_config(parser.parse_args(
+        ["train", "--no-endgame-sampling"]
+    )).endgame.enabled is False
+    with pytest.raises(ValueError):
+        TrainConfig(endgame=EndgameSamplingConfig(enabled=True, exponent=0))
 
 
 def test_cpp_onnx_backend_runs_a_debug_iteration(tmp_path: Path) -> None:
@@ -608,12 +715,15 @@ def test_continuous_last_iteration_stop_is_preserved(
 
     assert calls == iterations
     assert summary["stopped_early"] is True
-    assert summary["end_iteration"] == iterations
+    # A self-play stop exits before training, so that iteration is not counted
+    # as complete; its games are still saved for the next run.
+    expected_iteration = iterations if stop_phase == "training" else iterations - 1
+    assert summary["end_iteration"] == expected_iteration
     assert summary["total_games"] == iterations * 2
     assert not interrupts.stop_requested()
     assert paths.final.exists()
     extra = pipeline._read_checkpoint(paths.latest)
-    assert extra["iteration"] == iterations
+    assert extra["iteration"] == expected_iteration
 
 
 def test_cli_accepts_continuous_flag() -> None:

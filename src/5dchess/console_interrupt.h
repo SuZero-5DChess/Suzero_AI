@@ -43,11 +43,15 @@
 namespace suzero::chess5d::internal {
 
 inline constexpr char kInterruptNotice[] =
-    "\n[Ctrl+C] 已收到中断信号：本轮自对弈会继续跑完，随后保存并退出；"
-    "再按一次 Ctrl+C 立即中止。\n";
+    "\n[Ctrl+C] 已收到中断信号：正在进行的对局会跑完，不再开始新对局；"
+    "样本写入文件并保存后退出，下次从该进度继续；再按一次 Ctrl+C 立即中止。\n";
 
 inline constexpr char kInterruptAbort[] =
     "\n[Ctrl+C] 再次收到中断信号，立即中止（本轮进度可能丢失）。\n";
+
+/// Set on the first press. The self-play scheduler stops handing out new games
+/// while games already in flight run to completion.
+inline std::atomic<bool> g_stopRequested{false};
 
 /// Press count of the active guard. Written from the OS handler thread(s).
 inline std::atomic<int> g_interruptPresses{0};
@@ -55,6 +59,10 @@ inline std::atomic<int> g_interruptPresses{0};
 /// Guards every handler entry: after the guard is destroyed a late signal must
 /// fall through to CPython instead of being counted or printed here.
 inline std::atomic<bool> g_interruptActive{false};
+
+inline bool stopRequested() noexcept {
+  return g_stopRequested.load(std::memory_order_acquire);
+}
 
 /// Writes UTF-8 text to stderr, readable both on a console and in a log file.
 inline void writeInterruptMessage(const char* text) noexcept {
@@ -104,14 +112,22 @@ inline BOOL WINAPI consoleCtrlHandler(DWORD type) {
   if (!g_interruptActive.load(std::memory_order_acquire)) {
     return FALSE;
   }
+  const bool ctrl_c = type == CTRL_C_EVENT;
   const int presses =
       g_interruptPresses.fetch_add(1, std::memory_order_acq_rel) + 1;
   if (presses == 1) {
+    g_stopRequested.store(true, std::memory_order_release);
     writeInterruptMessage(kInterruptNotice);
-    // FALSE chains to the handlers registered earlier (CPython's), which
-    // records the SIGINT for the main thread. Returning TRUE here would
-    // swallow it and the cooperative stop would never fire.
-    return FALSE;
+    if (ctrl_c) {
+      // FALSE chains to the handlers registered earlier (CPython's), which
+      // records the SIGINT for the main thread. Returning TRUE here would
+      // swallow it and Python's cooperative stop would never fire.
+      return FALSE;
+    }
+    // A parent sends CTRL_BREAK to a detached child process group. Returning
+    // TRUE keeps the default SIGBREAK termination from killing the child
+    // mid-game; the native scheduler observes g_stopRequested instead.
+    return TRUE;
   }
   writeInterruptMessage(kInterruptAbort);
   TerminateProcess(GetCurrentProcess(), 130);
@@ -126,6 +142,7 @@ inline void posixInterruptHandler(int signum) {
   const int presses =
       g_interruptPresses.fetch_add(1, std::memory_order_acq_rel) + 1;
   if (presses == 1) {
+    g_stopRequested.store(true, std::memory_order_release);
     writeInterruptMessage(kInterruptNotice);
     // Chain to the previous handler (CPython's), so the interpreter still
     // sees SIGINT and applies the cooperative stop after the call returns.
@@ -152,6 +169,7 @@ class ConsoleInterruptGuard {
  public:
   ConsoleInterruptGuard() noexcept {
     g_interruptPresses.store(0, std::memory_order_relaxed);
+    g_stopRequested.store(false, std::memory_order_release);
     g_interruptActive.store(true, std::memory_order_release);
 #ifdef _WIN32
     installed_ = SetConsoleCtrlHandler(consoleCtrlHandler, TRUE) != 0;
@@ -168,6 +186,7 @@ class ConsoleInterruptGuard {
     // Deactivate first: a signal racing with the restore below must go to
     // CPython untouched.
     g_interruptActive.store(false, std::memory_order_release);
+    g_stopRequested.store(false, std::memory_order_release);
 #ifdef _WIN32
     if (installed_) {
       SetConsoleCtrlHandler(consoleCtrlHandler, FALSE);

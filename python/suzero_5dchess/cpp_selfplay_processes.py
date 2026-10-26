@@ -50,6 +50,8 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping, Sequence
 
 import numpy as np
 
+from .interrupts import stop_requested
+
 if TYPE_CHECKING:  # pragma: no cover - result types are only needed by the parent
     from .self_play import SelfPlayResult
 
@@ -71,6 +73,15 @@ STDERR_NAME = "stderr.log"
 
 STDERR_TAIL_CHARS = 4000
 
+# Set by the child's signal handlers.  A signal arriving before the native
+# guard is installed must not be lost (or, on Windows, terminate the child).
+_child_stop = threading.Event()
+
+
+def _record_child_stop(signum: int, frame: object) -> None:
+    del signum, frame
+    _child_stop.set()
+
 # Exactly the arrays consumed by ``cpp_self_play._samples_by_game``.  Keeping
 # the list explicit avoids accidentally serialising metadata or object arrays.
 TRANSPORT_ARRAYS = (
@@ -88,6 +99,8 @@ TRANSPORT_ARRAYS = (
     "player",
     "move_count",
     "game_index",
+    "sample_source",
+    "search_visits",
 )
 
 ProgressCallback = Callable[[int], None]
@@ -313,7 +326,9 @@ def worker_command(request_path: Path) -> list[str]:
 # ----------------------------------------------------------------- child side
 
 
-def _load_request(request_path: Path) -> tuple[Path, dict[str, Any]]:
+def _load_request(
+    request_path: Path,
+) -> tuple[Path, dict[str, Any], dict[str, Any] | None]:
     if not request_path.is_absolute():
         raise ValueError(f"request path must be absolute: {request_path}")
     data = json.loads(request_path.read_text(encoding="utf-8"))
@@ -337,7 +352,37 @@ def _load_request(request_path: Path) -> tuple[Path, dict[str, Any]]:
         raise ValueError("binding_kwargs.num_games must be an integer") from exc
     if games < 1:
         raise ValueError("binding_kwargs.num_games must be >= 1")
-    return output_dir, dict(kwargs)
+
+    store = data.get("replay_store")
+    if store is not None:
+        if not isinstance(store, dict):
+            raise ValueError("replay_store must be a JSON object")
+        directory = Path(str(store.get("directory", "")))
+        if not directory.is_absolute():
+            raise ValueError("replay_store.directory must be absolute")
+        if directory.is_symlink():
+            raise ValueError("replay_store.directory must not be a symlink")
+        if not directory.is_dir():
+            raise ValueError(f"replay_store.directory does not exist: {directory}")
+        try:
+            iteration = int(store["iteration"])
+            game_id_start = int(store["game_id_start"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(
+                "replay_store needs integer iteration and game_id_start"
+            ) from exc
+        if game_id_start < 0:
+            raise ValueError("replay_store.game_id_start must be non-negative")
+        variant = store.get("variant")
+        if not isinstance(variant, str) or not variant:
+            raise ValueError("replay_store.variant must be a non-empty string")
+        store = {
+            "directory": directory,
+            "iteration": iteration,
+            "game_id_start": game_id_start,
+            "variant": variant,
+        }
+    return output_dir, dict(kwargs), store
 
 
 def _load_binding() -> Any:
@@ -390,6 +435,8 @@ def _extract_arrays(raw: Mapping[str, Any]) -> dict[str, np.ndarray]:
             arrays[key] = value
             continue
         if key not in raw:
+            if key in ("sample_source", "search_visits"):
+                continue  # Payloads from older extensions have no provenance.
             raise RuntimeError(f"run_selfplay result is missing array {key!r}")
         value = np.asarray(raw[key])
         if value.dtype == object:
@@ -441,6 +488,30 @@ def _write_error_result(
         pass
 
 
+def _write_stopped_result(
+    result_path: Path,
+    progress_path: Path,
+    games: int,
+    streamed: bool,
+) -> int:
+    """Finish a child that was asked to stop before any game started."""
+
+    _atomic_json(
+        result_path,
+        {
+            "status": "ok",
+            "games": [],
+            "stats": {},
+            "samples": 0,
+            "streamed": streamed,
+            "stopped": True,
+            "requested_games": games,
+        },
+    )
+    _write_progress(progress_path, {"done": 0, "games": games})
+    return 0
+
+
 def run_worker(request_path: str | os.PathLike[str]) -> int:
     """Child entry: run exactly one native ``run_selfplay`` call."""
 
@@ -449,7 +520,7 @@ def run_worker(request_path: str | os.PathLike[str]) -> int:
 
     path = Path(request_path)
     try:
-        output_dir, kwargs = _load_request(path)
+        output_dir, kwargs, store_config = _load_request(path)
     except Exception as exc:
         print(f"self-play worker: invalid request {path}: {exc}", file=sys.stderr)
         return 2
@@ -469,7 +540,16 @@ def run_worker(request_path: str | os.PathLike[str]) -> int:
 
     try:
         _write_progress(progress_path, {"done": 0, "games": games})
+        streamed = store_config is not None
+        if _child_stop.is_set():
+            return _write_stopped_result(
+                result_path, progress_path, games, streamed
+            )
         binding = _load_binding()
+        if _child_stop.is_set():
+            return _write_stopped_result(
+                result_path, progress_path, games, streamed
+            )
 
         # The native bridge invokes this from several game threads, and the
         # Python binding only takes the GIL (file I/O releases it).  Hold the
@@ -493,22 +573,78 @@ def run_worker(request_path: str | os.PathLike[str]) -> int:
                     progress_path, {"done": value, "games": games}
                 )
 
-        raw = binding.run_selfplay(**kwargs, progress=on_game)
+        call_kwargs = dict(kwargs)
+        call_kwargs["progress"] = on_game
+        stream_error: list[BaseException] = []
+        if store_config is not None:
+            from .game_store import GameStore
+            from .protocol import resolve_variant
+
+            store = GameStore(
+                store_config["directory"],
+                resolve_variant(store_config["variant"]),
+                capacity=1,
+                enforce_capacity=False,
+            )
+            game_id_start = int(store_config["game_id_start"])
+            iteration = int(store_config["iteration"])
+
+            def on_stream(done: int, index: int, payload: dict[str, Any]) -> None:
+                del done
+                if stream_error:
+                    return
+                try:
+                    from .cpp_self_play import _selfplay_results
+
+                    converted = _selfplay_results(dict(payload))
+                    if len(converted) != 1:
+                        raise RuntimeError(
+                            "streamed self-play payload must contain exactly "
+                            "one game"
+                        )
+                    store.append_result(
+                        game_id_start + int(index),
+                        converted[0],
+                        iteration=iteration,
+                    )
+                except BaseException as exc:  # surfaced after native returns
+                    stream_error.append(exc)
+
+            call_kwargs["stream_games"] = True
+            call_kwargs["on_game"] = on_stream
+
+        raw = binding.run_selfplay(**call_kwargs)
+        if stream_error:
+            raise RuntimeError(
+                f"streaming self-play games to the replay store failed: "
+                f"{type(stream_error[0]).__name__}: {stream_error[0]}"
+            ) from stream_error[0]
         if not isinstance(raw, Mapping):
             raise RuntimeError(
                 f"run_selfplay returned {type(raw)!r}, expected a mapping"
             )
 
-        arrays = _extract_arrays(raw)
         game_list = _extract_games(raw)
         stats = _extract_stats(raw)
-        if len(game_list) != games:
+        stopped = bool(raw.get("stopped")) or _child_stop.is_set()
+        if len(game_list) > games or (
+            len(game_list) != games and not stopped
+        ):
             raise RuntimeError(
                 f"run_selfplay returned {len(game_list)} games, requested "
                 f"{games}"
             )
 
-        _atomic_npz(arrays_path, arrays)
+        if store_config is None:
+            arrays = _extract_arrays(raw)
+            _atomic_npz(arrays_path, arrays)
+            sample_count = int(arrays["used_board_counts"].shape[0])
+        else:
+            # The samples are already in the shared store; sending them back to
+            # the parent would load the whole round into RAM for nothing.
+            sample_count = sum(
+                int(entry.get("samples", 0)) for entry in game_list
+            )
         _atomic_json(
             result_path,
             {
@@ -516,10 +652,15 @@ def run_worker(request_path: str | os.PathLike[str]) -> int:
                 "pid": os.getpid(),
                 "games": game_list,
                 "stats": stats,
-                "samples": int(arrays["used_board_counts"].shape[0]),
+                "samples": sample_count,
+                "streamed": store_config is not None,
+                "stopped": stopped,
+                "requested_games": games,
             },
         )
-        _write_progress(progress_path, {"done": games, "games": games})
+        _write_progress(
+            progress_path, {"done": len(game_list), "games": games}
+        )
         return 0
     except Exception as exc:
         _write_error_result(result_path, exc)
@@ -544,21 +685,57 @@ def _read_progress(child_dir: Path, games: int, previous: int) -> int:
     return max(previous, max(0, min(done, games)))
 
 
+def _request_child_stop(proc: subprocess.Popen) -> bool:
+    """Ask one live child to stop after its in-flight games.
+
+    Children run in their own process group/session, so the terminal's Ctrl+C
+    never reaches them.  Windows uses CTRL_BREAK (the native guard treats it as
+    a cooperative stop and refuses the default termination); POSIX uses SIGINT,
+    which the same guard catches during the blocking native call.
+
+    Returns True when a signal was delivered.  Callers must not signal a child
+    before it has written its first progress line: its Python handler is
+    installed before that write, and an earlier signal would hit the default
+    action and kill the interpreter while it is still starting.
+    """
+
+    if proc.poll() is not None:
+        return False
+    try:
+        if os.name == "nt":
+            proc.send_signal(signal.CTRL_BREAK_EVENT)
+        else:
+            proc.send_signal(signal.SIGINT)
+    except (OSError, ValueError):
+        # The child may have exited between poll() and the signal.  Its
+        # result files (if any) still decide the outcome.
+        return False
+    return True
+
+
 def _wait_for_children(
     procs: Sequence[subprocess.Popen],
     child_dirs: Sequence[Path],
     plan: Sequence[ProcessPlan],
     progress: ProgressCallback | None,
+    *,
+    stopped: Callable[[], bool] | None = None,
 ) -> int:
     """Poll progress and exit codes until every child has finished.
 
     Returns the highest total progress reported while waiting.  There is no
     deadline.  The first non-zero exit raises ``_WorkerExit`` so the caller can
     stop the remaining children immediately.
+
+    ``stopped`` is polled while the children run.  Once it is true, each child
+    is signalled once after it has written its first progress line (so its
+    Python handlers already exist); its native scheduler then stops handing out
+    new games and returns the ones already in flight.
     """
 
     scene = [0] * len(plan)
     reported = 0
+    signalled = [False] * len(procs)
 
     while True:
         total = 0
@@ -570,6 +747,18 @@ def _wait_for_children(
         if callable(progress) and total > reported:
             reported = total
             progress(reported)
+
+        if stopped is not None and stopped():
+            for index, proc in enumerate(procs):
+                if signalled[index]:
+                    continue
+                # A child installs its SIGINT/SIGBREAK handlers before writing
+                # the first progress line.  Retry next tick until then instead
+                # of killing an interpreter that is still starting.
+                if not (child_dirs[index] / PROGRESS_NAME).is_file():
+                    continue
+                if _request_child_stop(proc):
+                    signalled[index] = True
 
         active = 0
         failure: tuple[int, int] | None = None
@@ -646,37 +835,56 @@ def _load_child_results(child_dir: Path, expected_games: int) -> list[SelfPlayRe
     game_list = payload.get("games")
     if not isinstance(game_list, list):
         raise RuntimeError(f"self-play worker result has no game list: {result_path}")
-    if len(game_list) != expected_games:
+    actual_games = len(game_list)
+    stopped = bool(payload.get("stopped"))
+    if actual_games > expected_games:
         raise RuntimeError(
-            f"self-play worker returned {len(game_list)} games, expected "
+            f"self-play worker returned {actual_games} games, expected at most "
+            f"{expected_games}"
+        )
+    if actual_games != expected_games and not stopped:
+        raise RuntimeError(
+            f"self-play worker returned {actual_games} games, expected "
             f"{expected_games}"
         )
 
     indices = sorted(int(entry["index"]) for entry in game_list)
-    if indices != list(range(expected_games)):
+    if indices != list(range(actual_games)):
         raise RuntimeError(
             "self-play worker game indices are not the expected local "
-            f"0..{expected_games - 1} range: {indices}"
+            f"0..{actual_games - 1} range: {indices}"
         )
 
     try:
-        with np.load(arrays_path, allow_pickle=False) as data:
-            arrays = {key: data[key] for key in data.files}
-            game_index = arrays.get("game_index")
-            if game_index is not None and game_index.size:
-                low = int(game_index.min())
-                high = int(game_index.max())
-                if low < 0 or high >= expected_games:
-                    raise RuntimeError(
-                        "self-play worker sample game_index is outside its "
-                        f"local 0..{expected_games - 1} range: [{low}, {high}]"
-                    )
-            raw: dict[str, Any] = dict(arrays)
-            raw["games"] = game_list
-            # Conversion is parent-only; workers serialise the native arrays.
+        if actual_games == 0:
+            # A child stopped before its first game may have no arrays file.
             from .cpp_self_play import _selfplay_results
 
-            results = _selfplay_results(raw)
+            results = _selfplay_results({"games": []})
+        elif payload.get("streamed"):
+            # The child already persisted every game into the shared store, so
+            # only metadata crosses back; the parent must not reload blobs.
+            from .cpp_self_play import _selfplay_results
+
+            results = _selfplay_results({"games": game_list})
+        else:
+            with np.load(arrays_path, allow_pickle=False) as data:
+                arrays = {key: data[key] for key in data.files}
+                game_index = arrays.get("game_index")
+                if game_index is not None and game_index.size:
+                    low = int(game_index.min())
+                    high = int(game_index.max())
+                    if low < 0 or high >= actual_games:
+                        raise RuntimeError(
+                            "self-play worker sample game_index is outside its "
+                            f"local 0..{actual_games - 1} range: [{low}, {high}]"
+                        )
+                raw: dict[str, Any] = dict(arrays)
+                raw["games"] = game_list
+                # Conversion is parent-only; workers serialise the native arrays.
+                from .cpp_self_play import _selfplay_results
+
+                results = _selfplay_results(raw)
     except RuntimeError:
         raise
     except Exception as exc:
@@ -685,11 +893,14 @@ def _load_child_results(child_dir: Path, expected_games: int) -> list[SelfPlayRe
             f"{exc}"
         ) from exc
 
-    if len(results) != expected_games:
+    if len(results) != actual_games:
         raise RuntimeError(
             f"self-play worker produced {len(results)} converted games, "
-            f"expected {expected_games}"
+            f"expected {actual_games}"
         )
+    if payload.get("streamed"):
+        for result in results:
+            result.persisted = True
     return results
 
 
@@ -730,7 +941,7 @@ def _log_summary(
     child_stats: Sequence[Mapping[str, Any]],
     wall_seconds: float,
 ) -> None:
-    samples = sum(len(result.samples) for result in results)
+    samples = sum(result.sample_count for result in results)
     backend_rows = 0
     setup_values: list[float] = []
     for stats in child_stats:
@@ -784,12 +995,17 @@ def run_self_play_processes(
     processes: int,
     total_server_threads: int,
     progress: ProgressCallback | None = None,
+    replay_store: Mapping[str, Any] | None = None,
 ) -> list[SelfPlayResult]:
     """Run one iteration's self-play across ``processes`` child interpreters.
 
     ``binding_kwargs`` is the parent's original ``run_selfplay`` keyword set
     with the ``progress`` callback removed.  ``num_games`` and ``num_threads``
     are treated as totals and split across children.
+
+    ``replay_store`` describes a shared :class:`GameStore`; each child appends
+    its own games as they finish.  ``game_id_start`` is advanced by the number
+    of games in each preceding child, so ids never collide across processes.
     """
 
     kwargs = dict(binding_kwargs)
@@ -810,6 +1026,12 @@ def run_self_play_processes(
         ) from exc
     base_seed = int(kwargs.get("seed", 0)) & UINT64_MASK
 
+    if stop_requested():
+        # Ctrl+C before the children exist: do not pay startup for a batch the
+        # caller is about to abandon.
+        logger.warning("Ctrl+C: self-play cancelled before any child started")
+        return []
+
     plan = build_plan(
         processes, total_workers, total_server_threads, games, base_seed
     )
@@ -823,6 +1045,7 @@ def run_self_play_processes(
     stderr_paths: list[Path] = []
     started = time.perf_counter()
     keep_diagnostics = False
+    store_game_offset = 0
 
     try:
         for item in plan:
@@ -831,13 +1054,17 @@ def run_self_play_processes(
             child_dirs.append(child_dir)
 
             request_path = child_dir / REQUEST_NAME
-            _atomic_json(
-                request_path,
-                {
-                    "output_dir": str(child_dir.resolve()),
-                    "binding_kwargs": child_binding_kwargs(kwargs, item),
-                },
-            )
+            request_payload: dict[str, Any] = {
+                "output_dir": str(child_dir.resolve()),
+                "binding_kwargs": child_binding_kwargs(kwargs, item),
+            }
+            if replay_store is not None:
+                child_store = dict(replay_store)
+                base = int(replay_store.get("game_id_start", 0))
+                child_store["game_id_start"] = base + store_game_offset
+                store_game_offset += item.games
+                request_payload["replay_store"] = child_store
+            _atomic_json(request_path, request_payload)
 
             stderr_path = child_dir / STDERR_NAME
             stdout_handle = (child_dir / STDOUT_NAME).open("wb")
@@ -864,7 +1091,9 @@ def run_self_play_processes(
             procs.append(proc)
 
         try:
-            reported = _wait_for_children(procs, child_dirs, plan, progress)
+            reported = _wait_for_children(
+                procs, child_dirs, plan, progress, stopped=stop_requested
+            )
         except _WorkerExit as exc:
             keep_diagnostics = True
             _terminate_all(procs)
@@ -882,7 +1111,7 @@ def run_self_play_processes(
             results.extend(_load_child_results(child_dir, item.games))
             child_stats.append(_read_child_stats(child_dir))
 
-        if len(results) != games:
+        if len(results) != games and not stop_requested():
             raise RuntimeError(
                 f"multiprocess self-play returned {len(results)} games, "
                 f"expected {games}"
@@ -922,13 +1151,25 @@ def run_self_play_processes(
 # --------------------------------------------------------------------- child CLI
 
 
-def _ignore_sigint() -> None:
-    try:
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
-    except (ValueError, OSError):
-        # Not the main thread (or an unsupported platform): the parent still
-        # detaches the child group, and a second Ctrl+C is handled there.
-        pass
+def _install_stop_handlers() -> None:
+    """Record a stop request that arrives before the native guard exists.
+
+    On Windows the parent targets this child's process group with CTRL_BREAK;
+    CPython maps that to SIGBREAK.  Without a Python handler the default action
+    would terminate the child mid-game.  During ``run_selfplay`` the native
+    guard installs its own handler first and handles the event itself.
+    """
+
+    for name in ("SIGINT", "SIGBREAK"):
+        number = getattr(signal, name, None)
+        if number is None:
+            continue
+        try:
+            signal.signal(number, _record_child_stop)
+        except (ValueError, OSError):
+            # Not the main thread (or unsupported): the native guard still
+            # covers the duration of the blocking call.
+            pass
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -940,7 +1181,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="absolute path to this child's request JSON",
     )
     args = parser.parse_args(argv)
-    _ignore_sigint()
+    _install_stop_handlers()
     return run_worker(args.worker)
 
 

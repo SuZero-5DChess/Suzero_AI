@@ -5,11 +5,16 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 from pathlib import Path
+from typing import Callable
 
+from . import console_sink
 from .archive_writer import ArchiveWriter
 from .config import NetworkConfig, TrainConfig, debug_train_config
+from .console_mode import disable_quick_edit
+from .endgame_sampling import EndgameSamplingConfig
 from .evaluation import load_network_checkpoint, play_match
 from .export_onnx import export_network
 from .network import build_network
@@ -27,7 +32,9 @@ def _configure_logging(log_dir: Path | None = None) -> None:
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)s %(name)s: %(message)s", "%Y-%m-%d %H:%M:%S"
     )
-    stream = logging.StreamHandler()
+    # The console is the only unreliable destination: a paused console must
+    # never stall the trainer, so it is written from a background thread.
+    stream = logging.StreamHandler(console_sink.install() or sys.stderr)
     stream.setFormatter(formatter)
     logger.addHandler(stream)
     if log_dir is not None:
@@ -61,14 +68,67 @@ def _add_training_options(parser: argparse.ArgumentParser) -> None:
         action="store_true",
         help="keep training after each batch of --iterations iterations: "
         "resume from the latest checkpoint and start the next batch without "
-        "exiting. One Ctrl+C finishes the current iteration, saves, and "
-        "stops; a second press aborts immediately",
+        "exiting. One Ctrl+C during self-play stops handing out new games, "
+        "lets the in-flight games finish and saves their samples (skipping "
+        "training); during training/evaluation it finishes the iteration. "
+        "A second press aborts immediately",
     )
     parser.add_argument("--games", type=int, default=None)
     parser.add_argument("--sims", type=int, default=None)
     parser.add_argument("--batch-size", type=int, default=None)
     parser.add_argument("--min-replay-size", type=int, default=None)
     parser.add_argument("--replay-size", type=int, default=None)
+    parser.add_argument(
+        "--replay-backend", choices=("file", "memory"), default=None,
+        help="file: one NPZ per finished game, written immediately and trained "
+        "from disk (default); memory: encode the whole round in RAM",
+    )
+    parser.add_argument(
+        "--repeat-rows", dest="no_repeat_rows", action="store_false",
+        default=None,
+        help="let adjacent shuffle rounds draw the same rows (default: each "
+        "round excludes the rows the previous round selected)",
+    )
+    parser.add_argument(
+        "--no-repeat-rows", dest="no_repeat_rows", action="store_true",
+        default=None,
+        help="keep adjacent shuffle rounds disjoint (default)",
+    )
+    parser.add_argument(
+        "--window", action="store_true",
+        help="enable a dynamically growing replay window (default: disabled)",
+    )
+    parser.add_argument("--window-expand-per-row", type=float, default=None)
+    parser.add_argument("--window-taper-exponent", type=float, default=None)
+    parser.add_argument("--window-taper-scale", type=int, default=None,
+                        help="taper scale in generated samples (default: --replay-size)")
+    parser.add_argument("--window-max-samples", type=int, default=None)
+    parser.add_argument("--window-keep-samples", type=int, default=None,
+                        help="optional rows per file-shuffle generation (does not trim history)")
+    parser.add_argument(
+        "--window-sampling", choices=("shuffle", "uniform"), default=None,
+        help="shuffle: finite NPZ file pass across epochs; uniform: in-memory sampling",
+    )
+    parser.add_argument(
+        "--endgame-sampling", dest="endgame_sampling", action="store_true",
+        default=None,
+        help="repeat rows near the end of their game inside each replay round; "
+        "every row is still included once (default: disabled)",
+    )
+    parser.add_argument(
+        "--no-endgame-sampling", dest="endgame_sampling", action="store_false",
+        default=None,
+        help="disable endgame row weighting (default)",
+    )
+    parser.add_argument(
+        "--endgame-weight", type=float, default=None,
+        help="expected extra copies of a game's final position (default: 1.0)",
+    )
+    parser.add_argument(
+        "--endgame-exponent", type=float, default=None,
+        help="ramp exponent of the endgame weight; 1 is linear, larger values "
+        "concentrate the boost in the last part of a game (default: 2.0)",
+    )
     parser.add_argument("--epochs-per-iteration", type=int, default=None)
     parser.add_argument("--steps-per-epoch", type=int, default=None)
     parser.add_argument("--lr", type=float, default=None)
@@ -99,6 +159,22 @@ def _add_training_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--no-playout-cap", action="store_true")
     parser.add_argument("--full-search-probability", type=float, default=None)
     parser.add_argument("--fast-sims", type=int, default=None)
+    parser.add_argument(
+        "--record-tree-positions", dest="record_tree_positions",
+        action="store_true", default=None,
+        help="reuse well-visited side positions from full-search trees (default; "
+        "no extra playouts)",
+    )
+    parser.add_argument(
+        "--no-record-tree-positions", dest="record_tree_positions",
+        action="store_false",
+        help="disable tree-position sampling",
+    )
+    parser.add_argument("--tree-min-visits", type=int, default=None)
+    parser.add_argument("--tree-max-depth", type=int, default=None)
+    parser.add_argument("--tree-max-per-turn", type=int, default=None,
+                        help="maximum tree rows per full-search decision (small step)")
+    parser.add_argument("--tree-sample-prob", type=float, default=None)
     parser.add_argument(
         "--workers",
         type=int,
@@ -167,6 +243,20 @@ def _add_training_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--model-match-reference", default=None,
                         help="additional fixed ONNX or trusted checkpoint opponent")
 
+    parser.add_argument("--gate-interval", type=int, default=None,
+                        help="candidate promotion matches every N iterations; 0 disables")
+    parser.add_argument("--gate-games", type=int, default=None)
+    parser.add_argument("--gate-workers", type=int, default=None,
+                        help="concurrent C++ gate games (default: 20)")
+    parser.add_argument("--gate-simulations", type=int, default=None)
+    parser.add_argument("--gate-min-average-score", type=float, default=None,
+                        help="promote when the candidate's mean game score "
+                             "(forced material terminals included) reaches this value")
+    parser.add_argument("--gate-min-finished", type=int, default=None)
+    parser.add_argument("--gate-max-boards", type=int, default=None)
+    parser.add_argument("--gate-provider", choices=("cpu", "cuda"), default=None)
+    parser.add_argument("--gate-temperature", type=float, default=None)
+
     parser.add_argument("--no-tensorboard", action="store_true")
     parser.add_argument("--no-jsonl", action="store_true")
 
@@ -215,6 +305,8 @@ def _build_config(args: argparse.Namespace) -> TrainConfig:
         "batch_size",
         "min_replay_size",
         "replay_buffer_size",
+        "replay_backend",
+        "no_repeat_rows",
         "epochs_per_iteration",
         "steps_per_epoch",
         "learning_rate",
@@ -236,6 +328,15 @@ def _build_config(args: argparse.Namespace) -> TrainConfig:
         "model_match_max_boards",
         "model_match_provider",
         "model_match_reference",
+        "gate_interval",
+        "gate_games",
+        "gate_workers",
+        "gate_simulations",
+        "gate_min_average_score",
+        "gate_min_finished",
+        "gate_max_boards",
+        "gate_provider",
+        "gate_temperature",
     ):
         arg_name = {
             "replay_buffer_size": "replay_size",
@@ -246,6 +347,39 @@ def _build_config(args: argparse.Namespace) -> TrainConfig:
         value = getattr(args, arg_name, None)
         if value is not None:
             setattr(config, field_name, value)
+
+    if getattr(args, "window", False):
+        config.window.enabled = True
+    for field_name in (
+        "expand_per_row", "taper_exponent", "taper_scale",
+        "max_samples", "keep_samples", "sampling",
+    ):
+        value = getattr(args, f"window_{field_name}", None)
+        if value is not None:
+            setattr(config.window, field_name, value)
+
+    if (
+        args.endgame_sampling is not None
+        or args.endgame_weight is not None
+        or args.endgame_exponent is not None
+    ):
+        config.endgame = EndgameSamplingConfig(
+            enabled=(
+                config.endgame.enabled
+                if args.endgame_sampling is None
+                else args.endgame_sampling
+            ),
+            strength=(
+                config.endgame.strength
+                if args.endgame_weight is None
+                else args.endgame_weight
+            ),
+            exponent=(
+                config.endgame.exponent
+                if args.endgame_exponent is None
+                else args.endgame_exponent
+            ),
+        )
 
     if args.iterations is not None:
         config.num_iterations = args.iterations
@@ -267,6 +401,10 @@ def _build_config(args: argparse.Namespace) -> TrainConfig:
         ("temperature_threshold", "temperature_threshold"),
         ("full_search_probability", "full_search_probability"),
         ("fast_sims", "fast_simulations"),
+        ("tree_min_visits", "record_tree_min_visits"),
+        ("tree_max_depth", "record_tree_max_depth"),
+        ("tree_max_per_turn", "record_tree_max_per_turn"),
+        ("tree_sample_prob", "record_tree_sample_probability"),
         ("workers", "workers"),
         ("selfplay_backend", "backend"),
         ("cpp_onnx_provider", "cpp_onnx_provider"),
@@ -280,6 +418,8 @@ def _build_config(args: argparse.Namespace) -> TrainConfig:
         self_play.playout_cap_randomization = False
     if args.record_games:
         self_play.record_games = True
+    if args.record_tree_positions is not None:
+        self_play.record_tree_positions = args.record_tree_positions
     config.self_play = self_play
 
     for arg_name, field_name in (
@@ -659,10 +799,38 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _console_protection() -> Callable[[], None] | None:
+    """Optionally disable QuickEdit for unattended runs.
+
+    Off by default: without QuickEdit the legacy console can no longer select
+    or copy text with the mouse. ``console_sink`` already keeps a paused
+    console from stalling training, so this is only for runs whose console is
+    never read.
+    """
+
+    if os.environ.get("SUZERO_DISABLE_QUICK_EDIT", "") != "1":
+        return None
+    restore = disable_quick_edit()
+    if restore is not None:
+        # Logging is not configured yet, and this must stay visible anyway.
+        print(
+            "[INFO] QuickEdit disabled for this run (SUZERO_DISABLE_QUICK_EDIT=1); "
+            "copy with Alt+Space > 编辑 > 标记",
+            file=sys.stderr,
+            flush=True,
+        )
+    return restore
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = build_parser()
-    args = parser.parse_args(argv)
-    return int(args.func(args))
+    restore_console_mode = _console_protection()
+    try:
+        parser = build_parser()
+        args = parser.parse_args(argv)
+        return int(args.func(args))
+    finally:
+        if restore_console_mode is not None:
+            restore_console_mode()
 
 
 if __name__ == "__main__":

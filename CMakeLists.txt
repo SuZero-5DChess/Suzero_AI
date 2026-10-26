@@ -156,6 +156,7 @@ if(SUZERO_BUILD_5DCHESS)
     src/5dchess/onnx_model.cpp
     src/5dchess/agent.cpp
     src/5dchess/selfplay_bridge.cpp
+    src/5dchess/tree_positions.cpp
   )
   target_link_libraries(suzero_5dchess
     PUBLIC suzero_mcts
@@ -306,6 +307,20 @@ if(SUZERO_BUILD_5DCHESS)
     endif()
     add_test(NAME suzero_5dchess_match_tests COMMAND suzero_5dchess_match_tests)
     suzero_stage_ort_runtime(suzero_5dchess_match_tests)
+
+    add_executable(suzero_5dchess_tree_position_tests
+      tests/test_5dchess_tree_positions.cpp)
+    target_link_libraries(suzero_5dchess_tree_position_tests PRIVATE suzero_5dchess)
+    target_compile_definitions(suzero_5dchess_tree_position_tests PRIVATE
+      SUZERO_5DCHESS_MODEL_PATH="${SUZERO_5DCHESS_MODEL}")
+    target_include_directories(suzero_5dchess_tree_position_tests PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    if(MSVC)
+      target_compile_options(suzero_5dchess_tree_position_tests PRIVATE /utf-8 /W4)
+    endif()
+    add_test(NAME suzero_5dchess_tree_position_tests
+      COMMAND suzero_5dchess_tree_position_tests)
+    suzero_stage_ort_runtime(suzero_5dchess_tree_position_tests)
   endif()
 endif()
 

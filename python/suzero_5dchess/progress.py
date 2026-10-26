@@ -17,6 +17,8 @@ import sys
 from contextlib import contextmanager
 from typing import Any, Callable, Iterator, TextIO
 
+from . import console_sink
+
 try:  # tqdm is optional; training still runs without it.
     from tqdm import tqdm
 except ImportError:  # pragma: no cover - fallback path tested via monkeypatch
@@ -36,7 +38,12 @@ def self_play_progress(
 ) -> Iterator[Callable[[int], None]]:
     """Yield ``advance(done)`` where ``done`` is the number of games finished."""
 
-    target = sys.stderr if stream is None else stream
+    if stream is None:
+        # Same rule as the log handlers: a paused console must never block
+        # self-play, so the bar goes through the background writer too.
+        target = console_sink.active() or sys.stderr
+    else:
+        target = stream
     bar = _open_bar(desc, total, target)
     if bar is None:
         yield _logging_progress(desc, total)

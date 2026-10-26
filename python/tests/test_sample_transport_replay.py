@@ -190,3 +190,51 @@ def test_empty_flat_transport():
     for key, array in list(raw.items()):
         raw[key] = array[:0] if not key.endswith("offsets") else np.array([0], dtype=np.int64)
     assert _samples_by_game(raw) == {}
+
+
+def test_tree_metadata_survives_worker_and_replay(tmp_path):
+    raw = flat_payload()
+    raw["sample_source"] = np.array([0, 1], dtype=np.int64)
+    raw["search_visits"] = np.array([0, 100], dtype=np.int64)
+    raw["value"] = np.array([1.0, 0.375], dtype=np.float32)
+    path = tmp_path / "tree-samples.npz"
+    np.savez(path, **_extract_arrays(raw))
+    with np.load(path, allow_pickle=False) as data:
+        grouped = _samples_by_game({key: data[key] for key in data.files})
+    assert grouped[0][0].metadata == {}
+    side = grouped[1][0]
+    assert side.metadata == {"tree_position": 1.0, "search_visits": 100.0}
+    assert side.value_target == 0.375
+    # Use a canonical valid action for replay's coordinate validation.
+    side.actions[:] = [0, 0, 1, 0, 1, 0, 1, 0]
+    replay = ReplayBuffer(2, VERY_SMALL)
+    replay.push([side])
+    restored = ReplayBuffer(2, VERY_SMALL)
+    restored.load_state_dict(replay.state_dict())
+    sample = restored.sample(1)[0]
+    assert sample.metadata == side.metadata
+    assert sample.value_target == 0.375
+
+
+@pytest.mark.parametrize("field,value", [
+    ("sample_source", np.array([0, 2], dtype=np.int64)),
+    ("sample_source", np.array([1], dtype=np.int64)),
+    ("sample_source", np.array([0, 1], dtype=np.float32)),
+    ("search_visits", np.array([0, -1], dtype=np.int64)),
+    ("search_visits", np.array([0, 0], dtype=np.int64)),
+    ("search_visits", np.array([0, 2], dtype=np.float32)),
+])
+def test_invalid_tree_metadata_rejected(field, value):
+    raw = flat_payload()
+    raw["sample_source"] = np.array([0, 1], dtype=np.int64)
+    raw["search_visits"] = np.array([0, 100], dtype=np.int64)
+    raw[field] = value
+    with pytest.raises(ValueError, match="tree-position metadata"):
+        _samples_by_game(raw)
+
+
+def test_incomplete_tree_metadata_rejected():
+    raw = flat_payload()
+    raw["sample_source"] = np.array([0, 1], dtype=np.int64)
+    with pytest.raises(ValueError, match="supplied together"):
+        _samples_by_game(raw)

@@ -68,13 +68,20 @@ struct SelfPlayBridgeConfig {
   /// Retain authoritative native actions and the final native FEN for archival.
   bool recordGames = false;
 
+  /// Extra training positions extracted from full-search trees (no new search).
+  bool recordTreePositions = true;
+  int recordTreeMinVisits = 64;
+  int recordTreeMaxDepth = 5;
+  int recordTreeMaxPerTurn = 4;
+  double recordTreeSampleProbability = 0.25;
+
   /// Base seed; game i derives its seed from (seed, i).
   std::uint64_t seed = 0;
 };
 
 /// One labelled training position produced by self-play.
 ///
-/// `policy` is the dense root visit distribution over all candidate actions
+/// `policy` is the dense node-local edge visit distribution over all candidates
 /// (SUBMIT last, like `Chess5DGameState::actions()`).
 struct BridgeSample {
   EncodedPosition encoded;
@@ -83,6 +90,12 @@ struct BridgeSample {
   mcts::PlayerId player = 0;
   int moveCount = 0;
   float value = 0.0f;
+
+  /// 0: actual game position (terminal outcome); 1: tree position (node utility).
+  int source = 0;
+  /// Unreduced node visit count, including its own evaluation (0 for main).
+  /// Policy normalization and quality guards use outgoing edge visits instead.
+  std::int64_t searchVisits = 0;
 };
 
 /// One authoritative action retained for .5dck archival. `player` is captured
@@ -108,6 +121,7 @@ struct BridgeGame {
   int boardCount = 0;
   int finalPlayer = 0;
   int movesPlayed = 0;
+  int treeSamples = 0;
 
   /// Empty unless SelfPlayBridgeConfig::recordGames is enabled.
   std::vector<BridgeMove> moves;
@@ -120,6 +134,11 @@ struct BridgeGame {
 /// It may run on any worker thread and must be thread-safe.
 using BridgeGameCallback =
     std::function<void(int completed, const BridgeGame& game)>;
+
+/// Checked before a worker starts its next game. Returning true stops handing
+/// out new games; games already in flight still finish and are returned.
+/// It may run on any worker thread and must be thread-safe.
+using BridgeStopCallback = std::function<bool()>;
 
 /// Evaluator/batching statistics for one runSelfPlay() call.
 ///
@@ -146,14 +165,17 @@ struct SelfPlayStats {
 };
 
 /// Runs `config.numGames` games on `config.numGameThreads` threads and blocks
-/// until all workers are joined. Results are indexed by game index. An
-/// exception in any worker stops the remaining games and is rethrown.
+/// until all workers are joined. Results are ordered by game index and are
+/// returned as a prefix of `0..numGames-1`; a cooperative stop may return
+/// fewer games once the ones already in flight have finished. An exception in
+/// any worker stops the remaining games and is rethrown.
 ///
 /// When `stats` is non-null it receives the batching counters and wall-clock
 /// timings of this call. It is left untouched if the call throws.
 std::vector<BridgeGame> runSelfPlay(
     const SelfPlayBridgeConfig& config,
     const BridgeGameCallback& onGameFinished = {},
-    SelfPlayStats* stats = nullptr);
+    SelfPlayStats* stats = nullptr,
+    const BridgeStopCallback& shouldStop = {});
 
 }  // namespace suzero::chess5d

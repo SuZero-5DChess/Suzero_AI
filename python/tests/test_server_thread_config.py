@@ -77,6 +77,8 @@ class FakeBinding:
     the parameter existed.
     """
 
+    TREE_POSITION_FORMAT_VERSION = 1
+
     def __init__(self, *, reject_server_threads: bool = False) -> None:
         self.reject_server_threads = reject_server_threads
         self.calls: list[dict[str, Any]] = []

@@ -141,6 +141,8 @@ def _profile_lines() -> list[dict]:
 
 
 class _FakeBinding:
+    TREE_POSITION_FORMAT_VERSION = 1
+
     def __init__(
         self,
         profile_lines: list[dict],

@@ -332,6 +332,28 @@ def encode_sample(sample: Any) -> bytes:
     return zlib.compress(payload, COMPRESSION_LEVEL)
 
 
+def peek_move_count(blob: bytes) -> int:
+    """Read ``move_count`` without inflating the whole record.
+
+    Replay weighting needs one integer per row.  Inflating only the fixed
+    header keeps that pass far cheaper than a full :func:`decode_sample`,
+    which would also rebuild the board, actions and policy arrays.
+    """
+
+    decompressor = zlib.decompressobj()
+    try:
+        head = decompressor.decompress(blob, _HEADER.size)
+    except zlib.error as exc:
+        raise ValueError(f"sample record is not valid zlib data: {exc}") from exc
+    if len(head) < _HEADER.size:
+        raise ValueError("sample record is truncated")
+    (version, _flags, _boards, _candidates, _policy, _squares, move_count,
+     _metadata_len, _urgency, _value) = _HEADER.unpack_from(head, 0)
+    if version != CODEC_VERSION:
+        raise ValueError(f"unsupported sample codec version {version}")
+    return int(move_count)
+
+
 def decode_sample(blob: bytes) -> dict[str, object]:
     """Decode one codec blob into a dictionary of ``PositionSample`` fields."""
 
@@ -436,5 +458,6 @@ __all__ = [
     "codes_to_planes",
     "decode_sample",
     "encode_sample",
+    "peek_move_count",
     "planes_to_codes",
 ]

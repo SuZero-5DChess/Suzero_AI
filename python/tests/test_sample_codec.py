@@ -169,3 +169,21 @@ def test_very_small_variant_uses_sixteen_squares():
         "metadata",
     )
     round_trip({name: getattr(saved, name) for name in fields}, original)
+
+
+def test_peek_move_count_reads_only_the_header():
+    from suzero_5dchess.sample_codec import peek_move_count
+
+    original = sample()
+    blob = encode_sample(original)
+    assert peek_move_count(blob) == original.move_count
+    assert peek_move_count(blob) == decode_sample(blob)["move_count"]
+
+    with pytest.raises(ValueError, match="truncated"):
+        peek_move_count(blob[:4])
+    with pytest.raises(ValueError, match="zlib"):
+        peek_move_count(b"not a compressed record")
+    corrupted = bytearray(zlib.decompress(blob))
+    corrupted[0] = 99
+    with pytest.raises(ValueError, match="version"):
+        peek_move_count(zlib.compress(bytes(corrupted)))

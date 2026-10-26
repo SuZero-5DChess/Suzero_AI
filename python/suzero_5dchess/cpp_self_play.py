@@ -16,18 +16,22 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from .config import MctsConfig, SelfPlayConfig
 from .env import _5dchess, _require_binding
 from .export_onnx import export_network
+from .interrupts import stop_requested
 from .network import SuzeroNetwork
 from .protocol import VariantSpec
 from .sample import PositionSample
 from .sample_codec import planes_to_codes
 from .self_play import SelfPlayResult
+
+if TYPE_CHECKING:  # pragma: no cover - avoids a module cycle at runtime
+    from .game_store import GameStore
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +90,21 @@ def _samples_by_game(
     player = raw["player"]
     move_count = raw["move_count"]
     game_index = raw["game_index"]
+    source = raw.get("sample_source")
+    search_visits = raw.get("search_visits")
+    if (source is None) != (search_visits is None):
+        raise ValueError("self-play sample_source and search_visits must be supplied together")
+    if source is not None:
+        if (
+            source.dtype != np.int64
+            or source.shape != (len(used),)
+            or not np.isin(source, (0, 1)).all()
+            or search_visits.dtype != np.int64
+            or search_visits.shape != (len(used),)
+            or (search_visits < 0).any()
+            or ((source == 1) & (search_visits == 0)).any()
+        ):
+            raise ValueError("invalid self-play tree-position metadata")
 
     board_source = codes if codes is not None else planes
     assert board_source is not None
@@ -158,33 +177,53 @@ def _samples_by_game(
             value_target=float(value[i]),
             player=int(player[i]),
             move_count=int(move_count[i]),
+            metadata=(
+                {"tree_position": 1.0, "search_visits": float(search_visits[i])}
+                if source is not None and source[i] == 1 else {}
+            ),
         )
         grouped.setdefault(int(game_index[i]), []).append(sample)
     return grouped
 
 
+def _result_from_entry(
+    entry: dict[str, Any], samples: list[PositionSample]
+) -> SelfPlayResult:
+    """Build one result, retaining the sample count even without the rows.
+
+    A streaming backend returns only game metadata to the parent, so the count
+    embedded in ``entry["samples"]`` is what keeps summaries accurate.
+    """
+
+    count = len(samples) if samples else int(entry.get("samples", 0))
+    return SelfPlayResult(
+        samples=samples,
+        white_outcome=float(entry["white_outcome"]),
+        terminal_reason=str(entry["terminal_reason"]),
+        semimoves=int(entry["semimoves"]),
+        turns=int(entry["turns"]),
+        board_limit=int(entry["board_limit"]),
+        board_count=int(entry["board_count"]),
+        final_player=int(entry["final_player"]),
+        moves=list(entry.get("moves", [])),
+        final_fen=str(entry.get("final_fen", "")),
+        tree_samples=int(entry.get("tree_samples", 0)),
+        sample_count=count,
+    )
+
+
 def _selfplay_results(raw: dict[str, Any]) -> list[SelfPlayResult]:
     """Convert one native result payload into per-game results."""
 
+    entries = sorted(raw["games"], key=lambda item: int(item["index"]))
+    if "used_board_counts" not in raw:
+        # Streamed payload: samples already went to disk from the callback.
+        return [_result_from_entry(entry, []) for entry in entries]
     grouped = _samples_by_game(raw)
-    results: list[SelfPlayResult] = []
-    for entry in sorted(raw["games"], key=lambda item: int(item["index"])):
-        index = int(entry["index"])
-        results.append(
-            SelfPlayResult(
-                samples=grouped.get(index, []),
-                white_outcome=float(entry["white_outcome"]),
-                terminal_reason=str(entry["terminal_reason"]),
-                semimoves=int(entry["semimoves"]),
-                turns=int(entry["turns"]),
-                board_limit=int(entry["board_limit"]),
-                board_count=int(entry["board_count"]),
-                final_player=int(entry["final_player"]),
-                moves=list(entry.get("moves", [])),
-                final_fen=str(entry.get("final_fen", "")),
-            )
-        )
-    return results
+    return [
+        _result_from_entry(entry, grouped.get(int(entry["index"]), []))
+        for entry in entries
+    ]
 
 
 def generate_games(
@@ -198,11 +237,18 @@ def generate_games(
     num_games: int | None = None,
     model_path: Path,
     progress: object | None = None,
+    game_store: "GameStore | None" = None,
+    game_id_start: int = 0,
+    iteration: int = -1,
 ) -> list[SelfPlayResult]:
     """Play ``num_games`` games with the C++ bridge and return labelled games.
 
     ``model_path`` is the unique ONNX destination for this iteration; callers
     pass one path per iteration so a still-open model file is never replaced.
+
+    With ``game_store`` set, the native bridge streams each finished game to
+    Python, which encodes and writes it immediately.  The same path is used by
+    human-facing backends and by the multiprocess children.
     """
 
     del device  # The C++ evaluator chooses its device via the provider.
@@ -222,8 +268,30 @@ def generate_games(
             ".gn5d recording requires a rebuilt _5dchess extension; run "
             "cmake --build build --config Release --target suzero_5dchess_py"
         )
+    if selfplay_config.record_tree_positions and getattr(
+        _5dchess, "TREE_POSITION_FORMAT_VERSION", 0
+    ) != 1:
+        raise RuntimeError(
+            "tree-position sampling requires a rebuilt _5dchess extension; run "
+            "cmake --build build --config Release --target suzero_5dchess_py, "
+            "or disable it with --no-record-tree-positions"
+        )
+    if game_store is not None and getattr(
+        _5dchess, "GAME_STREAM_FORMAT_VERSION", 0
+    ) != 1:
+        raise RuntimeError(
+            "per-game replay streaming requires a rebuilt _5dchess extension; "
+            "run cmake --build build --config Release --target "
+            "suzero_5dchess_py, or select --replay-backend memory"
+        )
     model_path = _export_model(network, spec, model_path)
     metadata_path = Path(str(model_path) + ".json")
+    if stop_requested():
+        # Ctrl+C during the export must not start a fresh batch; the caller
+        # saves the current progress and exits.
+        logger.warning("Ctrl+C: self-play cancelled before any game started")
+        _prune_models(model_path.parent)
+        return []
 
     binding_kwargs: dict[str, object] = dict(
         model_path=str(model_path),
@@ -254,6 +322,12 @@ def generate_games(
     )
     if selfplay_config.record_games:
         binding_kwargs["record_games"] = True
+    if selfplay_config.record_tree_positions:
+        for name in (
+            "record_tree_positions", "record_tree_min_visits", "record_tree_max_depth",
+            "record_tree_max_per_turn", "record_tree_sample_probability",
+        ):
+            binding_kwargs[name] = getattr(selfplay_config, name)
     requested_server_threads = selfplay_config.num_server_threads
 
     # ``processes > 1`` is a separate execution path: the model above is
@@ -265,12 +339,18 @@ def generate_games(
     if int(getattr(selfplay_config, "processes", 1)) > 1:
         from .cpp_selfplay_processes import run_self_play_processes
 
-        results = run_self_play_processes(
-            binding_kwargs,
-            processes=int(getattr(selfplay_config, "processes", 1)),
-            total_server_threads=int(requested_server_threads),
-            progress=progress if callable(progress) else None,
-        )
+        transport = None
+        if game_store is not None:
+            transport = game_store.child_transport(iteration)
+            transport["game_id_start"] = int(game_id_start)
+        runner_kwargs: dict[str, object] = {
+            "processes": int(getattr(selfplay_config, "processes", 1)),
+            "total_server_threads": int(requested_server_threads),
+            "progress": progress if callable(progress) else None,
+        }
+        if transport is not None:
+            runner_kwargs["replay_store"] = transport
+        results = run_self_play_processes(binding_kwargs, **runner_kwargs)
         _prune_models(model_path.parent)
         return results
 
@@ -281,11 +361,34 @@ def generate_games(
     binding_kwargs["progress"] = (
         on_game_finished if callable(progress) else None
     )
+    streamed: set[int] = set()
+    if game_store is not None:
+        def stream_game(done: int, index: int, raw: dict[str, Any]) -> None:
+            del done
+            converted = _selfplay_results(raw)
+            if len(converted) != 1:
+                raise RuntimeError(
+                    "streamed self-play payload must contain exactly one game"
+                )
+            game_store.append_result(
+                int(game_id_start) + int(index),
+                converted[0],
+                iteration=iteration,
+            )
+            streamed.add(int(index))
+
+        binding_kwargs["stream_games"] = True
+        binding_kwargs["on_game"] = stream_game
     # Older extensions built before num_server_threads was exposed do not
     # accept the keyword.  Omit it at the default so those builds keep
     # working, but never let a non-default choice be silently ignored.
     if requested_server_threads != 1:
         binding_kwargs["num_server_threads"] = requested_server_threads
+
+    if stop_requested():
+        logger.warning("Ctrl+C: self-play cancelled before any game started")
+        _prune_models(model_path.parent)
+        return []
 
     try:
         raw = _5dchess.run_selfplay(**binding_kwargs)
@@ -303,6 +406,17 @@ def generate_games(
         raise
 
     results = _selfplay_results(raw)
+    if game_store is not None:
+        for result_index, result in enumerate(results):
+            if result_index in streamed:
+                result.persisted = True
+        if len(streamed) != len(results):
+            # Without this, unstreamed samples would be silently dropped: the
+            # array payload is omitted whenever streaming is requested.
+            raise RuntimeError(
+                f"native self-play streamed {len(streamed)} of {len(results)} "
+                "games; refusing to continue with missing replay samples"
+            )
     _log_throughput(raw, results, selfplay_config)
     _prune_models(model_path.parent)
     return results
@@ -319,13 +433,14 @@ def _log_throughput(
     requests, including forced-only SUBMIT requests that may be resolved
     without a corresponding ONNX Runtime input row.  They are backend-side
     figures, not a measurement of the batch sizes actually fed to the
-    GPU/ONNX Runtime.  ``backend_rows/s`` is far larger than ``samples/s``
-    because only full-search moves are recorded.  A small average backend
-    batch can have several causes and should not be attributed to one.
+    GPU/ONNX Runtime. ``backend_rows/s`` includes intermediate search nodes;
+    ``samples/s`` counts full-search roots and default-enabled tree positions.
+    A small average backend batch can have several causes and should not be
+    attributed to one.
     """
 
     stats = raw.get("stats", {})
-    samples = sum(len(result.samples) for result in results)
+    samples = sum(result.sample_count for result in results)
     total_seconds = float(stats.get("total_seconds", 0.0))
     setup_seconds = float(stats.get("setup_seconds", 0.0))
     play_seconds = max(total_seconds - setup_seconds, 0.0)
@@ -336,11 +451,15 @@ def _log_throughput(
     def rate(count: int) -> float:
         return count / play_seconds if play_seconds > 0.0 else 0.0
 
+    tree_samples = sum(result.tree_samples for result in results)
     logger.info(
-        "cpp self-play (%s): %d games, %d samples in %.1fs (setup %.1fs)",
+        "cpp self-play (%s): %d games, %d samples (%d played, %d tree) "
+        "in %.1fs (setup %.1fs)",
         selfplay_config.cpp_onnx_provider,
         len(results),
         samples,
+        samples - tree_samples,
+        tree_samples,
         total_seconds,
         setup_seconds,
     )

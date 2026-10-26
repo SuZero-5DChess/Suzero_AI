@@ -15,7 +15,8 @@
 20 个游戏线程。并局时每个模型独立使用一个批量推理器和 ONNX Session，不混合不同权重。
 不提供 gate 提前判定或训练期自动晋级。
 原有 `evaluate` 命令、`--evaluation` 训练评估与 `SelfPlayRunner` 不改用本模块。
-新增独立的训练期定期对战选项，`run_train.bat` 默认启用（见下文）。
+新增独立的训练期定期对战选项，默认关闭；`run_train.bat` 不再设置相关旋钮，
+需要时通过 `--model-match-*` 显式开启（见下文）。
 
 ## 范围与边界
 
@@ -67,30 +68,32 @@ board projection、LSTM 与 value/submit/action head；在网络内部将 MoveKe
 
 ### 训练期定期对战
 
-`run_train.bat` 按顶部 `EVALUATION_INTERVAL` 指定的全局训练轮次间隔执行，每次分别对战：
+显式传入 `--model-match-interval` 后，按该全局训练轮次间隔执行，每次分别对战：
 
-1. **恰好 20 轮前**的模型（可独立修改回看轮数）；
-2. 固定旧模型 `<path/to/very_small_old_version_v1.pt>`（仓库不包含 checkpoint，
-   需从 `5dc_ml` 项目导出或自行准备）。
-   只在 `very_small` 变体默认传入此固定对手，其他变体只进行历史对战。
+1. **恰好 20 轮前**的模型（`--model-match-lookback`，默认 20）；
+2. 固定旧模型 `<path/to/very_small_old_version_v1.pt>`（`--model-match-reference`；
+   仓库不包含 checkpoint，需从 `5dc_ml` 项目导出或自行准备）。
+   未设置该参数时只进行历史对战。
 
 每个对手默认 20 局，使用 **20 个 C++ 游戏线程并发**，实际线程数不超过局数；
 双方模型各自使用独立批量推理器（一个 ONNX Session / server thread），不为每局重复加载模型。
 历史对手和固定对手的系列仍依次测量，不同时叠加两套系列的线程/显存预算。
-每步 simulations 由 `MATCH_SIMS` 控制；对战棋盘上限由 `MATCH_MAX_BOARDS` 控制，达到或超过上限立即按物质分结束；采样温度固定 0.1（非 argmax，按局种子可复现）、无根噪声、成对换色，
-双方预算相同。脚本使用 CUDA 推理，CPU 可通过参数切换。
+每步 simulations 由 `--model-match-sims`（默认 50）控制；对战棋盘上限由
+`--model-match-max-boards`（默认 25）控制，达到或超过上限立即按物质分结束；采样温度固定 0.1（非 argmax，按局种子可复现）、无根噪声、成对换色，
+双方预算相同。推理设备由 `--model-match-provider` 选择，默认 `cpu`。
 共同规则使用训练配置的 `max_board_limit` 和 `material_scale`，**不使用对手 checkpoint
 中保存的自对弈棋盘限制或搜索预算**。这是测量，不是 gate，不自动晋级或回滚权重。
 
-脚本顶部旋钮：`EVALUATION_INTERVAL`、`MATCH_LOOKBACK`、`MATCH_GAMES`、`MATCH_WORKERS`、`MATCH_SIMS`、
-`MATCH_MAX_BOARDS`、`MATCH_PROVIDER`、`MATCH_REFERENCE`。`MATCH_WORKERS` 独立于自对弈的
+旋钮通过 CLI 传入：`--model-match-interval`、`--model-match-lookback`、
+`--model-match-games`、`--model-match-workers`、`--model-match-sims`、
+`--model-match-max-boards`、`--model-match-provider`、`--model-match-reference`。
+`--model-match-workers` 独立于自对弈的
 `SELFPLAY_WORKERS` / `NUM_SERVER_THREADS` / `SELFPLAY_PROCESSES`，设为 1 恢复串行。
-也可单次覆盖：
+例如：
 
 ```bat
 run_train.bat very_small cls_action_mlp --model-match-interval 10 --model-match-lookback 30 --model-match-games 8 --model-match-workers 8 --model-match-sims 100
-run_train.bat very_small cls_action_mlp --model-match-provider cpu
-run_train.bat very_small cls_action_mlp --model-match-interval 0
+run_train.bat very_small cls_action_mlp --model-match-interval 10 --model-match-provider cuda
 ```
 
 直接使用 Python CLI 时默认关闭，显式传入：

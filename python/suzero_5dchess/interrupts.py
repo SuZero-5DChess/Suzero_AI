@@ -1,20 +1,22 @@
 """Cooperative Ctrl+C handling for long training runs.
 
-Pressing Ctrl+C once asks the trainer to stop *after the current iteration*:
-the iteration already in progress (self-play, training, evaluation) finishes,
-its checkpoint is written, and the process exits normally.  This keeps every
-completed iteration on disk instead of losing it to an abrupt KeyboardInterrupt
-in the middle of a replay-buffer write.
+Pressing Ctrl+C once during self-play asks the backend to stop handing out new
+games: the games already in flight finish, every finished game is written to
+the replay store, and the trainer saves its checkpoint and exits before the
+training phase.  The next run resumes from those files.  Outside self-play the
+current iteration (training, evaluation) finishes and is checkpointed before
+the process exits, so a completed iteration is never lost to an abrupt
+KeyboardInterrupt mid-write.
 
 A second Ctrl+C gives up waiting and aborts immediately (the in-flight
 iteration may then be lost).
 
 While the C++ self-play bridge runs, the Python handler cannot execute: the
 main thread is blocked inside the native call with the GIL released, so the
-signal is only delivered once the batch returns.  The bridge acknowledges the
-press itself in the meantime (see ``src/5dchess/console_interrupt.h``), so the
-console shows a notice right away while this cooperative semantics keeps
-applying after the call returns.
+signal is only delivered once the call returns.  The native guard acknowledges
+the press itself, sets the scheduler's stop flag, and stops starting new games
+(see ``src/5dchess/console_interrupt.h``); the cooperative semantics in this
+module still apply after the call returns.
 """
 
 from __future__ import annotations
@@ -41,8 +43,8 @@ def _handle(signum: int, frame: object) -> None:
         raise KeyboardInterrupt
     _stop.set()
     logger.warning(
-        "Ctrl+C received; finishing the current iteration and saving before "
-        "exit (press again to abort immediately)"
+        "Ctrl+C received; self-play will finish its in-flight games and save "
+        "before exit (press again to abort immediately)"
     )
 
 

@@ -249,7 +249,8 @@
   步既不产生样本也不加噪声；只有 SUBMIT 的强制局面直接推进，不调用网络。
   不提供 `max_game_length` 配置或 CLI 参数；每局只由棋盘上限或吃王、无合法动作
   等自然终局结束。任一动作触及棋盘上限都会立即产生物质分终局，吃王保持优先。
-  终局价值按当前行棋方视角分配，支持吃王 ±1、物质分 tanh、无合法动作和中止。
+  实战根样本的终局价值按行棋方视角分配，支持吃王 ±1、物质分 tanh、无合法动作和中止；
+  树内侧位置（默认开启）另用自身搜索价值，不套用实战结果。
 - **C++ 自对弈后端（`cpp_onnx`）**：每轮先把当前 PyTorch 网络导出为
   `runs/<variant>/<arch>/selfplay/model_iter_XXXX.onnx`（+ sidecar），再调用
   `suzero::chess5d::runSelfPlay`：`numGameThreads` 个 C++ 对局线程共享一个
@@ -265,17 +266,19 @@
   randomization、仅全搜索步产生样本并加噪声、按 semimove 切换温度、强制
   SUBMIT 不计样本、终局原因与 semimove/turn 计数一致）。
 - **协作式 Ctrl+C**：`interrupts.py` 在 `run_training` 期间接管 `SIGINT`。
-  第一次按下只置位停止标志；当前这一轮（自对弈、训练、评估）照常完成后，
-  循环顶部检测到标志即跳出，走正常的最终 checkpoint 保存并返回
-  `stopped_early=True`，退出码 0。第二次按下恢复原处理器并抛出
-  `KeyboardInterrupt`，CLI 捕获后返回 130，允许用户放弃进行中的一轮。
-  C++ 自对弈调用期间 GIL 已释放，Python 信号处理器会等到该调用返回后才
-  执行，因此“打完这一轮”的语义在两种后端下一致。为了让这次等待可见，
-  `run_selfplay` 的阻塞区间由 `ConsoleInterruptGuard` 覆盖：第一次按下在
-  毫秒级直接把提示写到 stderr（控制台走 `WriteConsoleW`，重定向走 UTF-8
-  `WriteFile`），然后返回 FALSE 让 CPython 照常记录 SIGINT；第二次按下
-  直接以 130 终止进程，与 Python 侧的第二次按下语义一致（见
-  `src/5dchess/console_interrupt.h`）。
+  第一次按下只置位停止标志；若当时正在自对弈，后端不再发新对局，已开始的对局
+  照常跑完，样本（文件后端逐局落盘）全部保存后跳过本轮训练，走正常的最终
+  checkpoint 保存并返回 `stopped_early=True`，退出码 0；若正在训练/评估，则当前
+  这一轮（含评估）照常完成后保存退出。下次启动从该 checkpoint 与回放文件续训：
+  未完成轮按 `selfplay_progress` 只补跑剩余对局，进度显示从已保存局数起算。
+  第二次按下恢复原处理器并抛出 `KeyboardInterrupt`，CLI 捕获后返回 130，允许
+  用户放弃进行中的一轮。C++ 自对弈调用期间 GIL 已释放，Python 信号处理器会等到
+  该调用返回后才执行；为此原生侧直接观察同一停止意图：`ConsoleInterruptGuard`
+  第一次按下在毫秒级把提示写到 stderr（控制台走 `WriteConsoleW`，重定向走 UTF-8
+  `WriteFile`），并置位 `g_stopRequested`，调度器随即停止派发新对局。C++ 的
+  `CTRL_C` 事件返回 FALSE 以便 CPython 仍记录 SIGINT；父进程发给子进程组的
+  `CTRL_BREAK` 返回 TRUE，避免子进程在局中被默认动作终止。第二次按下直接以 130
+  终止进程（见 `src/5dchess/console_interrupt.h`）。
 - **连续训练**：`--continuous` 让训练器按 `num_iterations` 划分为批次并
   无限运行：每批结束时 `latest.pt` 已发布，下一批以它续训；协作式 Ctrl+C
   使当前批的 summary 带 `stopped_early=True`，循环随即结束而不是再开一批。
@@ -284,8 +287,10 @@
   合并（图搜索在 C++ 侧，Python 训练侧保持简单树）。`workers > 1` 时用
   线程池并发多盘，每盘独立环境、RNG 与搜索树；网络处于 `eval()`，推理
   线程安全，结果按游戏序号稳定返回。
-- **训练**：均匀回放、AdamW、余弦学习率、梯度范数裁剪；
-  `AlphaZeroObjective` 把整个 batch 移到模型设备，策略 loss 在
+- **训练**：默认使用文件式回放（`replay_backend="file"`，每局一个 NPZ，内存中只留
+  计数与文件索引）并做行级 no-repeat shuffle；`--replay-backend memory` 可退回旧的
+  内存 uniform 回放。可选 lossy replay window（具体语义见下节）；AdamW、余弦学习率、
+  梯度范数裁剪；`AlphaZeroObjective` 把整个 batch 移到模型设备，策略 loss 在
   `clamp` 后的 logits 上做掩码交叉熵，价值为 MSE。batch 默认按总和
   （`loss_sum`）报告，与 `TorchTrainer` 的约定一致。
 - **评估**：第一次到达评估间隔时把当前网络写成 `marked.pt` 基线（不进行
@@ -301,8 +306,9 @@
   写入由训练启动的常驻 spawn 子进程异步执行：主进程只提交不含训练样本的轻量
   批次，子进程逐局原生重放校验和独占写入、每批统一裁剪，因而与后续训练、对战及
   下一轮自对弈重叠；队列有界并回传异常，正常结束前排空，异常退出时快速终止。
-  Python 与 C++（含多进程）后端均记录实际执行的完整动作流；训练样本只保留
-  full-search 位置不影响存档。`game_record.py` 默认写出 `gn5d` v2：只保留单个
+  Python 与 C++（含多进程）后端均记录实际执行的完整动作流；训练样本默认保留
+  full-search 根位置和树内侧位置，可用 `--no-record-tree-positions` 关闭后者；
+  两者都不改变存档。`game_record.py` 默认写出 `gn5d` v2：只保留单个
   `initial` FEN、八维整数数组或 `"submit"` 行动、结果和五个元信息字段，使用紧凑
   JSON；宽高、快照、当前棋盘、时间线状态、步数与最终 FEN 均由原生引擎重放推导。
   加载时校验合法性、结果与终局，旧 `5dc.capture-king` v1 / `.5dck` 缓存棋谱仍可读。
@@ -314,6 +320,287 @@
   动态轴。导出后写 sidecar（协议、几何、架构、参数量），可选地用
   ONNX Runtime 对比 PyTorch 输出。调试导出的模型已由 C++ 评估器加载并
   通过全部 410 项 5D 检查。
+
+### 树内位置采样（默认开启，2026-10-25）
+
+仅实现 KataGo `cpp/program/play.cpp::recordTreePositions` 思路，不实现
+`sidePositionProb` 的赛后独立搜索，也不实现 `reanalyzeCheapSearchPositions`。
+`SelfPlayConfig.record_tree_positions=True`；`--no-record-tree-positions`
+（或启动脚本 `TREE_POSITIONS=0`）可关闭。默认阈值 64、深度 5、每次完整搜索
+最多 4 行、保留概率 0.25。
+
+- **触发时机**：full-search 结束并选定真实着法后，推进状态/换根前提取。Python
+  节点拥有 `GameEnv` 快照；C++ 节点只持统计量，沿动作 clone/apply 重建局面，
+  必须在 `advanceRoot` 使旧节点指针失效之前完成。
+- **质量与筛选**：排除根和根的实际着法分支；到达候选的边访问数与候选自身出边
+  访问总数都至少达到 `record_tree_min_visits`。非终局、已展开且至少有一个非
+  SUBMIT 动作才可记录。跟踪各 player 的 always-best 标记，非最佳动作只清除
+  实际走该动作一方的标记；候选须满足当前行棋方标记。最佳动作用局部边访问数
+  最大值选取，平局取最小 action id。5D 不按深度奇偶交换玩家。
+- **有界遍历**：局面键去重、防环；深度范围 1–64，默认 5 个小步（含 SUBMIT），
+  单次最多检查 4096 个节点并在达到行数上限后结束。`max_per_turn` 的 turn 是
+  搜索决策，不是 SUBMIT 分隔的整回合。去重只在单次提取内，不抑制后续搜索的新目标。
+- **监督来源**：策略为该节点自身出边原始访问次数归一化，不使用零访问时的先验
+  回退；C++ 不把共享子节点全局访问数当作边分布。value 为 Python `Node.q` / C++
+  `NodeStats::utilityAvg()`，均为当前节点行棋方视角。实战根样本最后分配终局标签，
+  树样本保留搜索标签，不能统一覆盖。
+- **权重**：候选按独立 RNG 流做 Bernoulli 保留，保留后当普通行训练，无 per-row
+  loss 权重。借鉴 KataGo fractional targetWeight 的随机整数化，但增加了本项目的
+  质量/数量限制，不声称与完整上游采样分布或 batch loss 严格等价。
+- **可复现与成本**：不改主对局 RNG、搜索节点统计或模拟预算，不额外调用评估器；
+  原有噪声影响的树统计仍被复用，并非重新做一次无噪搜索。clone/重放、键生成和
+  编码仍有 CPU/内存成本，新增训练行不自动扩大训练预算。
+- **传输与兼容**：C++ 样本新增数值数组 `sample_source`（0=实战，1=树内）和
+  `search_visits`，多进程 NPZ 白名单显式转发。Python 转为现有数值 metadata
+  `tree_position=1` / `search_visits`，压缩 replay 格式不升级；ONNX 7 输入/3 输出
+  不变。关闭功能时不传新 kwargs，可用旧扩展；默认开启则要求
+  `TREE_POSITION_FORMAT_VERSION=1`，缺失时在导出/自对弈前明确报错要求重建，
+  或显式关闭后继续使用旧扩展。
+- **观测**：`SelfPlayResult.tree_samples`、JSONL `self_play.played_samples/tree_samples`
+  与 TensorBoard `SelfPlay/*` 统计分别计数；replay 累计生成量包含保留的树内行。
+  真实动作列表及 GN5D 归档不接收侧分支。
+
+### Lossy replay window：计数、裁剪、采样与恢复
+
+窗口是**有损的最新样本 FIFO**，不是全量训练数据归档。`WindowConfig` 默认关闭；
+关闭时仍沿用 `replay_buffer_size` 的固定容量，但采样方式取决于回放后端：文件后端
+（默认）依旧按文件顺序做行级 no-repeat 抽轮，内存后端则沿用旧的 uniform 语义。
+开启时 `min_rows` 取 `replay_buffer_size`，`max_samples` 默认 500,000，是有限
+上限，但在未训练积压存在时是软上限：只有训练计数大于 0 的行才允许淘汰。
+`min_replay_size` 仍单独决定是否开始训练，不等同于窗口下限。
+
+目标窗口采用先 clamp、后 floor 的公式：
+
+```text
+m = replay_buffer_size                           # min_rows，默认 100000
+s = taper_scale if specified else m
+W(N) = floor(clamp(
+    m + expand_per_row * (N**taper_exponent - s**taper_exponent)
+        / (taper_exponent * s**(taper_exponent - 1)),
+    m, max_samples))
+```
+
+默认 `expand_per_row=0.4`、`taper_exponent=0.65`、`taper_scale=None`，
+`keep_samples=None`（不限制训练子集）、`sampling="shuffle"`。`s` 是增长公式的
+尺度，不是保存的历史行数。小于 `m` 的原始目标被钳制为 `m`，超过 `max_samples`
+则不再扩大；对非整数目标最终向下取整。
+
+- **生成计数 `N`**：累计成功 `push` 的训练样本数；不是现存行数、对局数、动作数，
+  也不是训练器的 `samples_seen`。FIFO 淘汰、窗口裁剪和训练读取均不减少或增加 `N`。
+  强制 SUBMIT 与不产训练样本的 fast-search 位置不计入。
+- **裁剪时点**：先完成本轮所有结果的 `push`，再按更新后的 `N` 计算目标窗口并在
+  训练前 `trim` 一次；启动恢复后也先裁剪再进入后续流程。不能在每个游戏入库后按
+  动态窗口逐次裁剪，以免窗口随后增长时较老样本已经丢失。
+- **容量兜底**：开启窗口时 `ReplayBuffer.capacity = max_samples`；`push` 和加载
+  都在这个上限处尝试截取最新行。截取按“只删已训练行”执行，因此未训练积压会暂时
+  把窗口顶到容量之上。实际保留量还受可用历史限制；`min_rows` 是目标下限，不能
+  凭空补齐样本。窗口日志的 `evicted` 包括本轮 `push` 容量保护和动态 `trim` 合计
+  删除的行数。关闭窗口时不新增采样行为或窗口运行日志，只增加配置和 replay 计数
+  元数据。
+- **只淘汰训练过的行（核心不变量）**：两个后端都维护与存活行一一对齐的训练计数
+  （`train_counts.py`），数据源在真正呈现一批行时才递增。`trim_to`、push 超容量、
+  加载时缩小容量都只删除计数大于 0 的前导行；遇到计数为 0 的行立即停止。由于淘汰
+  只从头部进行，一个未训练的行保护它后面的全部行，窗口/容量成为软上限。积压被
+  训练后，下一轮淘汰才能越过它。旧快照没有计数时不视为已训练，加载会完整保留。
+- **未训练行优先**：发布 shuffle 轮时先打乱，再做稳定分区把 0 计数的行放到前面；
+  本轮训练预算先覆盖未训练积压，再重复已训练行。全部为 0 的新窗口顺序不变。
+- **分工与发布**：`python/suzero_5dchess/replay.py` 仍在 RAM 管理当前 lossy FIFO，
+  `file_replay.py` 的 `publish_shuffle` 把当前窗口的一次 shuffle 发布为一轮训练视图，
+  `pipeline.py` 同步编排自对弈、发布与训练。默认每片 4096 行，NPZ 只承载现有 zlib
+  blob 与 offsets 等数值数组，不改样本 codec，也不是上游的围棋 NPZ 数据格式。
+  写完分片和 `manifest.json` 后，原子发布 `current.json`；manifest 记录本轮选取的
+  窗口行索引 `rows`、窗口行数 `pool_samples` 和排除集摘要 `exclude_digest`。同输入、
+  同 seed 重试幂等复用同一轮，不借重试创建新身份重读。发布后清理旧轮，失败时清理
+  临时视图；不保存永久 raw 归档，不从旧轮恢复已淘汰样本。
+- **每轮选取**：仅 `window.enabled` 且 `sampling="shuffle"` 时走文件路径。每轮从
+  **上一轮未选中且尚未训练的行**中无放回选取 `min(keep_samples, 可用行)` 行（未设
+  keep 则取全部可用行）并打乱。`keep_samples` 不缩小持久化窗口，也不改变窗口增长。
+- **行级 no-repeat**：重复身份是 replay 窗口行，不是输出文件路径。新一轮不能重复
+  上一轮**实际服务过**的行（训练计数大于 0）；上一轮选了但没读到的行仍是 0 计数，
+  下一轮可以重新提供，避免未训练样本被连续跳过直到淘汰。写入新目录不代表允许
+  重读。`FileReplayDataSource` 保存 generation、file 与 row 游标，跨 epoch 连续读，
+  不归零、不回绕；本轮读完后若 epoch 预算未用完，就在训练线程内调用发布器产生
+  下一轮（排除上一轮已训练的行）并继续，所以一个 epoch 可以包含多轮 shuffle。
+  `keep_samples=None` 时一轮即整个可用窗口，通常每轮只发布一次。
+- **跨阶段平移**：新一轮发布前读取上一轮 manifest，用 `pool_samples +
+  (N_now - N_then) - len(buffer)` 计算窗口头部淘汰数，把上一轮行索引整体前移；
+  已淘汰的行退出排除集。窗口只从头部删除，因此该平移是精确的。
+- **文件后端（默认）**：`--replay-backend file` 时整个窗口是一个追加型单文件
+  `replay_store/replay.log`，单位是**局面行**而不是整局。每个完成的对局成为一帧：
+  帧头 `<4s I I H I I q i>` 记录 magic、payload 字节数、payload 的 CRC32、版本、
+  总行数、已裁掉的前导行数、`game_id` 与 `iteration`，payload 是
+  `rows × [u32 长度][zlib 样本]`。对局完成即追加，不必等整轮结束；C++ 桥与多进程
+  子进程在同一把 `replay.lock` 锁下写同一文件，父进程只重建帧索引（偏移、行数、
+  计数），样本 blob 从不驻留内存。实现集中在 `suzero_5dchess/row_log.py`。
+- **按行裁剪**：`trim_to` 删除最老的行，可以切掉最老一局的前导行；请求量先按训练
+  计数截断，只删已训练的前导行。帧头的 `skipped` 记下切掉多少，幸存行保留原来的
+  `(game_id, local row)` 编号，所以 `last_round.json` 的排除集跨裁剪仍然有效。裁剪
+  把存活帧重写进 `.compact` 临时文件再 `os.replace`，只在父进程、自对弈子进程退出
+  后执行。
+- **留缓冲、成批删**：窗口允许超出目标约 1/5（`TRIM_MARGIN_DIVISOR=5`），超出后一次
+  删回目标，而不是每局重写日志；追加路径触发的 `_trim_above` 删到目标下方的缓冲带，
+  给下一批对局留空间。因此正常情况实际窗口在目标与其 1.2 倍之间波动；未训练积压
+  存在时可以更高，直到训练计数覆盖到它们。
+- **旧布局导入**：首次扫描发现 `g<id>-<count>.npz` 时按 game-id 顺序导入日志，再把
+  归档移到 `replay_store/legacy/`；导入在写锁内进行，已进日志的 id 不再导入，崩溃
+  残留的归档因此安全。
+- **训练抽轮**：`GameFileDataSource` 同样按行级 no-repeat 抽轮：一轮排除上一轮实际
+  训练过的 `(game_id, row)`，一个 epoch 可推进多轮，读取按帧偏移顺序且只持有当前
+  对局。上一轮选择原子写入 `replay_store/last_round.json`；同 iteration、seed、窗口
+  与 `keep_samples` 的重试复用该轮，否则把其中已训练的行当作排除集。被裁掉的行
+  自然退出排除集。
+- **步数与尾批**：每个 epoch 的上限仍是 `requested_steps`（本轮无可选行时为 0）。
+  batch 可以跨分片拼接；数据最终不足一批时允许 partial，不重复补样。预算用完便
+  保存游标，下一 epoch 接着读；不会为了凑满预算重读上一轮已训练的行（未训练行
+  由下一轮重新提供）。
+- **耗尽与同步循环**：排除上一轮后没有可选行时结束本轮训练，置
+  `waiting_for_shuffle`，由外层下一轮自对弈更新窗口后再发布。epochs/steps/batch
+  配置保持原值，是上限而非必须凑满的呈现次数；数据不足时实际少训。
+- **uniform 兼容路径**：`--replay-backend memory` 且（`sampling="uniform"` 或窗口
+  关闭）时沿用内存源；每批从整个当前 buffer 均匀无放回，不同 batch 可重复，
+  `keep_samples` 不影响此路径。文件后端始终走上面的文件顺序抽轮，因此
+  `replay_backend="file"` 搭配 `window.sampling="uniform"` 会在配置校验时报错，
+  而不是静默忽略该选项。
+  非空 buffer 的 epoch 步数仍为
+  `min(requested_steps, max(1, len(buffer) // batch_size))`，无文件消费状态。
+- **恢复 `N`**：取
+  `max(extra.total_samples, buffer.total_generated, len(buffer))`，避免计数倒退；
+  replay 保存 `total_generated`，权重 checkpoint 的 extra 保存 `total_samples`。
+  旧 replay 没有生成计数时，可用权重 checkpoint 补齐；二者都没有历史累计值时，
+  只能以现存行数为下界，无法恢复此前已淘汰的生成历史。replay 文件缺失时仍按原有
+  告警路径继续，累计计数不代表丢失的样本可被还原。各计数不一致时告警并取最大值；
+  若把 `max_samples` 调小，加载时按新容量截断——同样只删已训练的行，并在删除时
+  告警“may discard up to … oldest trained samples”——再按当前 `W(N)` 裁剪。
+- **保存范围与消费恢复**：checkpoint 流程把**整个当前窗口**写入独立的
+  `replay_buffer.pt`，不是仅保存 keep 子集；其 `shuffle_state` 与权重 checkpoint
+  extra 的 `replay_shuffle` 保存当前 generation/file/row 消费状态。独立使用
+  `FileReplayDataSource` 时，只有同轮文件仍存在且 state 匹配才能据此续读。
+  完整 `run_training` 按 iteration 边界恢复：启动时丢弃 scratch 旧轮视图，先进行
+  下一轮 self-play，再发布新轮；**不承诺 mid-iteration 恢复**，也不保证逐 optimizer
+  step exactly-once。权重、replay 和文件视图不是一个逐 step 联合事务。不新增
+  逐轮窗口归档，旧轮/临时视图可删除。磁盘上可能还有旧权重、旧 replay 副本或其他
+  快照，但本功能不查找或恢复旧窗口；恢复旧权重也不保证取得其当时的 replay。
+
+跨轮行级去重由 `TrainConfig.no_repeat_rows`（默认 `true`，CLI `--repeat-rows` 或
+bat 的 `NO_REPEAT_ROWS=0` 关闭）控制。关闭后每一轮都从整个候选池抽样，相邻轮允许
+重复行，池较小时也能每轮拿满 `keep_samples` 或整池；`last_round.json` 仍记录本轮
+选择，只影响日志中的 `no_repeat_rows` 字段。该开关只改采样，不改 `trim_to`。
+
+**固定预算不随窗口增长而增长。** 每轮 10 epoch × 10 step × batch 256 对应最多
+25,600 次训练呈现，而非必须完成的数量。令实际训练呈现量为 `T`、每轮生成量为 `G`，
+稳定生成且窗口充分时，样本存留时间约 `W / G` 轮，每轮覆盖比例约 `T / W`，相乘
+得到平均复用约 `T / G`，窗口大小约去。只有实际用满预算且假设 `G=11,400` 时才有
+`25,600 / 11,400 ≈ 2.25`；行级 no-repeat 耗尽、keep 子集或剩余数据不足均可能使
+`T < 25,600`，必须按真实 `T` 计算。这里的 11,400 只是计算示例，不是实测。`W`
+改变存留时间、每轮覆盖和自对弈时间跨度，不会自动增加平均复用。启动增长期与其他
+非稳态条件会影响近似。窗口不改 epoch、step、batch、自对弈、对战预算或 gate 行为。
+
+仅启用窗口时，每轮 JSONL/控制台增加 `replay_window`：`total_generated`、
+`window_size`、`buffered`、`evicted`、`sampling`、`keep_samples`、`estimated_bytes`、
+`coverage`；coverage 使用**实际**训练报告的样本呈现数除以 `max(1, len(buffer))`，
+跳过训练为 0，不把请求配额记为实际训练。uniform 的该比值仍可因重复呈现大于 1，
+不是通用的全历史去重率。TensorBoard 提供
+`Replay/window_size`、`Replay/buffered`、`Replay/coverage`。
+文件路径另记 `training.shuffle`：发布式视图包含 `generation`、`files`、
+`file_index`、`row_offset`、`files_used`；文件后端包含 `generation`、`files`、
+`pool_samples`、`round_samples`、`remaining_samples`、`rounds`、`no_repeat_rows`。
+两者都带 `waiting_for_shuffle`，用于区分预算结束和排除上一轮后无可选行的数据耗尽。
+
+每轮训练报告（`training.train_counts`）另外给出**当前窗口内**每个自对弈样本已被
+训练的次数分布：`samples`（窗口行数）、`trained`（次数 > 0 的行数）、`untrained`
+（次数 == 0）、`total_trains`（总呈现次数）、`mean`、`median`（下中位数）、`p90`
+（最近秩）、`max`，以及 `histogram`（`0`…`9`、`10+`）。计数只在数据源真正把一批
+行交给训练循环时累加；被裁剪/淘汰的行连同计数一起消失，因此统计对象始终是当前
+可训练窗口，“生成过但已淘汰”的历史样本不在分布内。文件后端把计数按
+`(game_id, local_row)` 保存在根目录的 `train_counts.npz`（与 `replay_buffer.pt`
+分开；行标识稳定，部分裁剪后仍能合并）；内存后端随 `ReplayBuffer.state_dict()`
+一起保存。TensorBoard 记 `Replay/train_count_trained`、
+`Replay/train_count_untrained`、`Replay/train_count_mean`、
+`Replay/train_count_median`、`Replay/train_count_p90`、`Replay/train_count_max`。
+计数 sidecar 损坏只告警并从零开始，不阻断续训。
+
+**内存与磁盘按实测压缩格式估算。** 窗口仍常驻为逐样本 zlib blob，不是 float32
+one-hot 棋盘。先用代表性真实样本测得压缩总字节数 `B` 与行数 `n`，以
+`W × (B / n)` 估算 RAM blob 负载；另计 Python bytes/list、offsets、保存/发布临时
+副本、分片加载、batch 解码、padding、张量和自对弈结果的峰值。磁盘除
+`replay_buffer.pt` 外还保存当前 shuffled 视图（约选取行的压缩 blob 加 NPZ/manifest
+开销）；切轮期间旧轮与新轮可短暂并存，需预留双份视图峰值，不能当成完整 raw-disk
+数据集或零额外磁盘成本。不使用每行 60 KB 假设，不给出未经实测的压缩比或容量。
+
+### 终局样本过采样（`run_train.bat` 默认开启）
+
+回放行按 `move_count / 本局最大 move_count` 计算局内进度，权重为
+`1 + strength * progress**exponent`（`endgame_sampling.py`）。发布轮次时，每个可用行
+仍入选一次，权重高于 1 的行再按整数部分必然、小数部分按概率追加副本；
+`keep_samples` 子集则先按权重无放回抽取（Gumbel top-k）再追加副本。因此训练步数与
+行覆盖面不变，只改变同一 epoch 内各行的呈现次数。
+
+- **进度来源。** file 后端由 `GameStore.row_move_counts()` 从压缩记录读取定长头里的
+  `move_count`（`sample_codec.peek_move_count`，不完整解压样本），按 `game_id` 缓存
+  并按前导裁剪切片；memory 后端在 `push()` 时按一次调用一局计算并随
+  `ReplayBuffer.state_dict()` 保存 `progress`。旧快照没有该字段时，恢复路径用全窗口
+  最大 `move_count` 归一化兜底；可丢弃的 shuffle shard 与 legacy 迁移跳过这次扫描。
+- **语义边界。** 权重按行作用，不改变 `keep_samples`、`no_repeat_rows`、
+  `trim_to`、`train_counts` 的既有规则；同一行的副本各记一次训练。轮次 sidecar
+  记录 `endgame`，同 iteration/seed/窗口但设置不同的重试不会复用旧轮次。
+- **默认值。** 库默认关闭以免续训旧 checkpoint 时静默改变分布；`run_train.bat`
+  默认 `ENDGAME_SAMPLING=1`、`ENDGAME_WEIGHT=1.0`、`ENDGAME_EXPONENT=2.0`。
+
+### Gatekeeper：training 与 accepted 的同步分离
+
+`TrainConfig.gate_interval=1` 默认启用；`--gate-interval 0`（bat 的 `GATING=0`，或
+`debug_train_config()` 预设）关闭。关闭时 pipeline 不实例化 gate，不创建新产物、
+不增加 JSONL 字段，两个自对弈后端继续使用同一个 training network。配置新增字段会
+随 `train_config` 元数据保存，不改变现有权重、optimizer 或 checkpoint 格式语义。
+
+开启时，`gating.ModelGate` 负责准入状态和对局，pipeline 只接线：
+
+1. 先恢复 trainer（包括 optimizer），再加载 accepted state；无 state 时从恢复后的
+   training network bootstrap，iteration 为 resume 轮次，新 run 为 0。
+2. 每轮从 state 解析 accepted，按 `(iteration, checkpoint path, mtime_ns, size)` 缓存。
+   通过现有 `load_network_checkpoint` 加载到 trainer.device，设置 eval 并关闭梯度；
+   它不是 trainer.model 的别名。Python 与 C++ 自对弈使用相同的 resolved network。
+3. 训练始终更新 training model，按现有配置导出训练 ONNX。实际 gate 前额外保存完整
+   候选 checkpoint 及 replay，避免稀疏保存或提升后中断时只有不可训练恢复的权重快照。
+4. gate 通过时写不可变 accepted 快照，再原子更新 state；下一轮使用新 accepted。
+   拒绝、有效局不足或对局异常不回滚训练，不重跑自对弈，也不让被拒权重生成数据。
+5. 之后继续原 periodic match/evaluation 及保存。实际 gate 轮次也发布训练 latest，
+   checkpoint 的 extra_state.accepted 只保存 iteration/checkpoint 诊断摘要。
+
+`RunPaths` 集中定义 `<run>/accepted`、`<run>/accepted/state.json` 与 `<log>/gates`。
+state 为 format 1，含 iteration、checkpoint basename、variant、network_config、
+UTC updated_at 和可选 last_gate；它是唯一权威来源。历史快照命名
+`accepted/agent_iter_XXXX.pt`，使用 model/extra_state 布局，格式常量集中在
+`checkpoint.py`。同名文件仅可在元数据及全部权重一致时复用，不覆盖不同内容。
+
+启动和重新解析会检查 state 格式、变体、网络配置及快照可加载性，快照元数据必须与
+state 对齐。accepted iteration 领先 resume 时明确报错，要求恢复同轮完整训练 checkpoint，
+或明确删除 state 后重新 bootstrap；若历史同名快照冲突，应使用新 run 目录。快照或
+state 写入失败属于致命一致性错误，不能被宽泛异常捕获转换成对局失败。
+
+生产对局复用 export_network、MatchPlayer、play_model_match：候选固定为 participant 0，
+双方分别导出临时 ONNX，按 gate_games 换色，使用 gate_workers、gate_simulations、
+gate_temperature（0.1）、gate_provider、gate_max_boards，以及 self_play.material_scale；
+max_moves 固定为 0。gate 开启时启动即检查 C++ run_match，缺失不降级。加载、导出及
+临时模型操作包在 `torch.random.fork_rng(devices=[])` 中，保护 CPU Torch RNG；导出使用
+CPU 模型副本，不修改 training 的权重、设备或各子模块模式。完整对局 runner 可注入，
+单元测试不依赖真实对局、ONNX 或 GPU。
+
+纯函数 decide_gate 从 totals[0] 校验局数，并以每局候选 utility 的平均分判定：
+finished=wins+losses+draws，average=mean(scores)，截断不计入。必须 finished>0、
+达到最小局数，且平均分 >= gate_min_average_score 才通过（等于门槛通过）；material
+棋盘上限终局保留连续 tanh 得分，不压成 1/0。
+异常或畸形对局结果以 match_error 拒绝，训练继续；零有效局以 insufficient_finished 拒绝。
+未训练优先于 interval 跳过，不执行对局或创建 gate 报告。
+
+每次实际 gate 追加 `<log>/gates/iter_XXXX_<uuid>.json`，含 summary、原始 match 及可选 error。
+仅开启时迭代记录新增 selfplay_model_iteration、gate；控制台打印模型轮次、accepted
+迁移及平均分，TensorBoard 增加 Gate/average_score 和 Gate/accepted_iteration。latest.pt/agent_final.pt
+仍是训练最新模型，marked.pt 仍是旧 evaluation baseline，UI/推理入口不改。
+
+本实现借鉴 KataGo gatekeeper 的“训练候选 vs 数据生产 accepted”职责分离，但同步串行
+执行，不包含异步五进程架构、独立守护进程、热切换或自动重测，也不实现提前结束对局。
+固定局数的得分门槛不是显著性检验。对应关系见 docs/katago-mapping.md 第 7 节。
 
 ## 本地引擎与 GN5D 原生 UI（2026-10-24）
 
@@ -356,7 +643,8 @@
 5. 可选的 debug/统计输出接口。
 6. 更紧凑的状态键（当前为 `std::string`，键构造成本由游戏承担）。
 7. 5D 批量推理已支持，但每个 server 线程持有一份独立 ONNX 会话；模型热切换
-   与训练期数据写出（KataGo 的 `SelfplayManager`）尚未实现。
+   尚未实现。自对弈样本已按局流式落盘（见文件回放），但没有 KataGo
+   `SelfplayManager` 那样跨轮的后台数据管线。
 8. 参考 runner 的 Dirichlet 噪声是对称分布（`alpha=0.3`），本库的根噪声是
    KataGo 策略形状分布，两者只能近似对应；`Chess5DAgent` 默认关闭根噪声，
    自对弈训练时可自行开启并调整 `rootDirichletNoiseTotalConcentration`。
@@ -365,13 +653,136 @@
    网络，不跨对局批量推理；`cpp_onnx` 后端用 C++ 对局线程 + 批量评估器，
    可跨对局合批，但整个批次仍只用一个执行设备，且 `record_games` 只能
    记录样本、没有逐着法历史（C++ 桥不生成 `moves`）。
-10. 5D 回放缓冲区保存在内存中，并以逐样本 zlib 记录独立序列化为
-    `replay_buffer.pt`（不进入 checkpoint）；尚不支持 `.npz` 等外部自对弈
-    数据格式。
+10. 回放默认写入单文件 `replay_store/replay.log`（自研帧格式：CRC32、跨进程
+    写锁、行级裁剪，`.compact` + `os.replace` 原子重写），内存中只保留帧索引；
+    `--replay-backend memory` 时仍按逐样本 zlib 序列化为 `replay_buffer.pt`。可选
+    lossy replay window 只维护当前 FIFO 窗口，不提供完整历史数据仓库或旧窗口恢复；
+    可从旧版 `g<id>-<count>.npz` 目录自动导入，尚不支持从外部数据集导入。
 11. Python 侧 MCTS 不做置换合并、评估缓存或批量叶子评估；大规模训练时
     这些是最先需要补齐的性能项。
 
 ## 变更记录
+
+### 2026-10-26 · 回放样本库默认上限改为 100,000
+
+- `TrainConfig.replay_buffer_size` 与 `ReplayBuffer` 的默认容量从 50,000 改为
+  100,000；CLI `--replay-size` 未指定时继承该默认值，`run_train.bat` 无需改动。
+- 开启窗口时 `min_rows` 随之变为 100,000，`--window-max-samples` 必须不小于它；
+  需要更小窗口时显式调小 `--replay-size` 或调大上限。
+- 同步更新 README、TECHNICAL 与 `docs/katago-mapping.md` 中的默认值和示例。
+
+### 2026-10-26 · 只有训练过的回放行才允许淘汰
+
+- 修正抽样造成的未训练样本丢失：此前窗口裁剪、push 容量兜底和加载缩小容量都
+  按 FIFO 直接删行，一轮产出大于训练预算时，大量样本在从未被训练前就被淘汰。
+- `train_counts.py` 新增 `evictable_prefix()`（只允许淘汰前导已训练行，遇到 0 计数
+  即停止）与 `untrained_first()`（稳定分区，让训练预算先覆盖未训练积压）。
+- `ReplayBuffer` 的 push 超容量、`trim_to`、`_load_compact` 与 `GameStore` 的
+  `trim_to`/`_trim_above` 全部改为只删计数大于 0 的行；未训练的前排行保护其后的
+  所有行，窗口与 `capacity` 因此成为软上限。无计数（旧快照/legacy 格式）的行一律
+  保留，不视为已训练。
+- 启动时先恢复 `train_counts` 再裁剪，避免文件后端把未训练行当成可淘汰行。
+- 跨轮排除集只包含上一轮实际训练过的行；上一轮选中但未读到的行在下一轮重新参与
+  抽样。发布 shuffle 轮时按 `untrained_first` 排序，优先训练积压样本。
+- 验证：Python 863 项通过；新增/改写计数、窗口、文件后端与流水线断言，覆盖软容量、
+  未训练行保护、加载截断与跨阶段重新提供未训练行。
+
+### 2026-10-26 · 按局内进度过采样接近终局的行
+
+- 新增 `suzero_5dchess/endgame_sampling.py`：`EndgameSamplingConfig` 与进度/权重、
+  轮内重复、按权重无放回抽样等纯函数。
+- `ReplayBuffer` 记录逐行 `progress` 并随快照保存；`ReplayDataSource`（uniform /
+  shuffle 子集）与 `publish_shuffle` 改用加权抽样。`GameFileDataSource` 发布轮次时
+  通过 `GameStore.row_move_counts()` 读取 `move_count` 并为靠后的行追加副本。
+- 轮次 sidecar 与 generation 身份包含 `endgame` 设置；`_validate_round` 仅在该设置
+  存在时允许重复行。
+- `TrainConfig.endgame`、CLI `--endgame-*` 与 `run_train.bat` 的
+  `ENDGAME_SAMPLING/WEIGHT/EXPONENT` 接线；库默认关闭，启动脚本默认开启。
+
+### 2026-10-26 · 追踪每个回放样本被训练的次数分布
+
+- 新增 `suzero_5dchess/train_counts.py`：`summarize()` 输出当前窗口的
+  `samples/trained/untrained/total_trains/mean/median/p90/max` 与
+  `0…9/10+` 直方图；`record()` 只累加数据源真正呈现给训练循环的行。
+- 三种数据源接入计数：内存 uniform/shuffle 按 buffer 行号，文件 shuffle 按
+  manifest 的 pool 行号，`GameStore` 按窗口行号；裁剪时同步删除对应计数。
+- 持久化：内存后端随 `ReplayBuffer.state_dict()` 保存；文件后端写独立的
+  `train_counts.npz`（`(game_id, local_row)` 标识，加载时按当前窗口合并，损坏只
+  告警）。每轮 JSONL 的 `training.train_counts` 与控制台日志都会输出分布，
+  TensorBoard 增加 `Replay/train_count_*`。
+- 验证：Python 826 项通过（新增 `test_train_counts.py` 11 项，并补充窗口/文件
+  后端流水线的计数断言）。
+
+### 2026-10-25 · 回放改为单文件行日志，裁剪按行成批进行
+
+- `replay_store` 从“每局一个 NPZ”改为单个追加型 `replay.log`：每局一帧，帧头带
+  CRC32、总行数、已裁掉的前导行数与 `game_id`/`iteration`，payload 是逐行的 zlib
+  记录。新增 `suzero_5dchess/row_log.py` 承载帧编解码、`replay.lock` 跨进程写锁、
+  增量索引与重写式裁剪；`GameStore` 只保留窗口策略、旧布局迁移、轮次 sidecar 与
+  checkpoint 状态。
+- 窗口单位改为局面行：`trim_to` 删除最老的行，可以切掉最老一局的前导行（`skipped`
+  保留幸存行的编号），不再整局丢弃；训练源按帧偏移读取。
+- 裁剪留缓冲、成批进行：窗口可超出目标约 1/5，超出后一次删回目标；追加路径的
+  `_trim_above` 删到目标下方留出下一批空间，避免每局重写日志。
+- 多进程：子进程在同一把文件锁下追加，写前增量同步并修复崩溃留下的残帧（CRC
+  判定）；父进程在子进程退出后才重写日志。并行 worker 可以交错写入 id，
+  `next_game_id` 取日志中的最大 id 而不是最后一帧。
+- 迁移：首次扫描把旧 `g<id>-<count>.npz` 导入日志后移到 `legacy/`；旧 checkpoint 的
+  `suzero_game_store_v1` 状态仍可载入（忽略文件清单），旧 `last_round.json` 忽略。
+- 验证：Python 801 项通过（新增 `test_row_log.py` 10 项，以及行级裁剪、留缓冲、
+  迁移、id 交错等测试）；用现网 4,167 局 / 35,007 行的旧目录实测：导入 4.8 s、
+  重扫 31 ms、18.1 MB 日志裁剪一次 0.05 s，两进程并发各写 40 局无丢失无重复。
+
+### 2026-10-25 · 回放跨轮去重可关闭，启动脚本 gate 间隔改为 3
+
+- 新增 `TrainConfig.no_repeat_rows`（库默认 `true`，`run_train.bat` 默认
+  `NO_REPEAT_ROWS=0`），CLI `--repeat-rows` / `--no-repeat-rows`。关闭时
+  `GameFileDataSource` 与
+  `publish_shuffle`/`FileReplayDataSource` 的每一轮都从整池抽样，不再扣除上一轮
+  选中的行；`round` 日志与 summary 如实报告 `no_repeat_rows=false`。
+- `run_train.bat` 的 `GATE_INTERVAL` 默认值由 1 改为 3（库默认仍为 1），并新增
+  `NO_REPEAT_ROWS` 透传；gate 间隔按已完成训练轮计数，被拒绝的候选要等到下一个
+  间隔才复评。
+- 验证：Python 784 项通过；新增文件后端跨轮重复、发布式路径不传排除集、CLI 开关
+  与启动脚本透传四类测试。
+
+### 2026-10-25 · 续训按已保存对局数补齐（进度不从 0 重数）
+
+- checkpoint 的 `extra_state` 新增 `selfplay_progress = {"iteration", "games"}`，
+  记录最近一次自对弈把多少局写进了当前（可能未完成的）轮次。
+- 续训进入首个未完成轮时先读该记录，缺失时回退为统计 `GameStore` 中
+  `iteration` 相同的对局；`already` 截断到 `num_games`，本轮只再自对弈
+  `num_games - already` 局，`game_id_start` 顺延，进度行先 `advance(already)`
+  再叠加回调增量，因此显示的是 `257/1000` 而不是 `0/1000`。若已全部保存
+  （停止发生在最后一局之后），直接进入训练，不再重跑自对弈。
+- 补齐时自对弈 seed 偏移 `already * 1_000_003`，避免与已保存对局复用同一条
+  RNG 流而产生重复对局；`total_games` 仍只在真正新生成时累加，不会重复计数。
+- 验证：Python 780 项通过；新增“部分保存后续训补齐”和“全部已保存则不重跑”
+  两项流水线测试，覆盖 `num_games`、`game_id_start` 与进度回调累计值。
+
+### 2026-10-25 · 文件回放默认：逐局落盘与自对弈期间协作式 Ctrl+C
+
+- `replay_backend` 默认改为 `file`：每局结束立即写成
+  `replay_store/g<game-id>-<count>.npz`（`.tmp` + `os.replace`），训练直接从磁盘
+  读取；`replay_buffer.pt` 只保存计数、文件索引与窗口状态。`--replay-backend
+  memory` 保留旧的内存路径。文件后端与 `window.sampling="uniform"` 的组合现在
+  在配置校验时报错，避免选项被静默忽略。
+- C++ 桥新增逐局流式回调：`runSelfPlay` 的 `BridgeGameCallback` 携带
+  `(done, index, payload)`，`GAME_STREAM_FORMAT_VERSION = 1`；请求流式时不再返回
+  整批样本数组。单进程 `cpp_onnx` 与多进程子进程都用同一路径直接写共享
+  `GameStore`，父进程只重新扫描并载入元数据。
+- Ctrl+C 改为自对弈期间协作停止：原生调度器在取号前检查停止谓词，已开始的对局
+  自然跑完，返回连续的 game-index 前缀；`run_selfplay` 返回值新增 `stopped`。
+  多进程父进程在首次检测到停止后，等各子进程写出第一行进度（此时 Python 处理器
+  已安装）再向子进程组发送一次 `CTRL_BREAK`（POSIX 为 `SIGINT`），子进程在
+  `result.json` 中记录 `stopped`；
+  只有已停止时才允许返回短前缀。流水线在自对弈结束后发现停止就跳过训练，保存
+  checkpoint 与 replay 状态，下次启动从该进度续训。
+- 更新 `README.md`、`TECHNICAL.md`、`run_train.bat` 与 CLI 帮助文本，描述
+  文件布局、流式写入、`--replay-backend` 以及新的 Ctrl+C 语义。
+- 验证：Python 768 项通过；C++ `suzero_5dchess_tests` 1196 项检查通过。新增
+  覆盖包括逐局落盘、子进程流式、停止信号只发一次、短前缀校验与
+  “中断后下次续训仍保留已保存对局”。
 
 ### 2026-10-25 · 文档重新定位为 5D 国际象棋 AI
 

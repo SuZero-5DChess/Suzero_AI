@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import signal
 import subprocess
 import sys
 import threading
@@ -100,6 +101,8 @@ def _raw(
 
 
 class _FakeBinding:
+    TREE_POSITION_FORMAT_VERSION = 1
+
     def __init__(
         self, raw: dict[str, object], *, reject_server_threads: bool = False
     ) -> None:
@@ -443,6 +446,98 @@ def test_processes_two_delegates_without_progress_callback(
     assert advances == []
 
 
+def test_wait_for_children_signals_each_child_once(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(mp, "POLL_SECONDS", 0.0)
+    plan = [
+        mp.ProcessPlan(index=0, workers=1, games=2, server_threads=1, seed=0),
+        mp.ProcessPlan(index=1, workers=1, games=2, server_threads=1, seed=1),
+    ]
+    child_dirs = [tmp_path / "child_00", tmp_path / "child_01"]
+    for child_dir in child_dirs:
+        child_dir.mkdir()
+        # The parent only signals a child after its first progress line, which
+        # is written after the child installed its Python signal handlers.
+        (child_dir / mp.PROGRESS_NAME).write_text(
+            json.dumps({"done": 0, "games": 2}), encoding="utf-8"
+        )
+    stop = [False]
+
+    def on_poll(_index: int) -> None:
+        stop[0] = True
+
+    procs: list[_FakeProc] = [
+        _FakeProc([None, None, 0], on_poll),
+        _FakeProc([None, None, 0], on_poll),
+    ]
+    reported = mp._wait_for_children(
+        procs, child_dirs, plan, None, stopped=lambda: stop[0]
+    )
+
+    expected = (
+        signal.CTRL_BREAK_EVENT if os.name == "nt" else signal.SIGINT
+    )
+    assert reported == 0
+    for proc in procs:
+        assert proc.signals == [expected]
+
+
+def test_wait_for_children_does_not_signal_before_first_progress(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(mp, "POLL_SECONDS", 0.0)
+    plan = [mp.ProcessPlan(index=0, workers=1, games=2, server_threads=1, seed=0)]
+    child_dir = tmp_path / "child_00"
+    child_dir.mkdir()
+    proc = _FakeProc([None, 0])
+
+    reported = mp._wait_for_children(
+        [proc], [child_dir], plan, None, stopped=lambda: True
+    )
+
+    # The child exited before writing progress; it must not receive a signal
+    # that the default action would turn into an abrupt interpreter kill.
+    assert reported == 0
+    assert proc.signals == []
+
+
+def test_stopped_child_may_return_a_short_game_prefix(tmp_path: Path) -> None:
+    child = tmp_path / "child_00"
+    child.mkdir()
+    payload = {
+        "status": "ok",
+        "streamed": True,
+        "stopped": True,
+        "requested_games": 3,
+        "samples": 2,
+        "games": [_streamed_entry(0, 2)],
+        "stats": {"rows": 0},
+    }
+    (child / mp.RESULT_NAME).write_text(json.dumps(payload), encoding="utf-8")
+
+    results = mp._load_child_results(child, 3)
+    assert len(results) == 1
+    assert results[0].sample_count == 2
+    assert results[0].samples == []
+    assert results[0].persisted is True
+
+
+def test_unstopped_child_must_return_every_game(tmp_path: Path) -> None:
+    child = tmp_path / "child_00"
+    child.mkdir()
+    payload = {
+        "status": "ok",
+        "streamed": True,
+        "samples": 2,
+        "games": [_streamed_entry(0, 2)],
+        "stats": {},
+    }
+    (child / mp.RESULT_NAME).write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="expected at most|expected 3"):
+        mp._load_child_results(child, 3)
+
+
 # -------------------------------------------------------------- result merge
 
 
@@ -479,6 +574,123 @@ def test_local_game_indices_are_kept_in_order(
     assert [len(result.samples) for result in results] == [2, 1]
 
 
+def _streamed_entry(index: int, samples: int) -> dict[str, object]:
+    return {
+        "index": index,
+        "white_outcome": 0.0,
+        "terminal_reason": "draw",
+        "semimoves": 1,
+        "turns": 1,
+        "board_limit": 15,
+        "board_count": 1,
+        "final_player": 0,
+        "samples": samples,
+        "tree_samples": 0,
+        "moves": [],
+        "final_fen": "",
+    }
+
+
+def test_streamed_child_results_need_no_sample_transport(tmp_path: Path) -> None:
+    child = tmp_path / "child_00"
+    child.mkdir()
+    payload = {
+        "status": "ok",
+        "streamed": True,
+        "samples": 3,
+        "games": [_streamed_entry(0, 2), _streamed_entry(1, 1)],
+        "stats": {"rows": 3},
+    }
+    (child / mp.RESULT_NAME).write_text(json.dumps(payload), encoding="utf-8")
+
+    assert not (child / mp.ARRAYS_NAME).exists()
+    results = mp._load_child_results(child, 2)
+    assert [result.sample_count for result in results] == [2, 1]
+    assert [len(result.samples) for result in results] == [0, 0]
+    assert all(result.persisted for result in results)
+
+
+def test_child_streams_finished_games_straight_into_the_store(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from suzero_5dchess.game_store import GameStore
+
+    def stream_payload(count: int) -> dict[str, object]:
+        raw = _raw([0] * count)
+        q = int(raw["action_counts"][0])
+        moves = np.array(
+            [
+                [0, 0, 0, 0, 1, 1, 0, 0],
+                [0, 1, 0, 0, 2, 1, 0, 0],
+                [1, 0, 0, 0, 2, 2, 0, 0],
+            ],
+            dtype=np.int64,
+        )[:q]
+        raw["actions"] = np.repeat(moves[None, :, :], count, axis=0)
+        return raw
+
+    payloads = [stream_payload(1), stream_payload(2)]
+    output_dir, request = _make_child(tmp_path, payloads[0], "child_00")
+    store_dir = tmp_path / "replay_store"
+    store_dir.mkdir()
+    request_payload = json.loads(request.read_text(encoding="utf-8"))
+    request_payload["binding_kwargs"]["num_games"] = 2
+    request_payload["replay_store"] = {
+        "directory": str(store_dir.resolve()),
+        "variant": VERY_SMALL.name,
+        "iteration": 4,
+        "game_id_start": 7,
+    }
+    request.write_text(json.dumps(request_payload), encoding="utf-8")
+
+    class StreamingBinding:
+        def __init__(self) -> None:
+            self.calls: list[dict[str, object]] = []
+
+        def run_selfplay(self, **kwargs: object) -> dict[str, object]:
+            self.calls.append(kwargs)
+            callback = kwargs["on_game"]
+            assert callable(callback)
+            for index, payload in enumerate(payloads):
+                callback(index + 1, index, payload)
+            return {
+                "stats": {"rows": 3},
+                "games": [
+                    dict(
+                        payload["games"][0],
+                        index=index,
+                        samples=int(payload["used_board_counts"].shape[0]),
+                    )
+                    for index, payload in enumerate(payloads)
+                ],
+            }
+
+    binding = StreamingBinding()
+    monkeypatch.setattr(mp, "_load_binding", lambda: binding)
+
+    assert mp.run_worker(request) == 0
+    assert binding.calls[0]["stream_games"] is True
+
+    # No per-child blobs cross back to the parent.
+    assert not (output_dir / mp.ARRAYS_NAME).exists()
+    result_payload = json.loads(
+        (output_dir / mp.RESULT_NAME).read_text(encoding="utf-8")
+    )
+    assert result_payload["streamed"] is True
+    assert result_payload["samples"] == 3
+
+    store = GameStore(store_dir, VERY_SMALL, 16)
+    store.scan()
+    assert [entry.game_id for entry in store.games] == [7, 8]
+    assert [entry.count for entry in store.games] == [1, 2]
+    assert len(store) == 3
+
+    results = mp._load_child_results(output_dir, 2)
+    assert [result.sample_count for result in results] == [1, 2]
+    assert all(result.persisted for result in results)
+    assert all(result.samples == [] for result in results)
+
+
 # ------------------------------------------------------------------ progress
 
 
@@ -490,6 +702,10 @@ class _FakeProc:
         self.on_poll = on_poll
         self.calls = 0
         self.returncode: int | None = None
+        self.signals: list[int] = []
+
+    def send_signal(self, signum: int) -> None:
+        self.signals.append(signum)
 
     def poll(self) -> int | None:
         index = self.calls

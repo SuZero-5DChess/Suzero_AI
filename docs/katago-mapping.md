@@ -320,7 +320,8 @@ KataGo 的棋盘动作空间固定为 `NNPos` 的稠密大小；本库允许
 | 梯度范数上限与裁剪 | `pytorch/trainer.py` 的 `_grad_norm_cap` |
 | 指标累计、`_sum`/`_batch` 平均、EMA | `pytorch/metrics.py` |
 | checkpoint 字段与续训 | `pytorch/trainer.py` 的 `save_checkpoint` / `load_checkpoint` |
-| 模型、Board 编码、`.npz` 数据、导出 | **未移植** |
+| 上游 `python/shuffle.py` 的增长窗口、训练器文件消费思路 | 5D 侧 `replay.py` 管 RAM 窗口，`file_replay.py` 发布/消费分片，`pipeline.py` 同步编排；见 5.1 |
+| 模型、Board 编码、围棋 `.npz` 数据格式、导出 | **未移植** |
 
 - 保持一致：per-sample LR `3e-5 * learning_rate_scale`（AdamW 再乘 `1.33`）、
   warmup 曲线（1/20 … 1/1.4）、LR 的 batch 指数（AdamW 0.5 / SGD 0.0）与
@@ -329,6 +330,119 @@ KataGo 的棋盘动作空间固定为 `NNPos` 的稠密大小；本库允许
 - 泛化差异：KataGo 按 normalization 类型（fixup/bnorm 等）选择 weight decay
   的表是模型相关的，本仓库改为 `weight_decay` + 参数组系数显式配置。
 - 未复制上游 Python 文件；实现基于其公式重写。
+
+### 5.1 Lossy replay window 与上游 shuffle 的对应
+
+上游路径相对 KataGo 仓库根目录，不属于前文的 `cpp/search/`。本节核对了本地
+`vibe2/5dc_ml-main/katago/KataGo-master` 快照中的：
+
+- `python/shuffle.py`：窗口增长与 shuffled 数据发布思路；
+- `python/train.py`：`-no-repeat-files` 参数、`get_files_for_subepoch` 整文件配额；
+- `python/katago/utils/training_data_generator.py`：文件队列与已用完整路径持久化；
+- `python/katago/train/data_processing_pytorch.py`：每文件只读完整 batch；
+- `python/selfplay/synchronous_loop.sh`：同步自对弈/训练循环的 no-repeat-files 用法。
+
+本项目保留**有损 RAM 窗口**，仅将训练交接改为文件式：
+`python/suzero_5dchess/replay.py` 管理逐样本 zlib FIFO 与快照，`file_replay.py` 负责
+`publish_shuffle` / `FileReplayDataSource`，`pipeline.py` 负责同步编排。不是完整
+raw-disk 数据集，不移植围棋 NPZ 样本协议或永久 raw 数据仓库。
+
+- **相同思路**：随累计生成量扩大最新窗口；把训练交接改为文件式 shuffle；读完后
+  交还同步循环等待窗口更新。
+- **范围不同（no-repeat 身份不同）**：窗口外样本永久淘汰，没有 `add_to_data_rows`
+  或 raw 历史归档，不重新加载已丢弃的旧窗口；并且只有训练计数大于 0 的行才允许
+  淘汰，未训练积压会把窗口暂时顶到目标之上。更关键的是，本实现的去重身份是
+  **窗口行**，不是上游的输出文件路径：新一轮不选上一轮**实际训练过**的行，上一轮
+  选中却没读到的行仍可重新提供；即使写到新目录也不允许重读已训练的行。只保留当前
+  shuffled 训练视图，旧轮/临时视图会删除；`keep_samples` 限制每轮子集，不复制上游
+  keep-target 的整套数据管线。
+
+`WindowConfig` 默认 `enabled=False`，保持旧固定容量 uniform 回放；开启后的默认
+参数为 `expand_per_row=0.4`、`taper_exponent=0.65`、`taper_scale=None`、
+`max_samples=500000`、`keep_samples=None`、`sampling="shuffle"`。
+`min_rows` 直接取现有的 `replay_buffer_size`（默认 100,000），不是 `min_replay_size`。
+
+令 `N` 为累计成功 push 的训练样本数，`m=min_rows`，
+`s=taper_scale if specified else m`，目标窗口精确为：
+
+```text
+W(N) = floor(clamp(
+    m + expand_per_row * (N**taper_exponent - s**taper_exponent)
+        / (taper_exponent * s**(taper_exponent - 1)),
+    m, max_samples))
+```
+
+这里先钳制到有限上下界、再向下取整。`N` 不因淘汰而减少，也不因训练反复读取而增加。
+本轮所有游戏完成 push 后、训练前才按新 `N` trim 一次；启动恢复后也 trim。
+`capacity=max_samples` 另在 push/加载时限制行数，避免裁剪前无界增长；但这些限制只
+淘汰训练计数大于 0 的前导行，因此未训练积压存在时是软上限。实际行数还受已有历史
+限制。`evicted` 为本轮容量保护与动态 trim 合计删除的行数。
+
+**上游 no-repeat-files 的粒度是文件完整路径，不是行。** 该快照的 tracked-used
+语义由 `train_state["data_files_used"]` 和 `rev_data_files_remaining` 实现，跨 epoch
+与 checkpoint 保留已用路径；生成器不重填耗尽队列。新输出目录/文件即为新路径，
+同一原始位置出现在新 shuffle 中不算旧文件重读，并非 row-global 去重。
+`get_files_for_subepoch` 对超过软 epoch 配额的**整文件**随机接受或延期，延期的文件
+保持未消费；读取器按 `num_rows // batch_size` 只输出完整 batch，文件尾不足一批
+的行被丢弃。上游没有 `partial-filefraction` 参数，不能用它解释这一行为。
+
+本实现为固定预算明确作如下适配，而非宣称逐行复制上游行为：
+
+- **发布**：`--window` 且 `--window-sampling shuffle` 且本轮确实要训练时发布；
+  默认 4096 行/NPZ 分片（内装原有 zlib blob、offsets 等数值数组），写 manifest
+  后原子切换 `current.json`。manifest 记录本轮窗口行 `rows`、窗口行数
+  `pool_samples` 和排除集摘要 `exclude_digest`。同输入、同 seed 发布重试幂等复用
+  同一轮。每轮无放回选择 `min(keep_samples, 可用行)` 行（未指定则全部可用行）；
+  这里的"可用行"是当前窗口去掉上一轮实际训练过的行之后的行。上一轮选中但因预算
+  或中断没有读到的行仍是 0 训练计数，下一轮会重新提供。
+- **消费与多轮 epoch**：`FileReplayDataSource` 按已洗牌分片连续读；
+  generation/file/row 游标跨 epoch 保留，不重排、不重置、不回绕。本轮读完后若
+  epoch 预算未用完，就在训练线程内发布下一轮（排除刚读完那轮已训练的行）继续。
+  因此一个 epoch 可以包含多轮 shuffle，而相邻两轮已训练的行集合不交。
+- **跨 iteration 平移**：新阶段发布前，用
+  `pool_samples + (N_now - N_then) - len(buffer)` 计算窗口头部淘汰数，把上一轮
+  行索引整体前移；已淘汰的行退出排除集。窗口只从头部删除，所以平移是精确的。
+- **文件后端**：默认的 `--replay-backend file` 把每个完成对局追加为一帧到单文件
+  `replay_store/replay.log`，同样按行级规则抽轮；上一轮选择的 `(game_id, row)`
+  原子写入 `replay_store/last_round.json`，下一阶段只排除其中已训练的行，读取按
+  帧顺序且只持有当前对局。
+- **预算与尾行**：每个 epoch 的上限仍是 `requested_steps`（无可选行时为 0）。
+  跨片拼 batch，不以整文件随机接受方式超出预算；当前分片未读行延续到下一 epoch，
+  最后不足 batch 时允许 partial，不重复补样，不像上游丢弃文件尾行。不会为了凑
+  预算重读上一轮已训练的行；上一轮没读到的未训练行会被重新提供。
+- **同步耗尽**：排除上一轮后没有可选行时停止本轮训练并标记
+  `waiting_for_shuffle`；下一轮外层自对弈更新窗口后再发布。不在训练线程内无限
+  等数据，也不循环旧轮文件。epoch/step/batch 参数值不改，不足时少训。
+- **uniform**：`--replay-backend memory` 且 `sampling="uniform"` 时仍从整个当前
+  buffer 在内存采样，每 batch 内无放回、批间可重复，不应用 keep 子集或文件队列。
+  文件后端始终走文件顺序抽轮，因此它与 `uniform` 的组合会被配置校验拒绝。
+  默认 `WINDOW_MODE=0`，配置/CLI 名称和默认值不变；文件后端在窗口关闭时仍按
+  文件抽轮。
+
+恢复时累计生成计数仍取
+`max(extra.total_samples, buffer.total_generated, len(buffer))`；历史计数都缺失时，
+不能从现存行重建已淘汰的生成历史。文件后端把每局 NPZ 留在 `replay_store/`，
+`replay_buffer.pt` 只保存计数、文件索引与窗口状态；`memory` 后端则把整个当前
+窗口序列化进 `replay_buffer.pt`，不只保存 keep 子集。replay 的 `shuffle_state`
+和模型 extra 的 `replay_shuffle` 保存消费 generation/file/row 状态。这只保证
+checkpoint 边界恢复，不是每个 optimizer step 的 exactly-once 崩溃事务。不新增
+旧窗口恢复入口；残留旧权重/快照不意味着能还原任意历史窗口，删除旧轮也不会触发
+从 raw 历史补回数据。
+
+`training.shuffle` 记录 `generation`、`files`、`file_index`、`row_offset`、`files_used`、
+`pool_samples`、`round_samples`、`remaining_samples`、`rounds`、`no_repeat_rows`、
+`waiting_for_shuffle`；coverage 使用实际训练呈现行数而非请求配额。
+
+窗口大小不是复用预算：令每轮实际训练呈现量为 `T`、生成量为 `G`，稳态近似平均
+复用为 `T / G`，`W` 改变存留时间、覆盖比例和时间跨度，不自动扩大训练量。默认
+10 × 10 × 256 = 25,600 是上限；只有实际用满且假设 `G=11,400` 时才约为
+`25,600 / 11,400 ≈ 2.25`。行级 no-repeat、keep 或剩余数据不足可使 `T < 25,600`，
+必须代入实际 `T`。11,400 仅为示例，不是本轮实测，不承诺非稳态满足近似。
+
+RAM 仍保存 zlib 窗口，磁盘增加当前 shuffled 副本；切轮时新旧两轮短暂并存有双份
+视图峰值。容量估算应基于代表性样本的 **zlib 实测字节数**，另计 NPZ/manifest、
+对象/索引、发布/保存临时副本、分片加载与 batch 解码/padding；不使用每行 60 KB
+假设，不提供未经测量的压缩比。该适配不改正式训练、自对弈、对战预算或 gate 行为。
 
 ---
 
@@ -361,7 +475,89 @@ KataGo 的棋盘动作空间固定为 `NNPos` 的稠密大小；本库允许
 - 上游某行评估失败会单独标记；本库 backend 抛异常时同 batch 所有请求一起
   收到该异常（模型推理本身是整批原子的，失败通常不是单行可恢复的）。
 
-## 7. 许可证注意事项
+### 6.1 树内位置训练行（recordTreePositions）
+
+本节路径相对 KataGo 仓库根目录，参考 `cpp/program/play.cpp` 的
+`recordTreePositionsRec` / `recordTreePositions`，以及
+`cpp/dataio/trainingwrite.{h,cpp}` 的 `SidePosition` 写出逻辑。
+
+| KataGo | SuZero 5D 训练后端 | 适配 |
+|---|---|---|
+| `recordTreePositions` | `record_tree_positions` / `recordTreePositions` | 默认开启，只复用 full-search 树，不增加搜索；可用 `--no-record-tree-positions` 关闭 |
+| `recordTreeThreshold` | `record_tree_min_visits` | 同时限制到达边及节点出边总访问数，默认 64 |
+| `recordTreeTargetWeight` | `record_tree_sample_probability` | 默认 0.25 概率保留，保留后按普通行训练；不改 loss |
+| wrapper 的 `maxDepth=5` | `record_tree_max_depth` | 默认 5 个小步，含 SUBMIT，可配置 1–64 |
+| `plaAlwaysBest` / `oppAlwaysBest` | 按真实 player 更新的 always-best 标记 | 5D 同方可连续走多个小步，不按深度交换 |
+| `SidePosition.whiteValueTargets` | `Node.q` / `NodeStats.utilityAvg()` | 搜索价值已是候选当前行棋方视角，不能用实战结果替代 |
+| `extractPolicyTarget` | 节点自身出边访问次数归一化 | 不移植 play-selection 调整或 int16 策略压缩 |
+
+额外限制：不记录根，排除本次实际着法的整个根分支；跳过终局、未展开及仅 SUBMIT
+位置；局面键去重、防环，单次最多检查 4096 个节点、默认最多保留 4 行。上限按搜索
+决策小步计算，不是按整回合。C++ 图节点不持状态，沿动作克隆/重放并在换根前编码；
+策略使用节点局部 edge visits，不能使用共享子节点的全局 visits 替代。该功能默认
+开启，可用 `--no-record-tree-positions`（启动脚本 `TREE_POSITIONS=0`）关闭；
+默认开启时旧扩展缺少 `TREE_POSITION_FORMAT_VERSION=1` 会明确报错，需重建或关闭。
+
+KataGo 将 fractional targetWeight 随机整数化为训练行数，本实现借鉴这一低侵入
+策略，但加入访问/深度/数量限制，不声称与其完整数据分布严格等价。提取使用独立
+随机流，既不修改主搜索统计，也不改变实战随机序列。复用的是已有含根噪声影响的
+搜索，不额外进行“去噪搜索”。克隆、去重与编码仍有成本。
+
+数值来源数组经 C++ binding / 多进程 NPZ 转为现有 PositionSample metadata，
+随后沿原压缩 replay 保存，无 ONNX 或 replay 格式升级。真实对局归档保持不变。
+
+**本次未实现**：`sidePositionProb` 选择替代动作后的赛后独立搜索，以及
+`reanalyzeCheapSearchPositions` 对 fast 实战位置的重搜索；两者都不是树内位置复用，
+不可因同样写入上游 `sidePositions` 就混为一个功能。
+
+## 7. 同步 gatekeeper 与模型准入
+
+此节上游参考路径相对 KataGo 仓库根目录：`cpp/command/gatekeeper.cpp`，
+不属于搜索模块。借鉴的是模型角色和数据生产权限，不是复制完整分布式训练架构。
+
+| KataGo 角色/行为 | SuZero AI 对应 |
+|---|---|
+| 训练持续产生候选模型 | trainer.model，latest.pt / agent_final.pt 仍保存训练最新状态 |
+| accepted models 供 selfplay 读取 | accepted/state.json 唯一指针及 accepted/agent_iter_XXXX.pt 不可变快照 |
+| candidate 与 accepted 比赛准入 | gating.ModelGate，同步调用现有 C++ play_model_match |
+| accepted 更新后切换数据生产模型 | 下一轮开始 resolve；Python/C++ 后端均只使用 accepted |
+| 被拒模型不能成为数据生产模型 | 保留完整训练候选，不提升 accepted，不回滚训练，不重测 |
+
+配置默认 `gate_interval=1`，即每轮训练后都做一次准入；`--gate-interval 0`（bat 的
+`GATING=0`，或 `debug_train_config()` 预设）关闭时完全沿用旧的训练网络自对弈路径，
+不创建 accepted 或 gate 日志，也不增加迭代记录字段。开启后首次在恢复 trainer 后
+bootstrap accepted；
+每轮先用 accepted 自对弈，再训练和导出候选，到全局间隔则评测，之后照常周期对战、
+evaluation 与保存。marked.pt 不参与准入，也不替代 accepted。
+
+计分使用候选 participant 0 的每局 utility：胜 +1、负 −1、和 0，截断不计分也不计有效局数。
+`finished>0`、达到 gate_min_finished 且 mean(score)>=gate_min_average_score 才提升；
+等于门槛通过。
+棋盘数量上限触发的 material 是正常终局，保留连续 tanh 得分而不是压成 1/0。
+gate 默认 100 局、200 simulations、20 workers、50 棋盘上限、CUDA、温度 0.1、
+平均分门槛 0.05、至少 50 有效局。max_moves=0 关闭动作截断。固定样本门槛不提供
+统计显著性保证。
+
+持久化先保存每个实际参赛候选的完整训练 checkpoint，再写 accepted 快照并原子更新
+state；成功或失败都保留候选。若在提升后正常训练保存前中断，可以恢复对应完整候选，
+而不是把只含权重的 accepted 快照当作完整 optimizer 恢复点。state iteration 领先恢复
+checkpoint、变体/网络配置不匹配、快照损坏或发布失败均中止，不自动改用训练候选。
+state 缺失才 bootstrap；同名历史 accepted 快照内容不一致时拒绝覆盖，应使用新 run。
+
+每次实际评测追加 `<log_dir>/gates/iter_XXXX_<uuid>.json`，含完整对局及判定摘要。
+迭代 JSONL 仅开启时增加 selfplay_model_iteration 和 gate，checkpoint 的 accepted 摘要
+只作诊断。对局执行/导出异常记录 match_error 后继续训练；有效局不足 fail-closed；
+未训练或未到间隔只记录 skip。所有 gate 加载/导出隔离 Torch CPU RNG。
+
+与上游的刻意差异：
+
+- 本实现阻塞训练循环执行 gate，不是异步五进程架构，也没有独立守护进程或在线热切换。
+- 不扫描模型目录排队或按文件时间挑选 accepted；state.json 是唯一权威来源。
+- 不移动候选到独立 rejected 目录，不删除失败候选，也不自动重测被拒模型。
+- 不复刻上游在胜负已确定时提前停止剩余对局的机制；按配置运行固定预算。
+- 5D 棋 material 终局/截断语义不同于围棋强制终局计分，不能机械搬用其统计口径。
+
+## 8. 许可证注意事项
 
 - KataGo 搜索模块属于其 MIT 许可内容（Copyright 2025 David J Wu 等）。
 - 本项目**没有**复制 KataGo 的 `cpp/external/*`（CUDA、OpenCL、cutlass、

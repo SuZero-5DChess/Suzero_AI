@@ -627,6 +627,36 @@ void testSelfPlayBridgeSmoke() {
   }
 }
 
+void testSelfPlayBridgeCooperativeStop() {
+  SelfPlayBridgeConfig config;
+  config.evaluator.model_path = modelPath();
+  config.numGames = 4;
+  config.numGameThreads = 1;
+  config.numSimulations = 2;
+  config.fastSimulations = 1;
+  config.playoutCapRandomization = false;
+  config.minBoardLimit = 6;
+  config.maxBoardLimit = 8;
+  config.maxBatchSize = 2;
+  config.seed = 13;
+
+  std::atomic<int> finished{0};
+  const std::vector<BridgeGame> games = runSelfPlay(
+      config,
+      [&finished](int completed, const BridgeGame&) {
+        finished.store(completed);
+      },
+      nullptr,
+      [&finished]() { return finished.load() >= 1; });
+
+  // The game already in flight finished; no later game started.
+  CHECK(games.size() == 1);
+  CHECK(finished.load() == 1);
+  if (!games.empty()) {
+    CHECK(games.front().index == 0);
+  }
+}
+
 void testSelfPlayBridgeRecordingAndReplay() {
   SelfPlayBridgeConfig config;
   config.evaluator.model_path = modelPath();
@@ -838,6 +868,7 @@ int main(int argc, char** argv) {
     testBatchedOnnxEvaluatorMatchesSingle();
     testBatchedSelfPlaySmoke();
     testSelfPlayBridgeSmoke();
+    testSelfPlayBridgeCooperativeStop();
     testSelfPlayBridgeRecordingAndReplay();
     testAgentSearchAndTreeReuse();
     testAgentShortGame();
